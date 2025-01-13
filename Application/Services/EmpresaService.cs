@@ -1,4 +1,6 @@
-﻿using WebMesaGestor.Application.DTO.Input;
+﻿using System.Globalization;
+using System;
+using WebMesaGestor.Application.DTO.Input;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
@@ -15,33 +17,37 @@ namespace WebMesaGestor.Application.Services
             _empresaRepository = empresaRepository;
         }
 
-        public async Task<IEnumerable<EmpresaOutputDTO>> ListarEmpresas()
+        public async Task<IEnumerable<EmpOutputDTO>> ListarEmpresas()
         {
             IEnumerable<Empresa> empresas = await _empresaRepository.ListarEmpresas();
             return EmpresaMap.MapEmpresa(empresas);
-        }
+        }   
 
-        public async Task<EmpresaOutputDTO> EmpresaPorId(Guid id)
+        public async Task<EmpOutputDTO> EmpresaPorId(Guid id)
         {
             Empresa empresa = await _empresaRepository.EmpresaPorId(id);
             return EmpresaMap.MapEmpresa(empresa);
         }
 
-        public async Task<Empresa> CriarEmpresa(EmpresaInputDTO empresa)
+        public async Task<EmpOutputDTO> CriarEmpresa(EmpCriacaoDTO empresa)
         {
             Empresa map = EmpresaMap.MapEmpresa(empresa);
             Empresa retorno = await _empresaRepository.CriarEmpresa(map);
-            return retorno;
-        }
-
-        public async Task<EmpresaOutputDTO> AtualizarEmpresa(EmpresaInputDTO empresa)
-        {
-            Empresa retorno = EmpresaMap.MapEmpresa(empresa);
-            retorno = await _empresaRepository.AtualizarEmpresa(retorno);
             return EmpresaMap.MapEmpresa(retorno);
         }
 
-        public async Task<EmpresaOutputDTO> DeletarEmpresa(Guid id)
+        public async Task<EmpOutputDTO> AtualizarEmpresa(EmpEdicaoDTO empresa)
+        {
+            Empresa buscarEmpresa = await _empresaRepository.EmpresaPorId(empresa.Id);
+
+            buscarEmpresa.Emp_nome = empresa.Emp_nome;
+            buscarEmpresa.Emp_cnpj = empresa.Emp_cnpj;
+
+            Empresa retorno = await _empresaRepository.AtualizarEmpresa(buscarEmpresa);
+            return EmpresaMap.MapEmpresa(retorno);
+        }
+
+        public async Task<EmpOutputDTO> DeletarEmpresa(Guid id)
         {
             Empresa retorno = await _empresaRepository.DeletarEmpresa(id);
             return EmpresaMap.MapEmpresa(retorno);

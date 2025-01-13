@@ -49,7 +49,7 @@ namespace WebMesaGestor.Infra.Repositories
 
         public async Task<Empresa> DeletarEmpresa(Guid id)
         {
-            Empresa empresa = await _appDbContext.Empresas.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
+            Empresa empresa = await EmpresaPorId(id);
             _appDbContext.Empresas.Remove(empresa);
             await _appDbContext.SaveChangesAsync();
             return empresa;

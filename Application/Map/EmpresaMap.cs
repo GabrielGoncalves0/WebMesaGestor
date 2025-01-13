@@ -1,4 +1,6 @@
-﻿using WebMesaGestor.Application.DTO.Input;
+﻿using System.Data;
+using System.Globalization;
+using WebMesaGestor.Application.DTO.Input;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Domain.Entities;
 
@@ -6,22 +8,39 @@ namespace WebMesaGestor.Application.Map
 {
     public static class EmpresaMap
     {
-        public static EmpresaOutputDTO MapEmpresa(this Empresa empresa)
+        public static EmpOutputDTO MapEmpresa(this Empresa empresa)
         {
-            return new EmpresaOutputDTO
+            return new EmpOutputDTO
             {
                 Id = empresa.Id,
                 Emp_nome = empresa.Emp_nome,
-                Emp_cnpj = empresa.Emp_cnpj
+                Emp_cnpj = empresa.Emp_cnpj,
+                Criacao_data = empresa.Criacao_data
             };
         }
 
-        public static IEnumerable<EmpresaOutputDTO> MapEmpresa(this IEnumerable<Empresa> empresa)
+        public static IEnumerable<EmpOutputDTO> MapEmpresa(this IEnumerable<Empresa> empresa)
         {
             return empresa.Select(x => x.MapEmpresa()).ToList();
         }
 
-        public static Empresa MapEmpresa(this EmpresaInputDTO empresa)
+        public static Empresa MapEmpresa(this EmpCriacaoDTO empresa)
+        {
+            return new Empresa
+            {
+                Id = Guid.NewGuid(),
+                Emp_nome = empresa.Emp_nome,
+                Emp_cnpj = empresa.Emp_cnpj,
+                Criacao_data = DateTime.UtcNow
+            };
+        }
+
+        public static IEnumerable<Empresa> MapEmpresa(this IEnumerable<EmpCriacaoDTO> empresa)
+        {
+            return empresa.Select(x => x.MapEmpresa()).ToList();
+        }
+
+        public static Empresa MapEmpresa(this EmpEdicaoDTO empresa)
         {
             return new Empresa
             {
@@ -30,7 +49,7 @@ namespace WebMesaGestor.Application.Map
             };
         }
 
-        public static IEnumerable<Empresa> MapEmpresa(this IEnumerable<EmpresaInputDTO> empresa)
+        public static IEnumerable<Empresa> MapEmpresa(this IEnumerable<EmpEdicaoDTO> empresa)
         {
             return empresa.Select(x => x.MapEmpresa()).ToList();
         }

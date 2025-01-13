@@ -23,14 +23,14 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] EmpresaInputDTO empresa)
+        public async Task<IActionResult> Post([FromBody] EmpCriacaoDTO empresa)
         {
             return Ok(await _empresaService.CriarEmpresa(empresa));
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] EmpresaInputDTO empresa)
+        public async Task<IActionResult> Put([FromBody] EmpEdicaoDTO empresa)
         {
             return Ok(await _empresaService.AtualizarEmpresa(empresa));
         }
