@@ -1,10 +1,11 @@
 ﻿using System.Globalization;
 using System;
-using WebMesaGestor.Application.DTO.Input;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Application.DTO.Input.Criacao;
+using WebMesaGestor.Application.DTO.Input.Edicao;
 
 namespace WebMesaGestor.Application.Services
 {

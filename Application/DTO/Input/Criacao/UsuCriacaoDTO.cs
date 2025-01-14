@@ -1,10 +1,9 @@
 ﻿using WebMesaGestor.Domain.Entities;
 
-namespace WebMesaGestor.Application.DTO.Input
+namespace WebMesaGestor.Application.DTO.Input.Criacao
 {
-    public class UsuEdicaoDTO
+    public class UsuCriacaoDTO
     {
-        public Guid Id { get; set; }
         public string Usu_nome { get; set; }
         public string Usu_email { get; set; }
         public string Usu_telefone { get; set; }

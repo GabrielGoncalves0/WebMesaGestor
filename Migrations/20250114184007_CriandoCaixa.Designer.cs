@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMesaGestor.Infra.Data;
 
@@ -11,9 +12,11 @@ using WebMesaGestor.Infra.Data;
 namespace WebMesaGestor.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250114184007_CriandoCaixa")]
+    partial class CriandoCaixa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,37 +24,6 @@ namespace WebMesaGestor.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("WebMesaGestor.Domain.Entities.Caixa", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("Abertura_data")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<decimal?>("Cai_Val_Fechamento")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Cai_Val_Inicial")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Cai_status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("Fechamento_data")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("UsuarioId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("Caixas");
-                });
 
             modelBuilder.Entity("WebMesaGestor.Domain.Entities.Empresa", b =>
                 {
@@ -117,15 +89,6 @@ namespace WebMesaGestor.Migrations
                     b.HasIndex("EmpresaId");
 
                     b.ToTable("Usuarios");
-                });
-
-            modelBuilder.Entity("WebMesaGestor.Domain.Entities.Caixa", b =>
-                {
-                    b.HasOne("WebMesaGestor.Domain.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("WebMesaGestor.Domain.Entities.Usuario", b =>

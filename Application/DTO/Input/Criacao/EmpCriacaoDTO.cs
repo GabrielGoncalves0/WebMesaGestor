@@ -1,4 +1,4 @@
-﻿namespace WebMesaGestor.Application.DTO.Input
+﻿namespace WebMesaGestor.Application.DTO.Input.Criacao
 {
     public class EmpCriacaoDTO
     {

@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using WebMesaGestor.Domain.Entities;
+﻿using WebMesaGestor.Domain.Entities;
 
-namespace WebMesaGestor.Application.DTO.Input
+namespace WebMesaGestor.Application.DTO.Input.Edicao
 {
-    public class UsuCriacaoDTO
+    public class UsuEdicaoDTO
     {
+        public Guid Id { get; set; }
         public string Usu_nome { get; set; }
         public string Usu_email { get; set; }
         public string Usu_telefone { get; set; }

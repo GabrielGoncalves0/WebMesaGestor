@@ -1,0 +1,61 @@
+﻿using WebMesaGestor.Application.DTO.Input.Criacao;
+using WebMesaGestor.Application.DTO.Input.Edicao;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Domain.Entities;
+
+namespace WebMesaGestor.Application.Map
+{
+    public static class CaixaMap
+    {
+        public static CaiOutputDTO MapCaixa(this Caixa caixa)
+        {
+            return new CaiOutputDTO
+            {
+                Id = caixa.Id,
+                Cai_Val_Inicial = caixa.Cai_Val_Inicial,
+                Cai_Val_Fechamento = caixa.Cai_Val_Fechamento,
+                Abertura_data = caixa.Abertura_data,
+                Fechamento_data = caixa.Fechamento_data,
+                Cai_status = caixa.Cai_status,
+                Usuario = UsuarioMap.MapUsuario(caixa.Usuario)
+            };
+        }
+
+        public static IEnumerable<CaiOutputDTO> MapCaixa(this IEnumerable<Caixa> caixa)
+        {
+            return caixa.Select(x => x.MapCaixa()).ToList();
+        }
+
+        public static Caixa MapCaixa(this CaiCriacaoDTO caixa)
+        {
+            return new Caixa
+            {
+                Id = Guid.NewGuid(),
+                Cai_Val_Inicial = caixa.Cai_Val_Inicial,
+                UsuarioId = caixa.UsuarioId,
+                Abertura_data = DateTime.UtcNow,
+                Cai_status = CaixaStatus.Aberto
+            };
+        }
+
+        public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiCriacaoDTO> caixa)
+        {
+            return caixa.Select(x => x.MapCaixa()).ToList();
+        }
+
+        public static Caixa MapCaixa(this CaiEdicaoDTO caixa)
+        {
+            return new Caixa
+            {
+                Cai_Val_Fechamento = caixa.Cai_Val_Fechamento,
+                Fechamento_data = DateTime.UtcNow,
+                Cai_status = CaixaStatus.Fechado
+            };
+        }
+
+        public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiEdicaoDTO> caixa)
+        {
+            return caixa.Select(x => x.MapCaixa()).ToList();
+        }
+    }
+}

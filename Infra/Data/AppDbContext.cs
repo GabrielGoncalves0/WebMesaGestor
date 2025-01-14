@@ -11,5 +11,6 @@ namespace WebMesaGestor.Infra.Data
 
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Caixa> Caixas { get; set; }
     }
 }
