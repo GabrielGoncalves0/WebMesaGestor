@@ -17,7 +17,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Contrato interface e Repository
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+// Services
 builder.Services.AddScoped<EmpresaService>();
+builder.Services.AddScoped<UsuarioService>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
