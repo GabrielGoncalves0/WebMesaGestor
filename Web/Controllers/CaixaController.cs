@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebMesaGestor.Application.DTO.Input.Criacao;
-using WebMesaGestor.Application.DTO.Input.Edicao;
+using WebMesaGestor.Application.DTO.Input.Caixa;
 using WebMesaGestor.Application.Services;
 
 namespace WebMesaGestor.Web.Controllers
@@ -23,16 +22,15 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CaiCriacaoDTO caixa)
+        public async Task<IActionResult> Post([FromBody] CaiAbrirDTO caixa)
         {
-            return Ok(await _caixaService.CriarCaixa(caixa));
+            return Ok(await _caixaService.AbrirCaixa(caixa));
         }
 
-
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] CaiEdicaoDTO caixa)
+        public async Task<IActionResult> Put([FromBody] CaiFecharDTO caixa)
         {
-            return Ok(await _caixaService.AtualizarCaixa(caixa));
+            return Ok(await _caixaService.FecharCaixa(caixa));
         }
 
         [HttpGet]

@@ -18,13 +18,13 @@ namespace WebMesaGestor.Infra.Repositories
         {
             return await _appDbContext.Caixas.ToListAsync();
         }
-
+            
         public async Task<Caixa> CaixaPorId(Guid id)
         {
             return await _appDbContext.Caixas.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
         }
 
-        public async Task<Caixa> CriarCaixa(Caixa caixa)
+        public async Task<Caixa> AbrirCaixa(Caixa caixa)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace WebMesaGestor.Infra.Repositories
             }
         }
 
-        public async Task<Caixa> AtualizarCaixa(Caixa caixa)
+        public async Task<Caixa> FecharCaixa(Caixa caixa)
         {
             _appDbContext.Caixas.Update(caixa);
             await _appDbContext.SaveChangesAsync();

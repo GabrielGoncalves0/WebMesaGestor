@@ -1,6 +1,6 @@
 ﻿using WebMesaGestor.Domain.Entities;
 
-namespace WebMesaGestor.Application.DTO.Input.Criacao
+namespace WebMesaGestor.Application.DTO.Input.USuario
 {
     public class UsuCriacaoDTO
     {

@@ -1,5 +1,4 @@
-﻿using WebMesaGestor.Application.DTO.Input.Criacao;
-using WebMesaGestor.Application.DTO.Input.Edicao;
+﻿using WebMesaGestor.Application.DTO.Input.Caixa;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
@@ -44,20 +43,20 @@ namespace WebMesaGestor.Application.Services
             return CaixaMap.MapCaixa(caixa);
         }
 
-        public async Task<CaiOutputDTO> CriarCaixa(CaiCriacaoDTO caixa)
+        public async Task<CaiOutputDTO> AbrirCaixa(CaiAbrirDTO caixa)
         {
             Caixa map = CaixaMap.MapCaixa(caixa);
-            Caixa retorno = await _caixaRepository.CriarCaixa(map);
+            Caixa retorno = await _caixaRepository.AbrirCaixa(map);
             return CaixaMap.MapCaixa(retorno);
         }
 
-        public async Task<CaiOutputDTO> AtualizarCaixa(CaiEdicaoDTO caixa)
+        public async Task<CaiOutputDTO> FecharCaixa(CaiFecharDTO caixa)
         {
             Caixa buscarCaixa = await _caixaRepository.CaixaPorId(caixa.Id);
 
             buscarCaixa.Cai_Val_Fechamento = caixa.Cai_Val_Fechamento;
             
-            Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarCaixa);
+            Caixa retorno = await _caixaRepository.FecharCaixa(buscarCaixa);
             return CaixaMap.MapCaixa(retorno);
         }
 

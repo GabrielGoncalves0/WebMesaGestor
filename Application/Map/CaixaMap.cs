@@ -1,5 +1,4 @@
-﻿using WebMesaGestor.Application.DTO.Input.Criacao;
-using WebMesaGestor.Application.DTO.Input.Edicao;
+﻿using WebMesaGestor.Application.DTO.Input.Caixa;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Domain.Entities;
 
@@ -26,7 +25,7 @@ namespace WebMesaGestor.Application.Map
             return caixa.Select(x => x.MapCaixa()).ToList();
         }
 
-        public static Caixa MapCaixa(this CaiCriacaoDTO caixa)
+        public static Caixa MapCaixa(this CaiAbrirDTO caixa)
         {
             return new Caixa
             {
@@ -38,12 +37,12 @@ namespace WebMesaGestor.Application.Map
             };
         }
 
-        public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiCriacaoDTO> caixa)
+        public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiAbrirDTO> caixa)
         {
             return caixa.Select(x => x.MapCaixa()).ToList();
         }
 
-        public static Caixa MapCaixa(this CaiEdicaoDTO caixa)
+        public static Caixa MapCaixa(this CaiFecharDTO caixa)
         {
             return new Caixa
             {
@@ -53,7 +52,7 @@ namespace WebMesaGestor.Application.Map
             };
         }
 
-        public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiEdicaoDTO> caixa)
+        public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiFecharDTO> caixa)
         {
             return caixa.Select(x => x.MapCaixa()).ToList();
         }

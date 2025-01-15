@@ -1,5 +1,4 @@
-﻿using WebMesaGestor.Application.DTO.Input.Criacao;
-using WebMesaGestor.Application.DTO.Input.Edicao;
+﻿using WebMesaGestor.Application.DTO.Input.USuario;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Domain.Entities;
 

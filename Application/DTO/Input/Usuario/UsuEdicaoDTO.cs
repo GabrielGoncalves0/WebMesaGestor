@@ -1,6 +1,6 @@
 ﻿using WebMesaGestor.Domain.Entities;
 
-namespace WebMesaGestor.Application.DTO.Input.Edicao
+namespace WebMesaGestor.Application.DTO.Input.USuario
 {
     public class UsuEdicaoDTO
     {

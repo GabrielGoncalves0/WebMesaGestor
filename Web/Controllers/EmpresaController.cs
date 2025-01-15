@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebMesaGestor.Application.DTO.Input.Criacao;
-using WebMesaGestor.Application.DTO.Input.Edicao;
+using WebMesaGestor.Application.DTO.Input.Empresa;
 using WebMesaGestor.Application.Services;
 
 namespace WebMesaGestor.Web.Controllers

@@ -1,6 +1,5 @@
 ﻿using System.Data;
-using WebMesaGestor.Application.DTO.Input.Criacao;
-using WebMesaGestor.Application.DTO.Input.Edicao;
+using WebMesaGestor.Application.DTO.Input.Empresa;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Domain.Entities;
 

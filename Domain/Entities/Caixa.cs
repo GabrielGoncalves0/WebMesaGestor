@@ -14,7 +14,9 @@ namespace WebMesaGestor.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal Cai_Val_Inicial { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal? Cai_Val_Fechamento { get; set; } 
+        public decimal? Cai_Val_Fechamento { get; set; }
+        //[Column(TypeName = "decimal(18,2)")]
+        //public decimal Cai_Val_Total { get; set; }
         public DateTime Abertura_data { get; set; }
         public DateTime? Fechamento_data { get; set; }
         public CaixaStatus Cai_status { get; set; }
