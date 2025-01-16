@@ -13,10 +13,10 @@ namespace WebMesaGestor.Infra.Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Caixa> Caixas { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
-        public DbSet<Marca> Marcas { get; set; }
         public DbSet<Mesa> Mesas { get; set; }
         public DbSet<Setor> Setores { get; set; }
-        public DbSet<Grupo> Grupos { get; set; }
-        public DbSet<Subgrupo> Subgrupos { get; set; }
+        public DbSet<GrupoOpcoes> GrupoOpcoes { get; set; }
+        public DbSet<Opcoes> Opcoes { get; set; }
+        public DbSet<Produto> Produtos { get; set; }
 }
 }
