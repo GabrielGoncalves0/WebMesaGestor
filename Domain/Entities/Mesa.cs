@@ -2,15 +2,16 @@
 
 namespace WebMesaGestor.Domain.Entities
 {
-    public class Empresa
+    public enum MesaStatus { Livre, Ocupada }
+    public class Mesa
     {
-        public Empresa() {}
+        public Mesa()
+        {
+        }
         [Key]
         public Guid Id { get; set; }
-        [StringLength(100)]
-        public string EmpNome { get; set; }
-        [StringLength(100)]
-        public string EmpCnpj { get; set; }
+        public int MesaNumero { get; set; }
+        public MesaStatus MesaStatus { get; set; }
         public DateTime CriacaoData { get; set; }
     }
 }

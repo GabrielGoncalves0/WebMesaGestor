@@ -2,15 +2,15 @@
 
 namespace WebMesaGestor.Domain.Entities
 {
-    public class Empresa
+    public class Categoria
     {
-        public Empresa() {}
+        public Categoria()
+        {
+        }
         [Key]
         public Guid Id { get; set; }
         [StringLength(100)]
-        public string EmpNome { get; set; }
-        [StringLength(100)]
-        public string EmpCnpj { get; set; }
+        public string CatDesc { get; set; }
         public DateTime CriacaoData { get; set; }
     }
 }

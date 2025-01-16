@@ -2,15 +2,17 @@
 
 namespace WebMesaGestor.Domain.Entities
 {
-    public class Empresa
+    public enum SetorStatus { Ativo, Inativo }
+    public class Setor
     {
-        public Empresa() {}
+        public Setor()
+        {
+        }
         [Key]
         public Guid Id { get; set; }
         [StringLength(100)]
-        public string EmpNome { get; set; }
-        [StringLength(100)]
-        public string EmpCnpj { get; set; }
+        public string SetDesc { get; set; }
+        public SetorStatus SetStatus { get; set; }
         public DateTime CriacaoData { get; set; }
     }
 }

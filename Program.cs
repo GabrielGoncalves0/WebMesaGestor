@@ -3,6 +3,7 @@ using WebMesaGestor.Application.Services;
 using WebMesaGestor.Domain.Interfaces;
 using WebMesaGestor.Infra.Data;
 using WebMesaGestor.Infra.Repositories;
+using WebSubgrupoGestor.Infra.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +17,25 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 // Contrato interface e Repository
+builder.Services.AddScoped<ICaixaRepository, CaixaRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+builder.Services.AddScoped<IGrupoRepository, GrupoRepository>();
+builder.Services.AddScoped<IMarcaRepository, MarcaRepository>();
+builder.Services.AddScoped<IMesaRepository, MesaRepository>();
+builder.Services.AddScoped<ISetorRepository, SetorRepository>();
+builder.Services.AddScoped<ISubgrupoRepository, SubgrupoRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 // Services
+builder.Services.AddScoped<CaixaService>();
+builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<EmpresaService>();
+builder.Services.AddScoped<GrupoService>();
+builder.Services.AddScoped<MarcaService>();
+builder.Services.AddScoped<MesaService>();
+builder.Services.AddScoped<SetorService>();
+builder.Services.AddScoped<SubgrupoService>();
 builder.Services.AddScoped<UsuarioService>();
 
 
