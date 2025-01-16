@@ -40,8 +40,8 @@ namespace WebMesaGestor.Application.Services
         {
             Empresa buscarEmpresa = await _empresaRepository.EmpresaPorId(empresa.Id);
 
-            buscarEmpresa.Emp_nome = empresa.Emp_nome;
-            buscarEmpresa.Emp_cnpj = empresa.Emp_cnpj;
+            buscarEmpresa.EmpNome = empresa.EmpNome;
+            buscarEmpresa.EmpCnpj = empresa.EmpCnpj;
 
             Empresa retorno = await _empresaRepository.AtualizarEmpresa(buscarEmpresa);
             return EmpresaMap.MapEmpresa(retorno);

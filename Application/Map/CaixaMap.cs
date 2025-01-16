@@ -11,11 +11,11 @@ namespace WebMesaGestor.Application.Map
             return new CaiOutputDTO
             {
                 Id = caixa.Id,
-                Cai_Val_Inicial = caixa.Cai_Val_Inicial,
-                Cai_Val_Fechamento = caixa.Cai_Val_Fechamento,
-                Abertura_data = caixa.Abertura_data,
-                Fechamento_data = caixa.Fechamento_data,
-                Cai_status = caixa.Cai_status,
+                CaiValInicial = caixa.CaiValInicial,
+                CaiValFechamento = caixa.CaiValFechamento,
+                AberturaData = caixa.AberturaData,
+                FechamentoData = caixa.FechamentoData,
+                CaiStatus = caixa.CaiStatus,
                 Usuario = UsuarioMap.MapUsuario(caixa.Usuario)
             };
         }
@@ -30,10 +30,10 @@ namespace WebMesaGestor.Application.Map
             return new Caixa
             {
                 Id = Guid.NewGuid(),
-                Cai_Val_Inicial = caixa.Cai_Val_Inicial,
+                CaiValInicial = caixa.CaiValInicial,
                 UsuarioId = caixa.UsuarioId,
-                Abertura_data = DateTime.UtcNow,
-                Cai_status = CaixaStatus.Aberto
+                AberturaData = DateTime.UtcNow,
+                CaiStatus = CaixaStatus.Aberto
             };
         }
 
@@ -46,9 +46,9 @@ namespace WebMesaGestor.Application.Map
         {
             return new Caixa
             {
-                Cai_Val_Fechamento = caixa.Cai_Val_Fechamento,
-                Fechamento_data = DateTime.UtcNow,
-                Cai_status = CaixaStatus.Fechado
+                CaiValFechamento = caixa.CaiValFechamento,
+                FechamentoData = DateTime.UtcNow,
+                CaiStatus = CaixaStatus.Fechado
             };
         }
 

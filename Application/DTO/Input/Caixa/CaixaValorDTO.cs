@@ -3,6 +3,6 @@
     public class CaixaValorDTO
     {
         public Guid Id { get; set; }
-        public decimal? Cai_Val_Fechamento { get; set; }
+        public decimal? CaiValFechamento { get; set; }
     }
 }

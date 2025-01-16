@@ -2,7 +2,7 @@
 {
     public class EmpCriacaoDTO
     {
-        public string Emp_nome { get; set; }
-        public string Emp_cnpj { get; set; }
+        public string EmpNome { get; set; }
+        public string EmpCnpj { get; set; }
     }
 }

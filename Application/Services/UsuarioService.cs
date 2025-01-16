@@ -52,11 +52,11 @@ namespace WebMesaGestor.Application.Services
         {
             Usuario buscarUsuario = await _usuarioRepository.UsuarioPorId(usuario.Id);
 
-            buscarUsuario.Usu_nome = usuario.Usu_nome;
-            buscarUsuario.Usu_email = usuario.Usu_email;
-            buscarUsuario.Usu_telefone = usuario.Usu_telefone;
-            buscarUsuario.Usu_senha = usuario.Usu_senha;
-            buscarUsuario.Usu_tipo = usuario.Usu_tipo;
+            buscarUsuario.UsuNome = usuario.UsuNome;
+            buscarUsuario.UsuEmail = usuario.UsuEmail;
+            buscarUsuario.UsuTelefone = usuario.UsuTelefone;
+            buscarUsuario.UsuSenha = usuario.UsuSenha;
+            buscarUsuario.UsuTipo = usuario.UsuTipo;
             buscarUsuario.EmpresaId = usuario.EmpresaId;
 
             Usuario retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);

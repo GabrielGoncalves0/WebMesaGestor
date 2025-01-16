@@ -5,7 +5,7 @@ namespace WebMesaGestor.Application.DTO.Input.Caixa
 {
     public class CaiAbrirDTO
     {
-        public decimal Cai_Val_Inicial { get; set; }
+        public decimal CaiValInicial { get; set; }
         public Guid? UsuarioId { get; set; }
     }
 }

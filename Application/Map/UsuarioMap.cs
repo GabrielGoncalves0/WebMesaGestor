@@ -11,11 +11,11 @@ namespace WebMesaGestor.Application.Map
             return new UsuOutputDTO
             {
                 Id = usuario.Id,
-                Usu_nome = usuario.Usu_nome,
-                Usu_email = usuario.Usu_email,
-                Usu_telefone = usuario.Usu_telefone,
-                Usu_tipo = usuario.Usu_tipo,
-                Criacao_data = usuario.Criacao_data,
+                UsuNome = usuario.UsuNome,
+                UsuEmail = usuario.UsuEmail,
+                UsuTelefone = usuario.UsuTelefone,
+                UsuTipo = usuario.UsuTipo,
+                CriacaoData = usuario.CriacaoData,
                 Empresa = EmpresaMap.MapEmpresa(usuario.Empresa)
             };
         }
@@ -30,12 +30,12 @@ namespace WebMesaGestor.Application.Map
             return new Usuario
             {
                 Id = Guid.NewGuid(),
-                Usu_nome = usuario.Usu_nome,
-                Usu_email = usuario.Usu_email,
-                Usu_telefone = usuario.Usu_telefone,
-                Usu_senha = usuario.Usu_senha,
-                Usu_tipo = usuario.Usu_tipo,
-                Criacao_data = DateTime.UtcNow,
+                UsuNome = usuario.UsuNome,
+                UsuEmail = usuario.UsuEmail,
+                UsuTelefone = usuario.UsuTelefone,
+                UsuSenha = usuario.UsuSenha,
+                UsuTipo = usuario.UsuTipo,
+                CriacaoData = DateTime.UtcNow,
                 EmpresaId = usuario.EmpresaId
             };
         }
@@ -49,11 +49,11 @@ namespace WebMesaGestor.Application.Map
         {
             return new Usuario
             {
-                Usu_nome = usuario.Usu_nome,
-                Usu_email = usuario.Usu_email,
-                Usu_telefone = usuario.Usu_telefone,
-                Usu_senha = usuario.Usu_senha,
-                Usu_tipo = usuario.Usu_tipo,
+                UsuNome = usuario.UsuNome,
+                UsuEmail = usuario.UsuEmail,
+                UsuTelefone = usuario.UsuTelefone,
+                UsuSenha = usuario.UsuSenha,
+                UsuTipo = usuario.UsuTipo,
                 EmpresaId = usuario.EmpresaId
             };
         }

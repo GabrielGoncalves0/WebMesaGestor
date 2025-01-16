@@ -54,7 +54,7 @@ namespace WebMesaGestor.Application.Services
         {
             Caixa buscarCaixa = await _caixaRepository.CaixaPorId(caixa.Id);
 
-            buscarCaixa.Cai_Val_Fechamento = caixa.Cai_Val_Fechamento;
+            buscarCaixa.CaiValFechamento = caixa.CaiValFechamento;
             
             Caixa retorno = await _caixaRepository.FecharCaixa(buscarCaixa);
             return CaixaMap.MapCaixa(retorno);

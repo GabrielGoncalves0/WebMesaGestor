@@ -12,9 +12,9 @@ namespace WebMesaGestor.Application.Map
             return new EmpOutputDTO
             {
                 Id = empresa.Id,
-                Emp_nome = empresa.Emp_nome,
-                Emp_cnpj = empresa.Emp_cnpj,
-                Criacao_data = empresa.Criacao_data
+                EmpNome = empresa.EmpNome,
+                EmpCnpj = empresa.EmpCnpj,
+                CriacaoData = empresa.CriacaoData
             };
         }
 
@@ -28,9 +28,9 @@ namespace WebMesaGestor.Application.Map
             return new Empresa
             {
                 Id = Guid.NewGuid(),
-                Emp_nome = empresa.Emp_nome,
-                Emp_cnpj = empresa.Emp_cnpj,
-                Criacao_data = DateTime.UtcNow
+                EmpNome = empresa.EmpNome,
+                EmpCnpj = empresa.EmpCnpj,
+                CriacaoData = DateTime.UtcNow
             };
         }
 
@@ -43,8 +43,8 @@ namespace WebMesaGestor.Application.Map
         {
             return new Empresa
             {
-                Emp_nome = empresa.Emp_nome,
-                Emp_cnpj = empresa.Emp_cnpj
+                EmpNome = empresa.EmpNome,
+                EmpCnpj = empresa.EmpCnpj
             };
         }
 
