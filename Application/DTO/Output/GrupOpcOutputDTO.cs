@@ -9,6 +9,6 @@ namespace WebMesaGestor.Application.DTO.Output
         public int GrupOpcMax { get; set; }
         public GrupOpcTipo GrupOpcTipo { get; set; }
         public DateTime CriacaoData { get; set; }
-        public ProOutputDTO produto { get; set; }
+        public ProOutputDTO? produto { get; set; }
     }
 }

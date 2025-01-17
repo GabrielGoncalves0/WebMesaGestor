@@ -16,6 +16,6 @@ namespace WebMesaGestor.Domain.Entities
         public GrupOpcTipo GrupOpcTipo { get; set; }
         public DateTime CriacaoData { get; set; }
         public Guid? ProdutoId { get; set; }
-        public Produto? Produto { get; set; }
+        public virtual Produto? Produto { get; set; }
     }
 }

@@ -17,12 +17,14 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
             return Ok(await _usuarioService.ListarUsuarios());
         }
 
         [HttpPost]
+        [Route("cadastrar")]
         public async Task<IActionResult> Post([FromBody] UsuCriacaoDTO usuario)
         {
             return Ok(await _usuarioService.CriarUsuario(usuario));
@@ -30,20 +32,21 @@ namespace WebMesaGestor.Web.Controllers
 
 
         [HttpPut]
+        [Route("atualizar")]
         public async Task<IActionResult> Put([FromBody] UsuEdicaoDTO usuario)
         {
             return Ok(await _usuarioService.AtualizarUsuario(usuario));
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
             return Ok(await _usuarioService.UsuarioPorId(id));
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             return Ok(await _usuarioService.DeletarUsuario(id));

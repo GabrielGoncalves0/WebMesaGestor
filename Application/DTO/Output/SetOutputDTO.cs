@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using WebMesaGestor.Domain.Entities;
+﻿using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Application.DTO.Output
 {

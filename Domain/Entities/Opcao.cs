@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebMesaGestor.Domain.Entities
 {
-    public class Opcoes
+    public class Opcao
     {
-        public Opcoes()
+        public Opcao()
         {
         }
         [Key]
@@ -17,6 +17,6 @@ namespace WebMesaGestor.Domain.Entities
         public int OpcaoQuantMax { get; set; }
         public DateTime CriacaoData { get; set; }
         public Guid? GrupoOpcoesId { get; set; }
-        public GrupoOpcoes? GrupoOpcoes { get; set; }
+        public virtual GrupoOpcoes? GrupoOpcoes { get; set; }
     }
 }

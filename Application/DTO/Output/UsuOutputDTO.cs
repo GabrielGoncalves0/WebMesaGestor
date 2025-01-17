@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using WebMesaGestor.Domain.Entities;
+﻿using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Application.DTO.Output
 {
@@ -11,6 +10,6 @@ namespace WebMesaGestor.Application.DTO.Output
         public string UsuTelefone { get; set; }
         public UsuarioTipo UsuTipo { get; set; }
         public DateTime CriacaoData { get; set; }
-        public virtual EmpOutputDTO Empresa { get; set; }
+        public virtual EmpOutputDTO? Empresa { get; set; }
     }
 }
