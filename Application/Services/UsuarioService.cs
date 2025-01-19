@@ -45,6 +45,10 @@ namespace WebMesaGestor.Application.Services
         {
             Usuario map = UsuarioMap.MapUsuario(usuario);
             Usuario retorno = await _usuarioRepository.CriarUsuario(map);
+            if (retorno.EmpresaId != null)
+            {
+                retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
+            }
             return UsuarioMap.MapUsuario(retorno);
         }
 
@@ -60,6 +64,10 @@ namespace WebMesaGestor.Application.Services
             buscarUsuario.EmpresaId = usuario.EmpresaId;
 
             Usuario retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);
+            if (retorno.EmpresaId != null)
+            {
+                retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
+            }
             return UsuarioMap.MapUsuario(retorno);
         }
 

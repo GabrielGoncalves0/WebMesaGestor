@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebMesaGestor.Application.DTO.Input.USuario;
 using WebMesaGestor.Application.Services;
+using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Web.Controllers
 {
@@ -20,7 +21,12 @@ namespace WebMesaGestor.Web.Controllers
         [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _usuarioService.ListarUsuarios());
+            var usuarios = await _usuarioService.ListarUsuarios();
+
+            var resposta = new RespostaPadrao<object>(
+            "Usuários listados com sucesso.", usuarios, 200);
+
+            return Ok(resposta);
         }
 
         [HttpPost]

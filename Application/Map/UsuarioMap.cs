@@ -16,7 +16,7 @@ namespace WebMesaGestor.Application.Map
                 UsuTelefone = usuario.UsuTelefone,
                 UsuTipo = usuario.UsuTipo,
                 CriacaoData = usuario.CriacaoData,
-                Empresa = EmpresaMap.MapEmpresa(usuario.Empresa)
+                Empresa = usuario.Empresa != null ? EmpresaMap.MapEmpresa(usuario.Empresa) : null
             };
         }
 
