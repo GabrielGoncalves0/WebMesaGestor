@@ -17,36 +17,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _empresaService.ListarEmpresas());
+            var empresa = await _empresaService.ListarEmpresas();
+            return Ok(empresa);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] EmpCriacaoDTO empresa)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] EmpCriacaoDTO empCriacaoDTO)
         {
-            return Ok(await _empresaService.CriarEmpresa(empresa));
+            var empresa = await _empresaService.CriarEmpresa(empCriacaoDTO);
+            return Ok(empresa);
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] EmpEdicaoDTO empresa)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] EmpEdicaoDTO empEdicaoDTO)
         {
-            return Ok(await _empresaService.AtualizarEmpresa(empresa));
+            var empresa = await _empresaService.AtualizarEmpresa(empEdicaoDTO);
+            return Ok(empresa);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _empresaService.EmpresaPorId(id));
+            var empresa = await _empresaService.EmpresaPorId(id);
+            return Ok(empresa);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _empresaService.DeletarEmpresa(id));
+            var empresa = await _empresaService.DeletarEmpresa(id);
+            return Ok(empresa);
         }
     }
 }

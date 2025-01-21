@@ -22,25 +22,37 @@ namespace WebMesaGestor.Application.Services
             _pedidoRepository = pedidoRepository;
         }
 
-        public async Task<IEnumerable<TraOutputDTO>> ListarTrasacoes()
+        public async Task<Response<IEnumerable<TraOutputDTO>>> ListarTrasacoes()
         {
-            IEnumerable<Transacao> transacaos = await _transacaoRepository.ListarTransacoes();
-            foreach (var transacao in transacaos)
+            Response<IEnumerable<TraOutputDTO>> resposta = new Response<IEnumerable<TraOutputDTO>>();
+            try
             {
-                if (transacao.UsuarioId != null)
+                IEnumerable<Transacao> transacaos = await _transacaoRepository.ListarTransacoes();
+                foreach (var transacao in transacaos)
                 {
-                    transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
+                    if (transacao.UsuarioId != null)
+                    {
+                        transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
+                    }
+                    if (transacao.CaixaId != null)
+                    {
+                        transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
+                    }
+                    if (transacao.PedidoId != null)
+                    {
+                        transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
+                    }
                 }
-                if (transacao.CaixaId != null)
-                {
-                    transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
-                }
-                if (transacao.PedidoId != null)
-                {
-                    transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
-                }
+                resposta.Dados = TransacaoMap.MapTransacao(transacaos);
+                resposta.Mensagem = "Transacões listadas com sucesso";
+                return resposta;
             }
-            return TransacaoMap.MapTransacao(transacaos);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<TraOutputDTO> TransacaoPorId(Guid id)

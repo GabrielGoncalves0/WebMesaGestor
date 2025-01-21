@@ -17,9 +17,9 @@ namespace WebMesaGestor.Domain.Entities
         [Column(TypeName ="decimal(18,2)")]
         public  decimal ProPreco { get; set; }
         public DateTime CriacaoData { get; set; }
-        public Guid CategoriaId { get; set; }
-        public virtual Categoria Categoria { get; set; }
-        public Guid SetorId { get; set; }
-        public virtual Setor Setor { get; set; }
+        public Guid? CategoriaId { get; set; }
+        public virtual Categoria? Categoria { get; set; }
+        public Guid? SetorId { get; set; }
+        public virtual Setor? Setor { get; set; }
     }
 }

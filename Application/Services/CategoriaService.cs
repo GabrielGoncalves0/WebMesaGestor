@@ -15,10 +15,22 @@ namespace WebMesaGestor.Application.Services
             _categoriaRepository = categoriaRepository;
         }
 
-        public async Task<IEnumerable<CatOutputDTO>> ListarCategorias()
+        public async Task<Response<IEnumerable<CatOutputDTO>>> ListarCategorias()
         {
-            IEnumerable<Categoria> categorias = await _categoriaRepository.ListarCategorias();
-            return CategoriaMap.MapCategoria(categorias);
+            Response<IEnumerable<CatOutputDTO>> resposta = new Response<IEnumerable<CatOutputDTO>>();
+            try
+            {
+                IEnumerable<Categoria> categorias = await _categoriaRepository.ListarCategorias();
+                resposta.Dados = CategoriaMap.MapCategoria(categorias);
+                resposta.Mensagem = "Categorias listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<CatOutputDTO> CategoriaPorId(Guid id)

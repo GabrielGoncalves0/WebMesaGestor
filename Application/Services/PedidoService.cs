@@ -21,21 +21,33 @@ namespace WebMesaGestor.Application.Services
             _mesaRepository = mesaRepository;
         }
 
-        public async Task<IEnumerable<PedOutputDTO>> ListarPedidos()
+        public async Task<Response<IEnumerable<PedOutputDTO>>> ListarPedidos()
         {
-            IEnumerable<Pedido> pedidos = await _pedidoRepository.ListarPedidos();
-            foreach (var pedido in pedidos)
+            Response<IEnumerable<PedOutputDTO>> resposta = new Response<IEnumerable<PedOutputDTO>>();
+            try
             {
-                if (pedido.UsuarioId != null)
+                IEnumerable<Pedido> pedidos = await _pedidoRepository.ListarPedidos();
+                foreach (var pedido in pedidos)
                 {
-                    pedido.Usuario = await _usuarioRepository.UsuarioPorId((Guid)pedido.UsuarioId);
+                    if (pedido.UsuarioId != null)
+                    {
+                        pedido.Usuario = await _usuarioRepository.UsuarioPorId((Guid)pedido.UsuarioId);
+                    }
+                    if (pedido.MesaId != null)
+                    {
+                        pedido.Mesa = await _mesaRepository.MesaPorId((Guid)pedido.MesaId);
+                    }
                 }
-                if (pedido.MesaId != null)
-                {
-                    pedido.Mesa = await _mesaRepository.MesaPorId((Guid)pedido.MesaId);
-                }
+                resposta.Dados = PedidoMap.MapPedido(pedidos);
+                resposta.Mensagem = "Pedidos listados com sucesso";
+                return resposta;
             }
-            return PedidoMap.MapPedido(pedidos);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<PedOutputDTO> PedidoPorId(Guid id)

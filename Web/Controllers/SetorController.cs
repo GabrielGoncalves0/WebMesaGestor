@@ -16,36 +16,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _setorService.ListarSetors());
+            var setor = await _setorService.ListarSetors();
+            return Ok(setor);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] SetCriacaoDTO setor)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] SetCriacaoDTO setCriacaoDTO)
         {
-            return Ok(await _setorService.CriarSetor(setor));
+            var setor = await _setorService.CriarSetor(setCriacaoDTO);
+            return Ok(setor);
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] SetEdicaoDTO setor)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] SetEdicaoDTO setEdicaoDTO)
         {
-            return Ok(await _setorService.AtualizarSetor(setor));
+            var setor = await _setorService.AtualizarSetor(setEdicaoDTO);
+            return Ok(setor);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _setorService.SetorPorId(id));
+            var setor = await _setorService.SetorPorId(id);
+            return Ok(setor);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _setorService.DeletarSetor(id));
+            var setor = await _setorService.DeletarSetor(id);
+            return Ok(setor);
         }
     }
 }

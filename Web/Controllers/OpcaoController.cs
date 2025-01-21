@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebMesaGestor.Application.DTO.Input.Opcoes;
 using WebMesaGestor.Application.Services;
+using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Web.Controllers
 {
@@ -16,36 +17,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _opcaoService.ListarOpcoes());
+            var opcao = await _opcaoService.ListarOpcoes();
+            return Ok(opcao);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] OpcCriacaoDTO opcao)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] OpcCriacaoDTO opcCriacaoDTO)
         {
-            return Ok(await _opcaoService.CriarOpcao(opcao));
+            var opcao = await _opcaoService.CriarOpcao(opcCriacaoDTO);
+            return Ok(opcao);
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] OpcEdicaoDTO opcao)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] OpcEdicaoDTO opcEdicaoDTO)
         {
-            return Ok(await _opcaoService.AtualizarOpcao(opcao));
+            var opcao = await _opcaoService.AtualizarOpcao(opcEdicaoDTO);
+            return Ok(opcao);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _opcaoService.OpcaoPorId(id));
+            var opcao = await _opcaoService.OpcaoPorId(id);
+            return Ok(opcao);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _opcaoService.DeletarOpcao(id));
+            var opcao = await _opcaoService.DeletarOpcao(id);
+            return Ok(opcao);
         }
     }
 }

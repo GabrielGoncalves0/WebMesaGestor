@@ -18,17 +18,29 @@ namespace WebMesaGestor.Application.Services
             _empresaRepository = empresaRepository;
         }
 
-        public async Task<IEnumerable<UsuOutputDTO>> ListarUsuarios()
+        public async Task<Response<IEnumerable<UsuOutputDTO>>> ListarUsuarios()
         {
-            IEnumerable<Usuario> usuarios = await _usuarioRepository.ListarUsuarios();
-            foreach(var usuario in usuarios)
+            Response<IEnumerable<UsuOutputDTO>> resposta = new Response<IEnumerable<UsuOutputDTO>>();
+            try
             {
-                if (usuario.EmpresaId != null)
+                IEnumerable<Usuario> usuarios = await _usuarioRepository.ListarUsuarios();
+                foreach(var usuario in usuarios)
                 {
-                    usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+                    if (usuario.EmpresaId != null)
+                    {
+                        usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+                    }
                 }
+                resposta.Dados = UsuarioMap.MapUsuario(usuarios);
+                resposta.Mensagem = "Usuários listados com sucesso";
+                return resposta;
             }
-            return UsuarioMap.MapUsuario(usuarios);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<UsuOutputDTO> UsuarioPorId(Guid id)

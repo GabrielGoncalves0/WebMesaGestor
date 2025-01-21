@@ -15,10 +15,22 @@ namespace WebMesaGestor.Application.Services
             _grupoOpcaoRepository = grupoRepository;
         }
 
-        public async Task<IEnumerable<GrupOpcOutputDTO>> ListarGrupoOpcoes()
+        public async Task<Response<IEnumerable<GrupOpcOutputDTO>>> ListarGrupoOpcoes()
         {
-            IEnumerable<GrupoOpcoes> grupos = await _grupoOpcaoRepository.ListarGrupoOpcoes();
-            return GrupoOpcaoMap.MapGrupoOpcao(grupos);
+            Response<IEnumerable<GrupOpcOutputDTO>> resposta = new Response<IEnumerable<GrupOpcOutputDTO>>();
+            try
+            {
+                IEnumerable<GrupoOpcoes> grupos = await _grupoOpcaoRepository.ListarGrupoOpcoes();
+                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(grupos);
+                resposta.Mensagem = "Grupos listados com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<GrupOpcOutputDTO> GrupoOpcaoPorId(Guid id)

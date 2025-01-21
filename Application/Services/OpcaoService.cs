@@ -17,17 +17,29 @@ namespace WebMesaGestor.Application.Services
             _grupoOpcoesRepository = grupoOpcoesRepository;
         }
 
-        public async Task<IEnumerable<OpcOutputDTO>> ListarOpcoes()
+        public async Task<Response<IEnumerable<OpcOutputDTO>>> ListarOpcoes()
         {
-            IEnumerable<Opcao> opcoes = await _opcaoRepository.ListarOpcoes();
-            foreach (var opcao in opcoes)
+            Response<IEnumerable<OpcOutputDTO>> resposta = new Response<IEnumerable<OpcOutputDTO>>();
+            try
             {
-                if (opcao.GrupoOpcoesId != null)
+                IEnumerable<Opcao> opcoes = await _opcaoRepository.ListarOpcoes();
+                foreach (var opcao in opcoes)
                 {
-                    opcao.GrupoOpcoes = await _grupoOpcoesRepository.GrupoOpcaoPorId((Guid)opcao.GrupoOpcoesId);
+                    if (opcao.GrupoOpcoesId != null)
+                    {
+                        opcao.GrupoOpcoes = await _grupoOpcoesRepository.GrupoOpcaoPorId((Guid)opcao.GrupoOpcoesId);
+                    }
                 }
+                resposta.Dados = OpcaoMap.MapOpcao(opcoes);
+                resposta.Mensagem = "Opções listadas com sucesso";
+                return resposta;
             }
-            return OpcaoMap.MapOpcao(opcoes);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<OpcOutputDTO> OpcaoPorId(Guid id)

@@ -22,18 +22,15 @@ namespace WebMesaGestor.Web.Controllers
         public async Task<IActionResult> Get()
         {
             var usuarios = await _usuarioService.ListarUsuarios();
-
-            var resposta = new RespostaPadrao<object>(
-            "Usuários listados com sucesso.", usuarios, 200);
-
-            return Ok(resposta);
+            return Ok(usuarios);
         }
 
         [HttpPost]
         [Route("cadastrar")]
         public async Task<IActionResult> Post([FromBody] UsuCriacaoDTO usuario)
         {
-            return Ok(await _usuarioService.CriarUsuario(usuario));
+            var result = await _usuarioService.CriarUsuario(usuario);
+            return Ok(result);
         }
 
 
@@ -41,21 +38,24 @@ namespace WebMesaGestor.Web.Controllers
         [Route("atualizar")]
         public async Task<IActionResult> Put([FromBody] UsuEdicaoDTO usuario)
         {
-            return Ok(await _usuarioService.AtualizarUsuario(usuario));
+            var result = await _usuarioService.AtualizarUsuario(usuario)
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _usuarioService.UsuarioPorId(id));
+            var usuario = await _usuarioService.UsuarioPorId(id);
+            return Ok(usuario);
         }
 
         [HttpDelete]
         [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _usuarioService.DeletarUsuario(id));
+            var usuario = await _usuarioService.DeletarUsuario(id);
+            return Ok(usuario);
         }
     }
 }

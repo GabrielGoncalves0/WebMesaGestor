@@ -16,35 +16,43 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _caixaService.ListarCaixas());
+            var caixa = await _caixaService.ListarCaixas();
+            return Ok(caixa);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CaiAbrirDTO caixa)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] CaiAbrirDTO caiAbrirDTO)
         {
-            return Ok(await _caixaService.AbrirCaixa(caixa));
+            var caixa = await _caixaService.AbrirCaixa(caiAbrirDTO);
+            return Ok(caixa);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] CaiFecharDTO caixa)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] CaiFecharDTO caiFecharDTO)
         {
-            return Ok(await _caixaService.FecharCaixa(caixa));
+            var caixa = await _caixaService.FecharCaixa(caiFecharDTO);
+            return Ok(caixa);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _caixaService.CaixaPorId(id));
+            var caixa = await _caixaService.CaixaPorId(id);
+            return Ok(caixa);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _caixaService.DeletarCaixa(id));
+            var caixa = await _caixaService.DeletarCaixa(id);
+            return Ok(caixa );
         }
     }
 }

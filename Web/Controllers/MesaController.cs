@@ -16,36 +16,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _mesaService.ListarMesas());
+            var mesa = await _mesaService.ListarMesas();
+            return Ok(mesa);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] MesCriacaoDTO mesa)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] MesCriacaoDTO mesCriacaoDTO)
         {
-            return Ok(await _mesaService.CriarMesa(mesa));
+            var mesa = await _mesaService.CriarMesa(mesCriacaoDTO);
+            return Ok(mesa);
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] MesEdicaoDTO mesa)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] MesEdicaoDTO mesEdicaoDTO)
         {
-            return Ok(await _mesaService.AtualizarMesa(mesa));
+            var mesa = await _mesaService.AtualizarMesa(mesEdicaoDTO);
+            return Ok(mesa);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _mesaService.MesaPorId(id));
+            var mesa = await _mesaService.MesaPorId(id);
+            return Ok(mesa);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _mesaService.DeletarMesa(id));
+            var mesa = await _mesaService.DeletarMesa(id);
+            return Ok(mesa);
         }
     }
 }

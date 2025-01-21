@@ -16,36 +16,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _categoriaService.ListarCategorias());
+            var categoria = await _categoriaService.ListarCategorias();
+            return Ok(categoria);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CatCriacaoDTO categoria)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] CatCriacaoDTO catCriacaoDTO)
         {
-            return Ok(await _categoriaService.CriarCategoria(categoria));
+            var categoria = await _categoriaService.CriarCategoria(catCriacaoDTO);
+            return Ok(categoria);
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] CatEdicaoDTO categoria)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] CatEdicaoDTO catEdicaoDTO)
         {
-            return Ok(await _categoriaService.AtualizarCategoria(categoria));
+            var categoria = await _categoriaService.AtualizarCategoria(catEdicaoDTO);
+            return Ok(categoria);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _categoriaService.CategoriaPorId(id));
+            var categoria = await _categoriaService.CategoriaPorId(id);
+            return Ok(categoria);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _categoriaService.DeletarCategoria(id));
+            var categoria = await _categoriaService.DeletarCategoria(id);
+            return Ok(categoria);
         }
     }
 }

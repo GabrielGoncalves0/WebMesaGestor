@@ -17,10 +17,22 @@ namespace WebMesaGestor.Application.Services
             _setorRepository = setorRepository;
         }
 
-        public async Task<IEnumerable<SetOutputDTO>> ListarSetors()
+        public async Task<Response<IEnumerable<SetOutputDTO>>> ListarSetors()
         {
-            IEnumerable<Setor> setors = await _setorRepository.ListarSetors();
-            return SetorMap.MapSetor(setors);
+            Response<IEnumerable<SetOutputDTO>> resposta = new Response<IEnumerable<SetOutputDTO>>();
+            try
+            {
+                IEnumerable<Setor> setors = await _setorRepository.ListarSetors();
+                resposta.Dados = SetorMap.MapSetor(setors);
+                resposta.Mensagem = "Setores listados com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<SetOutputDTO> SetorPorId(Guid id)

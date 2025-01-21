@@ -16,36 +16,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _grupoOpcaoService.ListarGrupoOpcoes());
+            var grupoOpcao = await _grupoOpcaoService.ListarGrupoOpcoes();
+            return Ok(grupoOpcao);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] GrupOpcCriacaoDTO grupo)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] GrupOpcCriacaoDTO grupOpcCriacaoDTO)
         {
-            return Ok(await _grupoOpcaoService.CriarGrupoOpcao(grupo));
+            var grupoOpcao = await _grupoOpcaoService.CriarGrupoOpcao(grupOpcCriacaoDTO);
+            return Ok(grupoOpcao);
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] GrupOpcEdicaoDTO grupo)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] GrupOpcEdicaoDTO grupOpcEdicaoDTO)
         {
-            return Ok(await _grupoOpcaoService.AtualizarGrupoOpcao(grupo));
+            var grupoOpcao = await _grupoOpcaoService.AtualizarGrupoOpcao(grupOpcEdicaoDTO);
+            return Ok(grupoOpcao);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _grupoOpcaoService.GrupoOpcaoPorId(id));
+            var grupoOpcao = await _grupoOpcaoService.GrupoOpcaoPorId(id);
+            return Ok(grupoOpcao);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _grupoOpcaoService.DeletarGrupoOpcao(id));
+            var grupoOpcao = await _grupoOpcaoService.DeletarGrupoOpcao(id);
+            return Ok(grupoOpcao);
         }
     }
 }

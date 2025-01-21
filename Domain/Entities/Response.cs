@@ -1,17 +1,12 @@
 ﻿namespace WebMesaGestor.Domain.Entities
 {
-    public class RespostaPadrao<T>
+    public class Response<T>
     {
-        public string Mensagem { get; set; }
-        public T Dados { get; set; }
-        public int Codigo { get; set; }
+        //Diz que o dado pode ser nullo, e os dados que vai receber nele é generico
+        public T? Dados { get; set; }
+        public string Mensagem { get; set; } = string.Empty;
+        public bool Status { get; set; } = true;
 
-        public RespostaPadrao(string mensagem, T dados, int codigo)
-        {
-            Mensagem = mensagem;
-            Dados = dados;
-            Codigo = codigo;
-        }
     }
 }
 

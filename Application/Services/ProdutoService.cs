@@ -20,21 +20,33 @@ namespace WebMesaGestor.Application.Services
             _setorRepository = setorRepository;
         }
 
-        public async Task<IEnumerable<ProOutputDTO>> ListarProdutos()
+        public async Task<Response<IEnumerable<ProOutputDTO>>> ListarProdutos()
         {
-            IEnumerable<Produto> produtos = await _produtoRepository.ListarProdutos();
-            foreach (var produto in produtos)
+            Response<IEnumerable<ProOutputDTO>> resposta = new Response<IEnumerable<ProOutputDTO>>();
+            try
             {
-                if (produto.CategoriaId != null)
+                IEnumerable<Produto> produtos = await _produtoRepository.ListarProdutos();
+                foreach (var produto in produtos)
                 {
-                    produto.Categoria = await _categoriaRepository.CategoriaPorId((Guid)produto.CategoriaId);
+                    if (produto.CategoriaId != null)
+                    {
+                        produto.Categoria = await _categoriaRepository.CategoriaPorId((Guid)produto.CategoriaId);
+                    }
+                    if (produto.SetorId != null)
+                    {
+                        produto.Setor = await _setorRepository.SetorPorId((Guid)produto.SetorId);
+                    }
                 }
-                if (produto.SetorId != null)
-                {
-                    produto.Setor = await _setorRepository.SetorPorId((Guid)produto.SetorId);
-                }
+                resposta.Dados = ProdutoMap.MapProduto(produtos);
+                resposta.Mensagem = "Produtos listados com sucesso";
+                return resposta;
             }
-            return ProdutoMap.MapProduto(produtos);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<ProOutputDTO> ProdutoPorId(Guid id)

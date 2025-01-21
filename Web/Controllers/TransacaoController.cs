@@ -17,36 +17,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _transacaoService.ListarTrasacoes());
+            var transacao = await _transacaoService.ListarTrasacoes();
+            return Ok(transacao);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] TraCriacaoDTO transacao)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] TraCriacaoDTO traCriacaoDTO)
         {
-            return Ok(await _transacaoService.CriarTransacao(transacao));
+            var transacao = await _transacaoService.CriarTransacao(traCriacaoDTO);
+            return Ok(transacao);
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] TraEdicaoDTO transacao)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] TraEdicaoDTO traEdicaoDTO)
         {
-            return Ok(await _transacaoService.AtualizarTransacao(transacao));
+            var transacao = await _transacaoService.AtualizarTransacao(traEdicaoDTO);
+            return Ok(transacao);
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            return Ok(await _transacaoService.TransacaoPorId(id));
+            var transacao = await _transacaoService.TransacaoPorId(id);
+            return Ok(transacao);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _transacaoService.DeletarTransacao(id));
+            var transacao = await _transacaoService.DeletarTransacao(id);
+            return Ok(transacao);
         }
     }
 }

@@ -20,17 +20,29 @@ namespace WebMesaGestor.Application.Services
 
         }
 
-        public async Task<IEnumerable<CaiOutputDTO>> ListarCaixas()
+        public async Task<Response<IEnumerable<CaiOutputDTO>>> ListarCaixas()
         {
-            IEnumerable<Caixa> caixas = await _caixaRepository.ListarCaixas();
-            foreach (var caixa in caixas)
+            Response<IEnumerable<CaiOutputDTO>> resposta = new Response<IEnumerable<CaiOutputDTO>>();
+            try
             {
-                if (caixa.UsuarioId != null)
+                IEnumerable<Caixa> caixas = await _caixaRepository.ListarCaixas();
+                foreach (var caixa in caixas)
                 {
-                    caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
+                    if (caixa.UsuarioId != null)
+                    {
+                        caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
+                    }
                 }
+                resposta.Dados = CaixaMap.MapCaixa(caixas);
+                resposta.Mensagem = "Caixas listados com sucesso";
+                return resposta;
             }
-            return CaixaMap.MapCaixa(caixas);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<CaiOutputDTO> CaixaPorId(Guid id)

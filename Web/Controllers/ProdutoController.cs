@@ -15,34 +15,44 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _produtoservice.ListarProdutos());
+            var produto = await _produtoservice.ListarProdutos();
+            return Ok(produto);
         }
 
-        [HttpGet]
-        [Route("{id}")]
-        public async Task<IActionResult> Get([FromRoute] Guid id)
-        {
-            return Ok(await _produtoservice.ProdutoPorId(id));
-        }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ProCriacaoDTO produto)
+        [Route("cadastrar")]
+        public async Task<IActionResult> Post([FromBody] ProCriacaoDTO proCriacaoDTO)
         {
-            return Ok(await _produtoservice.CriarProduto(produto));
+            var produto = await _produtoservice.CriarProduto(proCriacaoDTO);
+            return Ok(produto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] ProEdicaoDTO produto)
+        [Route("atualizar")]
+        public async Task<IActionResult> Put([FromBody] ProEdicaoDTO proEdicaoDTO)
         {
-            return Ok(await _produtoservice.AtualizarProduto(produto));
+            var produto = await _produtoservice.AtualizarProduto(proEdicaoDTO);
+            return Ok(produto);
         }
+
+        [HttpGet]
+        [Route("buscar/{id}")]
+        public async Task<IActionResult> Get([FromRoute] Guid id)
+        {
+            var produto = await _produtoservice.ProdutoPorId(id);
+            return Ok(produto);
+        }
+
         [HttpDelete]
-        [Route("{id}")]
+        [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok(await _produtoservice.DeletarProduto(id));
+            var produto = await _produtoservice.DeletarProduto(id);
+            return Ok(produto);
         }
     }
 }

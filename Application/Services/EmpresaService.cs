@@ -17,10 +17,22 @@ namespace WebMesaGestor.Application.Services
             _empresaRepository = empresaRepository;
         }
 
-        public async Task<IEnumerable<EmpOutputDTO>> ListarEmpresas()
+        public async Task<Response<IEnumerable<EmpOutputDTO>>> ListarEmpresas()
         {
-            IEnumerable<Empresa> empresas = await _empresaRepository.ListarEmpresas();
-            return EmpresaMap.MapEmpresa(empresas);
+            Response<IEnumerable<EmpOutputDTO>> resposta = new Response<IEnumerable<EmpOutputDTO>>();
+            try
+            {
+                IEnumerable<Empresa> empresas = await _empresaRepository.ListarEmpresas();
+                resposta.Dados = EmpresaMap.MapEmpresa(empresas);
+                resposta.Mensagem = "Empresas listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }   
 
         public async Task<EmpOutputDTO> EmpresaPorId(Guid id)

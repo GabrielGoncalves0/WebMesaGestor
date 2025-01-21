@@ -15,10 +15,22 @@ namespace WebMesaGestor.Application.Services
             _mesaRepository = mesaRepository;
         }
 
-        public async Task<IEnumerable<MesOutputDTO>> ListarMesas()
+        public async Task<Response<IEnumerable<MesOutputDTO>>> ListarMesas()
         {
-            IEnumerable<Mesa> mesas = await _mesaRepository.ListarMesas();
-            return MesaMap.MapMesa(mesas);
+            Response<IEnumerable<MesOutputDTO>> resposta = new Response<IEnumerable<MesOutputDTO>>();
+            try
+            {
+                IEnumerable<Mesa> mesas = await _mesaRepository.ListarMesas();
+                resposta.Dados = MesaMap.MapMesa(mesas);
+                resposta.Mensagem = "Mesas listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
         public async Task<MesOutputDTO> MesaPorId(Guid id)
