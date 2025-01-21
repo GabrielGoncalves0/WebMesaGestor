@@ -45,37 +45,88 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<CaiOutputDTO> CaixaPorId(Guid id)
+        public async Task<Response<CaiOutputDTO>> CaixaPorId(Guid id)
         {
-            Caixa caixa = await _caixaRepository.CaixaPorId(id);
-            if (caixa.UsuarioId != null)
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            try
             {
-                caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
+                Caixa caixa = await _caixaRepository.CaixaPorId(id);
+                if (caixa.UsuarioId != null)
+                {
+                    caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
+                }
+
+                resposta.Dados = CaixaMap.MapCaixa(caixa);
+                resposta.Mensagem = "Caixas listados com sucesso";
+                return resposta;
             }
-            return CaixaMap.MapCaixa(caixa);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<CaiOutputDTO> AbrirCaixa(CaiAbrirDTO caixa)
+        public async Task<Response<CaiOutputDTO>> AbrirCaixa(CaiAbrirDTO caixa)
         {
-            Caixa map = CaixaMap.MapCaixa(caixa);
-            Caixa retorno = await _caixaRepository.AbrirCaixa(map);
-            return CaixaMap.MapCaixa(retorno);
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            try
+            {
+                Caixa map = CaixaMap.MapCaixa(caixa);
+                Caixa retorno = await _caixaRepository.AbrirCaixa(map);
+
+                resposta.Dados = CaixaMap.MapCaixa(retorno);
+                resposta.Mensagem = "Caixas listados com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<CaiOutputDTO> FecharCaixa(CaiFecharDTO caixa)
+        public async Task<Response<CaiOutputDTO>> FecharCaixa(CaiFecharDTO caixa)
         {
-            Caixa buscarCaixa = await _caixaRepository.CaixaPorId(caixa.Id);
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            try
+            {
+                Caixa buscarCaixa = await _caixaRepository.CaixaPorId(caixa.Id);
+                buscarCaixa.CaiValFechamento = caixa.CaiValFechamento;
+                Caixa retorno = await _caixaRepository.FecharCaixa(buscarCaixa);
 
-            buscarCaixa.CaiValFechamento = caixa.CaiValFechamento;
-            
-            Caixa retorno = await _caixaRepository.FecharCaixa(buscarCaixa);
-            return CaixaMap.MapCaixa(retorno);
+                resposta.Dados = CaixaMap.MapCaixa(retorno);
+                resposta.Mensagem = "Caixas listados com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<CaiOutputDTO> DeletarCaixa(Guid id)
+        public async Task<Response<CaiOutputDTO>> DeletarCaixa(Guid id)
         {
-            Caixa retorno = await _caixaRepository.DeletarCaixa(id);
-            return CaixaMap.MapCaixa(retorno);
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+
+            try
+            {
+                Caixa retorno = await _caixaRepository.DeletarCaixa(id);
+
+                resposta.Dados = CaixaMap.MapCaixa(retorno);
+                resposta.Mensagem = "Caixas listados com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }

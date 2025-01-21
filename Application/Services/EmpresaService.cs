@@ -35,34 +35,83 @@ namespace WebMesaGestor.Application.Services
             }
         }   
 
-        public async Task<EmpOutputDTO> EmpresaPorId(Guid id)
+        public async Task<Response<EmpOutputDTO>> EmpresaPorId(Guid id)
         {
-            Empresa empresa = await _empresaRepository.EmpresaPorId(id);
-            return EmpresaMap.MapEmpresa(empresa);
+            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
+            try
+            {
+                Empresa empresa = await _empresaRepository.EmpresaPorId(id);
+                resposta.Dados = EmpresaMap.MapEmpresa(empresa);
+                resposta.Mensagem = "Empresa encontrada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<EmpOutputDTO> CriarEmpresa(EmpCriacaoDTO empresa)
+        public async Task<Response<EmpOutputDTO>> CriarEmpresa(EmpCriacaoDTO empresa)
         {
-            Empresa map = EmpresaMap.MapEmpresa(empresa);
-            Empresa retorno = await _empresaRepository.CriarEmpresa(map);
-            return EmpresaMap.MapEmpresa(retorno);
+            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
+            try
+            {
+                Empresa map = EmpresaMap.MapEmpresa(empresa);
+                Empresa retorno = await _empresaRepository.CriarEmpresa(map);
+
+                resposta.Dados = EmpresaMap.MapEmpresa(retorno);
+                resposta.Mensagem = "Empresa criada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<EmpOutputDTO> AtualizarEmpresa(EmpEdicaoDTO empresa)
+        public async Task<Response<EmpOutputDTO>> AtualizarEmpresa(EmpEdicaoDTO empresa)
         {
-            Empresa buscarEmpresa = await _empresaRepository.EmpresaPorId(empresa.Id);
+            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
+            try
+            {
+                Empresa buscarEmpresa = await _empresaRepository.EmpresaPorId(empresa.Id);
+                buscarEmpresa.EmpNome = empresa.EmpNome;
+                buscarEmpresa.EmpCnpj = empresa.EmpCnpj;
+                Empresa retorno = await _empresaRepository.AtualizarEmpresa(buscarEmpresa);
 
-            buscarEmpresa.EmpNome = empresa.EmpNome;
-            buscarEmpresa.EmpCnpj = empresa.EmpCnpj;
-
-            Empresa retorno = await _empresaRepository.AtualizarEmpresa(buscarEmpresa);
-            return EmpresaMap.MapEmpresa(retorno);
+                resposta.Dados = EmpresaMap.MapEmpresa(retorno);
+                resposta.Mensagem = "Empresa atualizada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<EmpOutputDTO> DeletarEmpresa(Guid id)
+        public async Task<Response<EmpOutputDTO>> DeletarEmpresa(Guid id)
         {
-            Empresa retorno = await _empresaRepository.DeletarEmpresa(id);
-            return EmpresaMap.MapEmpresa(retorno);
+            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
+            try
+            {
+                Empresa retorno = await _empresaRepository.DeletarEmpresa(id);
+
+                resposta.Dados = EmpresaMap.MapEmpresa(retorno);
+                resposta.Mensagem = "Empresa deletada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }

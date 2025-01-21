@@ -33,33 +33,83 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<CatOutputDTO> CategoriaPorId(Guid id)
+        public async Task<Response<CatOutputDTO>> CategoriaPorId(Guid id)
         {
-            Categoria categoria = await _categoriaRepository.CategoriaPorId(id);
-            return CategoriaMap.MapCategoria(categoria);
+            Response<CatOutputDTO> resposta = new Response<CatOutputDTO>();
+            try
+            {
+                Categoria categoria = await _categoriaRepository.CategoriaPorId(id);
+
+                resposta.Dados = CategoriaMap.MapCategoria(categoria);
+                resposta.Mensagem = "Categorias listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<CatOutputDTO> CriarCategoria(CatCriacaoDTO categoria)
+        public async Task<Response<CatOutputDTO>> CriarCategoria(CatCriacaoDTO categoria)
         {
-            Categoria map = CategoriaMap.MapCategoria(categoria);
-            Categoria retorno = await _categoriaRepository.CriarCategoria(map);
-            return CategoriaMap.MapCategoria(retorno);
+            Response<CatOutputDTO> resposta = new Response<CatOutputDTO>();
+            try
+            {
+                Categoria map = CategoriaMap.MapCategoria(categoria);
+                Categoria retorno = await _categoriaRepository.CriarCategoria(map);
+
+                resposta.Dados = CategoriaMap.MapCategoria(retorno);
+                resposta.Mensagem = "Categorias listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<CatOutputDTO> AtualizarCategoria(CatEdicaoDTO categoria)
+        public async Task<Response<CatOutputDTO>> AtualizarCategoria(CatEdicaoDTO categoria)
         {
-            Categoria buscarCategoria = await _categoriaRepository.CategoriaPorId(categoria.Id);
+            Response<CatOutputDTO> resposta = new Response<CatOutputDTO>();
+            try
+            {
+                Categoria buscarCategoria = await _categoriaRepository.CategoriaPorId(categoria.Id);
+                buscarCategoria.CatDesc = categoria.CatDesc;
+                Categoria retorno = await _categoriaRepository.AtualizarCategoria(buscarCategoria);
 
-            buscarCategoria.CatDesc = categoria.CatDesc;
-
-            Categoria retorno = await _categoriaRepository.AtualizarCategoria(buscarCategoria);
-            return CategoriaMap.MapCategoria(retorno);
+                resposta.Dados = CategoriaMap.MapCategoria(retorno);
+                resposta.Mensagem = "Categorias listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<CatOutputDTO> DeletarCategoria(Guid id)
+        public async Task<Response<CatOutputDTO>> DeletarCategoria(Guid id)
         {
-            Categoria retorno = await _categoriaRepository.DeletarCategoria(id);
-            return CategoriaMap.MapCategoria(retorno);
+            Response<CatOutputDTO> resposta = new Response<CatOutputDTO>();
+            try
+            {
+                Categoria retorno = await _categoriaRepository.DeletarCategoria(id);
+
+                resposta.Dados = CategoriaMap.MapCategoria(retorno);
+                resposta.Mensagem = "Categorias listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 

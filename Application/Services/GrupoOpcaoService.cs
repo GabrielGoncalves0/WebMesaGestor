@@ -33,37 +33,85 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<GrupOpcOutputDTO> GrupoOpcaoPorId(Guid id)
+        public async Task<Response<GrupOpcOutputDTO>> GrupoOpcaoPorId(Guid id)
         {
-            GrupoOpcoes grupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(id);
-            return GrupoOpcaoMap.MapGrupoOpcao(grupoOpcao);
+            Response<GrupOpcOutputDTO> resposta = new Response<GrupOpcOutputDTO>();
+            try
+            {
+                GrupoOpcoes grupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(id);
+
+                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(grupoOpcao);
+                resposta.Mensagem = "Grupo encontrado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<GrupOpcOutputDTO> CriarGrupoOpcao(GrupOpcCriacaoDTO grupoOpcao)
+        public async Task<Response<GrupOpcOutputDTO>> CriarGrupoOpcao(GrupOpcCriacaoDTO grupoOpcao)
         {
-            GrupoOpcoes map = GrupoOpcaoMap.MapGrupoOpcao(grupoOpcao);
-            GrupoOpcoes retorno = await _grupoOpcaoRepository.CriarGrupoOpcao(map);
-            return GrupoOpcaoMap.MapGrupoOpcao(retorno);
+            Response<GrupOpcOutputDTO> resposta = new Response<GrupOpcOutputDTO>();
+            try
+            {
+                GrupoOpcoes map = GrupoOpcaoMap.MapGrupoOpcao(grupoOpcao);
+                GrupoOpcoes retorno = await _grupoOpcaoRepository.CriarGrupoOpcao(map);
+
+                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(retorno);
+                resposta.Mensagem = "Grupo criado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<GrupOpcOutputDTO> AtualizarGrupoOpcao(GrupOpcEdicaoDTO grupoOpcao)
+        public async Task<Response<GrupOpcOutputDTO>> AtualizarGrupoOpcao(GrupOpcEdicaoDTO grupoOpcao)
         {
-            GrupoOpcoes buscarGrupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(grupoOpcao.Id);
+            Response<GrupOpcOutputDTO> resposta = new Response<GrupOpcOutputDTO>();
+            try
+            {
+                GrupoOpcoes buscarGrupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(grupoOpcao.Id);
+                buscarGrupoOpcao.GrupOpcDesc = grupoOpcao.GrupOpcDesc;
+                buscarGrupoOpcao.GrupOpcTipo = grupoOpcao.GrupOpcTipo;
+                buscarGrupoOpcao.GrupOpcMax = grupoOpcao.GrupOpcMax;
+                buscarGrupoOpcao.ProdutoId = grupoOpcao.ProdutoId;
+                GrupoOpcoes retorno = await _grupoOpcaoRepository.AtualizarGrupoOpcao(buscarGrupoOpcao);
 
-            buscarGrupoOpcao.GrupOpcDesc = grupoOpcao.GrupOpcDesc;
-            buscarGrupoOpcao.GrupOpcTipo = grupoOpcao.GrupOpcTipo;
-            buscarGrupoOpcao.GrupOpcMax = grupoOpcao.GrupOpcMax;
-            buscarGrupoOpcao.ProdutoId = grupoOpcao.ProdutoId;
-
-
-            GrupoOpcoes retorno = await _grupoOpcaoRepository.AtualizarGrupoOpcao(buscarGrupoOpcao);
-            return GrupoOpcaoMap.MapGrupoOpcao(retorno);
+                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(retorno);
+                resposta.Mensagem = "Grupo atualizado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<GrupOpcOutputDTO> DeletarGrupoOpcao(Guid id)
+        public async Task<Response<GrupOpcOutputDTO>> DeletarGrupoOpcao(Guid id)
         {
-            GrupoOpcoes retorno = await _grupoOpcaoRepository.DeletarGrupoOpcao(id);
-            return GrupoOpcaoMap.MapGrupoOpcao(retorno);
+            Response<GrupOpcOutputDTO> resposta = new Response<GrupOpcOutputDTO>();
+            try
+            {
+                GrupoOpcoes retorno = await _grupoOpcaoRepository.DeletarGrupoOpcao(id);
+                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(retorno);
+                resposta.Mensagem = "Grupo deletado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }
