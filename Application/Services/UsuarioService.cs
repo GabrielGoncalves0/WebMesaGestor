@@ -43,50 +43,100 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<UsuOutputDTO> UsuarioPorId(Guid id)
+        public async Task<Response<UsuOutputDTO>> UsuarioPorId(Guid id)
         {
-            Usuario usuario = await _usuarioRepository.UsuarioPorId(id);
-            if (usuario.EmpresaId != null)
+            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            try
             {
-                usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+                Usuario usuario = await _usuarioRepository.UsuarioPorId(id);
+                if (usuario.EmpresaId != null)
+                {
+                    usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+                }
+
+                resposta.Dados = UsuarioMap.MapUsuario(usuario);
+                resposta.Mensagem = "Usuário encontrado com sucesso";
+                return resposta;
             }
-            return UsuarioMap.MapUsuario(usuario);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<UsuOutputDTO> CriarUsuario(UsuCriacaoDTO usuario)
+        public async Task<Response<UsuOutputDTO>> CriarUsuario(UsuCriacaoDTO usuario)
         {
-            Usuario map = UsuarioMap.MapUsuario(usuario);
-            Usuario retorno = await _usuarioRepository.CriarUsuario(map);
-            if (retorno.EmpresaId != null)
+            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            try
             {
-                retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
+                Usuario map = UsuarioMap.MapUsuario(usuario);
+                Usuario retorno = await _usuarioRepository.CriarUsuario(map);
+                if (retorno.EmpresaId != null)
+                {
+                    retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
+                }
+
+                resposta.Dados = UsuarioMap.MapUsuario(retorno);
+                resposta.Mensagem = "Usuário criado com sucesso";
+                return resposta;
             }
-            return UsuarioMap.MapUsuario(retorno);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<UsuOutputDTO> AtualizarUsuario(UsuEdicaoDTO usuario)
+        public async Task<Response<UsuOutputDTO>> AtualizarUsuario(UsuEdicaoDTO usuario)
         {
-            Usuario buscarUsuario = await _usuarioRepository.UsuarioPorId(usuario.Id);
-
-            buscarUsuario.UsuNome = usuario.UsuNome;
-            buscarUsuario.UsuEmail = usuario.UsuEmail;
-            buscarUsuario.UsuTelefone = usuario.UsuTelefone;
-            buscarUsuario.UsuSenha = usuario.UsuSenha;
-            buscarUsuario.UsuTipo = usuario.UsuTipo;
-            buscarUsuario.EmpresaId = usuario.EmpresaId;
-
-            Usuario retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);
-            if (retorno.EmpresaId != null)
+            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            try
             {
-                retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
-            }
-            return UsuarioMap.MapUsuario(retorno);
-        }
+                Usuario buscarUsuario = await _usuarioRepository.UsuarioPorId(usuario.Id);
 
-        public async Task<UsuOutputDTO> DeletarUsuario(Guid id)
+                buscarUsuario.UsuNome = usuario.UsuNome;
+                buscarUsuario.UsuEmail = usuario.UsuEmail;
+                buscarUsuario.UsuTelefone = usuario.UsuTelefone;
+                buscarUsuario.UsuSenha = usuario.UsuSenha;
+                buscarUsuario.UsuTipo = usuario.UsuTipo;
+                buscarUsuario.EmpresaId = usuario.EmpresaId;
+
+                Usuario retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);
+                if (retorno.EmpresaId != null)
+                {
+                    retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
+                }
+                resposta.Dados = UsuarioMap.MapUsuario(retorno);
+                resposta.Mensagem = "Usuário atualizado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
+        }
+        
+        public async Task<Response<UsuOutputDTO>> DeletarUsuario(Guid id)
         {
-            Usuario retorno = await _usuarioRepository.DeletarUsuario(id);
-            return UsuarioMap.MapUsuario(retorno);
+            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            try
+            {
+                Usuario usuario = await _usuarioRepository.DeletarUsuario(id);
+                resposta.Dados = UsuarioMap.MapUsuario(usuario);
+                resposta.Mensagem = "Usuário deletado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }

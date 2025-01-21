@@ -50,45 +50,94 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<PedOutputDTO> PedidoPorId(Guid id)
+        public async Task<Response<PedOutputDTO>> PedidoPorId(Guid id)
         {
-            Pedido pedido = await _pedidoRepository.PedidoPorId(id);
-            if (pedido.UsuarioId != null)
+            Response<PedOutputDTO> resposta = new Response<PedOutputDTO>();
+            try
             {
-                pedido.Usuario = await _usuarioRepository.UsuarioPorId((Guid)pedido.UsuarioId);
+                Pedido pedido = await _pedidoRepository.PedidoPorId(id);
+                if (pedido.UsuarioId != null)
+                {
+                    pedido.Usuario = await _usuarioRepository.UsuarioPorId((Guid)pedido.UsuarioId);
+                }
+                if (pedido.MesaId != null)
+                {
+                    pedido.Mesa = await _mesaRepository.MesaPorId((Guid)pedido.MesaId);
+                }
+                resposta.Dados = PedidoMap.MapPedido(pedido);
+                resposta.Mensagem = "Pedido encontrado com sucesso";
+                return resposta;
             }
-            if (pedido.MesaId != null)
+            catch (Exception ex)
             {
-                pedido.Mesa = await _mesaRepository.MesaPorId((Guid)pedido.MesaId);
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
             }
-            return PedidoMap.MapPedido(pedido);
         }
 
-        public async Task<PedOutputDTO> CriarPedido(PedCriacaoDTO pedido)
+        public async Task<Response<PedOutputDTO>> CriarPedido(PedCriacaoDTO pedido)
         {
-            Pedido map = PedidoMap.MapPedido(pedido);
-            Pedido retorno = await _pedidoRepository.CriarPedido(map);
-            return PedidoMap.MapPedido(retorno);
+            Response<PedOutputDTO> resposta = new Response<PedOutputDTO>();
+            try
+            {
+                Pedido map = PedidoMap.MapPedido(pedido);
+                Pedido retorno = await _pedidoRepository.CriarPedido(map);
+
+                resposta.Dados = PedidoMap.MapPedido(retorno);
+                resposta.Mensagem = "Pedido criado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<PedOutputDTO> AtualizarPedido(PedEdicaoDTO pedido)
+        public async Task<Response<PedOutputDTO>> AtualizarPedido(PedEdicaoDTO pedido)
         {
-            Pedido buscarPedido = await _pedidoRepository.PedidoPorId(pedido.Id);
+            Response<PedOutputDTO> resposta = new Response<PedOutputDTO>();
+            try
+            {
+                Pedido buscarPedido = await _pedidoRepository.PedidoPorId(pedido.Id);
+                buscarPedido.PedValor = pedido.PedValor;
+                buscarPedido.PedStatus = pedido.PedStatus;
+                buscarPedido.PedTipoPag = pedido.PedTipoPag;
+                buscarPedido.UsuarioId = pedido.UsuarioId;
+                buscarPedido.MesaId = pedido.MesaId;
+                Pedido retorno = await _pedidoRepository.AtualizarPedido(buscarPedido);
 
-            buscarPedido.PedValor = pedido.PedValor;
-            buscarPedido.PedStatus = pedido.PedStatus;
-            buscarPedido.PedTipoPag = pedido.PedTipoPag;
-            buscarPedido.UsuarioId = pedido.UsuarioId;
-            buscarPedido.MesaId = pedido.MesaId;
-
-            Pedido retorno = await _pedidoRepository.AtualizarPedido(buscarPedido);
-            return PedidoMap.MapPedido(retorno);
+                resposta.Dados = PedidoMap.MapPedido(retorno);
+                resposta.Mensagem = "Pedido atualizado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<PedOutputDTO> DeletarPedido(Guid id)
+        public async Task<Response<PedOutputDTO>> DeletarPedido(Guid id)
         {
-            Pedido retorno = await _pedidoRepository.DeletarPedido(id);
-            return PedidoMap.MapPedido(retorno);
+            Response<PedOutputDTO> resposta = new Response<PedOutputDTO>();
+            try
+            {
+                Pedido retorno = await _pedidoRepository.DeletarPedido(id);
+
+                resposta.Dados = PedidoMap.MapPedido(retorno);
+                resposta.Mensagem = "Pedido deletado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }

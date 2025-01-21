@@ -49,46 +49,96 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<ProOutputDTO> ProdutoPorId(Guid id)
+        public async Task<Response<ProOutputDTO>> ProdutoPorId(Guid id)
         {
-            Produto produto = await _produtoRepository.ProdutoPorId(id);
-            if (produto.CategoriaId != null)
+            Response<ProOutputDTO> resposta = new Response<ProOutputDTO>();
+            try
             {
-                produto.Categoria = await _categoriaRepository.CategoriaPorId((Guid)produto.CategoriaId);
+                Produto produto = await _produtoRepository.ProdutoPorId(id);
+                if (produto.CategoriaId != null)
+                {
+                    produto.Categoria = await _categoriaRepository.CategoriaPorId((Guid)produto.CategoriaId);
+                }
+                if (produto.SetorId != null)
+                {
+                    produto.Setor = await _setorRepository.SetorPorId((Guid)produto.SetorId);
+                }
+                resposta.Dados = ProdutoMap.MapProduto(produto);
+                resposta.Mensagem = "Produto encontrado com sucesso";
+                return resposta;
             }
-            if (produto.SetorId != null)
+            catch (Exception ex)
             {
-                produto.Setor = await _setorRepository.SetorPorId((Guid)produto.SetorId);
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
             }
-            return ProdutoMap.MapProduto(produto);
         }
 
-        public async Task<ProOutputDTO> CriarProduto(ProCriacaoDTO produto)
+        public async Task<Response<ProOutputDTO>> CriarProduto(ProCriacaoDTO produto)
         {
-            Produto map = ProdutoMap.MapProduto(produto);
-            Produto retorno = await _produtoRepository.CriarProduto(map);
-            return ProdutoMap.MapProduto(retorno);
+            Response<ProOutputDTO> resposta = new Response<ProOutputDTO>();
+            try
+            {
+                Produto map = ProdutoMap.MapProduto(produto);
+                Produto retorno = await _produtoRepository.CriarProduto(map);
+
+                resposta.Dados = ProdutoMap.MapProduto(retorno);
+                resposta.Mensagem = "Produto criado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<ProOutputDTO> AtualizarProduto(ProEdicaoDTO produto)
+        public async Task<Response<ProOutputDTO>> AtualizarProduto(ProEdicaoDTO produto)
         {
-            Produto buscarProduto = await _produtoRepository.ProdutoPorId(produto.Id);
+            Response<ProOutputDTO> resposta = new Response<ProOutputDTO>();
+            try
+            {
+                Produto buscarProduto = await _produtoRepository.ProdutoPorId(produto.Id);
 
-            buscarProduto.ProCodigo = produto.ProCodigo;
-            buscarProduto.ProDescricao = produto.ProDescricao;
-            buscarProduto.ProUnidade = produto.ProUnidade;
-            buscarProduto.ProPreco = produto.ProPreco;
-            buscarProduto.CategoriaId = produto.CategoriaId;
-            buscarProduto.SetorId = produto.SetorId;
+                buscarProduto.ProCodigo = produto.ProCodigo;
+                buscarProduto.ProDescricao = produto.ProDescricao;
+                buscarProduto.ProUnidade = produto.ProUnidade;
+                buscarProduto.ProPreco = produto.ProPreco;
+                buscarProduto.CategoriaId = produto.CategoriaId;
+                buscarProduto.SetorId = produto.SetorId;
 
-            Produto retorno = await _produtoRepository.AtualizarProduto(buscarProduto);
-            return ProdutoMap.MapProduto(retorno);
+                Produto retorno = await _produtoRepository.AtualizarProduto(buscarProduto);
+
+                resposta.Dados = ProdutoMap.MapProduto(retorno);
+                resposta.Mensagem = "Produto atualizado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<ProOutputDTO> DeletarProduto(Guid id)
+        public async Task<Response<ProOutputDTO>> DeletarProduto(Guid id)
         {
-            Produto retorno = await _produtoRepository.DeletarProduto(id);
-            return ProdutoMap.MapProduto(retorno);
+            Response<ProOutputDTO> resposta = new Response<ProOutputDTO>();
+            try
+            {
+                Produto retorno = await _produtoRepository.DeletarProduto(id);
+                resposta.Dados = ProdutoMap.MapProduto(retorno);
+                resposta.Mensagem = "Produto deletado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }

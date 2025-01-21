@@ -33,34 +33,86 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<MesOutputDTO> MesaPorId(Guid id)
+        public async Task<Response<MesOutputDTO>> MesaPorId(Guid id)
         {
-            Mesa mesa = await _mesaRepository.MesaPorId(id);
-            return MesaMap.MapMesa(mesa);
+            Response<MesOutputDTO> resposta = new Response<MesOutputDTO>();
+            try
+            {
+                Mesa mesa = await _mesaRepository.MesaPorId(id);
+
+                resposta.Dados = MesaMap.MapMesa(mesa);
+                resposta.Mensagem = "Mesa encontrada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<MesOutputDTO> CriarMesa(MesCriacaoDTO mesa)
+        public async Task<Response<MesOutputDTO>> CriarMesa(MesCriacaoDTO mesa)
         {
-            Mesa map = MesaMap.MapMesa(mesa);
-            Mesa retorno = await _mesaRepository.CriarMesa(map);
-            return MesaMap.MapMesa(retorno);
+            Response<MesOutputDTO> resposta = new Response<MesOutputDTO>();
+            try
+            {
+                Mesa map = MesaMap.MapMesa(mesa);
+                Mesa retorno = await _mesaRepository.CriarMesa(map);
+
+                resposta.Dados = MesaMap.MapMesa(retorno);
+                resposta.Mensagem = "Mesa Criada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<MesOutputDTO> AtualizarMesa(MesEdicaoDTO mesa)
+        public async Task<Response<MesOutputDTO>> AtualizarMesa(MesEdicaoDTO mesa)
         {
-            Mesa buscarMesa = await _mesaRepository.MesaPorId(mesa.Id);
+            Response<MesOutputDTO> resposta = new Response<MesOutputDTO>();
+            try
+            {
+                Mesa buscarMesa = await _mesaRepository.MesaPorId(mesa.Id);
+                buscarMesa.MesaNumero = mesa.MesaNumero;
+                buscarMesa.MesaStatus = mesa.MesaStatus;
+                Mesa retorno = await _mesaRepository.AtualizarMesa(buscarMesa);
 
-            buscarMesa.MesaNumero = mesa.MesaNumero;
-            buscarMesa.MesaStatus = mesa.MesaStatus;
+                resposta.Dados = MesaMap.MapMesa(retorno);
+                resposta.Mensagem = "Mesas atualizada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
 
-            Mesa retorno = await _mesaRepository.AtualizarMesa(buscarMesa);
-            return MesaMap.MapMesa(retorno);
+
         }
 
-        public async Task<MesOutputDTO> DeletarMesa(Guid id)
+        public async Task<Response<MesOutputDTO>> DeletarMesa(Guid id)
         {
-            Mesa retorno = await _mesaRepository.DeletarMesa(id);
-            return MesaMap.MapMesa(retorno);
+            Response<MesOutputDTO> resposta = new Response<MesOutputDTO>();
+            try
+            {
+                Mesa retorno = await _mesaRepository.DeletarMesa(id);
+
+                resposta.Dados = MesaMap.MapMesa(retorno);
+                resposta.Mensagem = "Mesas listadas com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }

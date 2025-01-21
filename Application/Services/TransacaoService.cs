@@ -55,50 +55,101 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<TraOutputDTO> TransacaoPorId(Guid id)
+        public async Task<Response<TraOutputDTO>> TransacaoPorId(Guid id)
         {
-            Transacao transacao = await _transacaoRepository.TransacaoPorId(id);
-            if (transacao.UsuarioId != null)
+            Response<TraOutputDTO> resposta = new Response<TraOutputDTO>();
+            try
             {
-                transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
+                Transacao transacao = await _transacaoRepository.TransacaoPorId(id);
+                if (transacao.UsuarioId != null)
+                {
+                    transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
+                }
+                if (transacao.CaixaId != null)
+                {
+                    transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
+                }
+                if (transacao.PedidoId != null)
+                {
+                    transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
+                }
+                resposta.Dados = TransacaoMap.MapTransacao(transacao);
+                resposta.Mensagem = "Transação encontrada com sucesso";
+                return resposta;
             }
-            if (transacao.CaixaId != null)
+            catch (Exception ex)
             {
-                transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
             }
-            if (transacao.PedidoId != null)
-            {
-                transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
-            }
-            return TransacaoMap.MapTransacao(transacao);
         }
 
-        public async Task<TraOutputDTO> CriarTransacao(TraCriacaoDTO transacao)
+        public async Task<Response<TraOutputDTO>> CriarTransacao(TraCriacaoDTO transacao)
         {
-            Transacao map = TransacaoMap.MapTransacao(transacao);
-            Transacao retorno = await _transacaoRepository.CriarTransacao(map);
-            return TransacaoMap.MapTransacao(retorno);
+            Response<TraOutputDTO> resposta = new Response<TraOutputDTO>();
+            try
+            {
+                Transacao map = TransacaoMap.MapTransacao(transacao);
+                Transacao retorno = await _transacaoRepository.CriarTransacao(map);
+                resposta.Dados = TransacaoMap.MapTransacao(retorno);
+                resposta.Mensagem = "Transação criada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<TraOutputDTO> AtualizarTransacao(TraEdicaoDTO transacao)
+        public async Task<Response<TraOutputDTO>> AtualizarTransacao(TraEdicaoDTO transacao)
         {
-            Transacao buscarTransacao = await _transacaoRepository.TransacaoPorId(transacao.Id);
+            Response<TraOutputDTO> resposta = new Response<TraOutputDTO>();
+            try
+            {
+                Transacao buscarTransacao = await _transacaoRepository.TransacaoPorId(transacao.Id);
 
-            buscarTransacao.TraDescricao = transacao.TraDescricao;
-            buscarTransacao.TraValor = transacao.TraValor;
-            buscarTransacao.TransactionStatus = transacao.TransactionStatus;
-            buscarTransacao.UsuarioId = transacao.UsuarioId;
-            buscarTransacao.CaixaId = transacao.CaixaId;
-            buscarTransacao.PedidoId = transacao.PedidoId;
+                buscarTransacao.TraDescricao = transacao.TraDescricao;
+                buscarTransacao.TraValor = transacao.TraValor;
+                buscarTransacao.TransactionStatus = transacao.TransactionStatus;
+                buscarTransacao.UsuarioId = transacao.UsuarioId;
+                buscarTransacao.CaixaId = transacao.CaixaId;
+                buscarTransacao.PedidoId = transacao.PedidoId;
 
-            Transacao retorno = await _transacaoRepository.AtualizarTransacao(buscarTransacao);
-            return TransacaoMap.MapTransacao(retorno);
+                Transacao retorno = await _transacaoRepository.AtualizarTransacao(buscarTransacao);
+
+                resposta.Dados = TransacaoMap.MapTransacao(retorno);
+                resposta.Mensagem = "Transação atualizada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
+
         }
 
-        public async Task<TraOutputDTO> DeletarTransacao(Guid id)
+        public async Task<Response<TraOutputDTO>> DeletarTransacao(Guid id)
         {
-            Transacao retorno = await _transacaoRepository.DeletarTransacao(id);
-            return TransacaoMap.MapTransacao(retorno);
+            Response<TraOutputDTO> resposta = new Response<TraOutputDTO>();
+            try
+            {
+                Transacao retorno = await _transacaoRepository.DeletarTransacao(id);
+                resposta.Dados = TransacaoMap.MapTransacao(retorno);
+                resposta.Mensagem = "Transação deletada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
+
         }
     }
 }

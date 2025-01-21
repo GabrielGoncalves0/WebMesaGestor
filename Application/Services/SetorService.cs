@@ -35,34 +35,83 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<SetOutputDTO> SetorPorId(Guid id)
+        public async Task<Response<SetOutputDTO>> SetorPorId(Guid id)
         {
-            Setor setor = await _setorRepository.SetorPorId(id);
-            return SetorMap.MapSetor(setor);
+            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
+            try
+            {
+                Setor setor = await _setorRepository.SetorPorId(id);
+
+                resposta.Dados = SetorMap.MapSetor(setor);
+                resposta.Mensagem = "Setor encontrado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<SetOutputDTO> CriarSetor(SetCriacaoDTO setor)
+        public async Task<Response<SetOutputDTO>> CriarSetor(SetCriacaoDTO setor)
         {
-            Setor map = SetorMap.MapSetor(setor);
-            Setor retorno = await _setorRepository.CriarSetor(map);
-            return SetorMap.MapSetor(retorno);
+            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
+            try
+            {
+                Setor map = SetorMap.MapSetor(setor);
+                Setor retorno = await _setorRepository.CriarSetor(map);
+
+                resposta.Dados = SetorMap.MapSetor(retorno);
+                resposta.Mensagem = "Setor criado com sucesso";
+                return resposta; 
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<SetOutputDTO> AtualizarSetor(SetEdicaoDTO setor)
+        public async Task<Response<SetOutputDTO>> AtualizarSetor(SetEdicaoDTO setor)
         {
-            Setor buscarSetor = await _setorRepository.SetorPorId(setor.Id);
+            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
+            try
+            {
+                Setor buscarSetor = await _setorRepository.SetorPorId(setor.Id);
+                buscarSetor.SetDesc = setor.SetDesc;
+                buscarSetor.SetStatus = setor.SetStatus;
+                Setor retorno = await _setorRepository.AtualizarSetor(buscarSetor);
 
-            buscarSetor.SetDesc = setor.SetDesc;
-            buscarSetor.SetStatus = setor.SetStatus;
-
-            Setor retorno = await _setorRepository.AtualizarSetor(buscarSetor);
-            return SetorMap.MapSetor(retorno);
+                resposta.Dados = SetorMap.MapSetor(retorno);
+                resposta.Mensagem = "Setor atualizado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<SetOutputDTO> DeletarSetor(Guid id)
+        public async Task<Response<SetOutputDTO>> DeletarSetor(Guid id)
         {
-            Setor retorno = await _setorRepository.DeletarSetor(id);
-            return SetorMap.MapSetor(retorno);
+            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
+            try
+            {
+                Setor retorno = await _setorRepository.DeletarSetor(id);
+                resposta.Dados = SetorMap.MapSetor(retorno);
+                resposta.Mensagem = "Setor deletado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }

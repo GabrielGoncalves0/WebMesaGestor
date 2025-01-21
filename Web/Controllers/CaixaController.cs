@@ -24,7 +24,7 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpPost]
-        [Route("cadastrar")]
+        [Route("abrir")]
         public async Task<IActionResult> Post([FromBody] CaiAbrirDTO caiAbrirDTO)
         {
             var caixa = await _caixaService.AbrirCaixa(caiAbrirDTO);
@@ -32,7 +32,7 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpPut]
-        [Route("atualizar")]
+        [Route("fechar")]
         public async Task<IActionResult> Put([FromBody] CaiFecharDTO caiFecharDTO)
         {
             var caixa = await _caixaService.FecharCaixa(caiFecharDTO);

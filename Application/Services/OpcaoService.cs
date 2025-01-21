@@ -42,40 +42,89 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<OpcOutputDTO> OpcaoPorId(Guid id)
+        public async Task<Response<OpcOutputDTO>> OpcaoPorId(Guid id)
         {
-            Opcao opcao = await _opcaoRepository.OpcaoPorId(id);
-            if (opcao.GrupoOpcoesId != null)
+            Response<OpcOutputDTO> resposta = new Response<OpcOutputDTO>();
+            try
             {
-                opcao.GrupoOpcoes = await _grupoOpcoesRepository.GrupoOpcaoPorId((Guid)opcao.GrupoOpcoesId);
+                Opcao opcao = await _opcaoRepository.OpcaoPorId(id);
+                if (opcao.GrupoOpcoesId != null)
+                {
+                    opcao.GrupoOpcoes = await _grupoOpcoesRepository.GrupoOpcaoPorId((Guid)opcao.GrupoOpcoesId);
+                }
+                resposta.Dados = OpcaoMap.MapOpcao(opcao);
+                resposta.Mensagem = "Opcao encontrada com sucesso";
+                return resposta;
             }
-            return OpcaoMap.MapOpcao(opcao);
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<OpcOutputDTO> CriarOpcao(OpcCriacaoDTO opcao)
+        public async Task<Response<OpcOutputDTO>> CriarOpcao(OpcCriacaoDTO opcao)
         {
-            Opcao map = OpcaoMap.MapOpcao(opcao);
-            Opcao retorno = await _opcaoRepository.CriarOpcao(map);
-            return OpcaoMap.MapOpcao(retorno);
+            Response<OpcOutputDTO> resposta = new Response<OpcOutputDTO>();
+            try
+            {
+                Opcao map = OpcaoMap.MapOpcao(opcao);
+                Opcao retorno = await _opcaoRepository.CriarOpcao(map);
+
+                resposta.Dados = OpcaoMap.MapOpcao(retorno);
+                resposta.Mensagem = "Opcao criada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<OpcOutputDTO> AtualizarOpcao(OpcEdicaoDTO opcao)
+        public async Task<Response<OpcOutputDTO>> AtualizarOpcao(OpcEdicaoDTO opcao)
         {
-            Opcao buscarOpcao = await _opcaoRepository.OpcaoPorId(opcao.Id);
+            Response<OpcOutputDTO> resposta = new Response<OpcOutputDTO>();
+            try
+            {
+                Opcao buscarOpcao = await _opcaoRepository.OpcaoPorId(opcao.Id);
+                buscarOpcao.OpcaoDesc = opcao.OpcaoDesc;
+                buscarOpcao.OpcaoValor = opcao.OpcaoValor;
+                buscarOpcao.OpcaoQuantMax = opcao.OpcaoQuantMax;
+                buscarOpcao.GrupoOpcoesId = opcao.GrupoOpcoesId;
+                Opcao retorno = await _opcaoRepository.AtualizarOpcao(buscarOpcao);
 
-            buscarOpcao.OpcaoDesc = opcao.OpcaoDesc;
-            buscarOpcao.OpcaoValor = opcao.OpcaoValor;
-            buscarOpcao.OpcaoQuantMax = opcao.OpcaoQuantMax;
-            buscarOpcao.GrupoOpcoesId = opcao.GrupoOpcoesId;
-
-            Opcao retorno = await _opcaoRepository.AtualizarOpcao(buscarOpcao);
-            return OpcaoMap.MapOpcao(retorno);
+                resposta.Dados = OpcaoMap.MapOpcao(retorno);
+                resposta.Mensagem = "Opcao atualizada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public async Task<OpcOutputDTO> DeletarOpcao(Guid id)
+        public async Task<Response<OpcOutputDTO>> DeletarOpcao(Guid id)
         {
-            Opcao retorno = await _opcaoRepository.DeletarOpcao(id);
-            return OpcaoMap.MapOpcao(retorno);
+            Response<OpcOutputDTO> resposta = new Response<OpcOutputDTO>();
+            try
+            {
+                Opcao retorno = await _opcaoRepository.DeletarOpcao(id);
+
+                resposta.Dados = OpcaoMap.MapOpcao(retorno);
+                resposta.Mensagem = "Opcao deletada com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
     }
 }
