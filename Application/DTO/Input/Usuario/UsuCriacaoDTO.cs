@@ -9,6 +9,6 @@ namespace WebMesaGestor.Application.DTO.Input.USuario
         public string UsuTelefone { get; set; }
         public string UsuSenha { get; set; }
         public UsuarioTipo UsuTipo { get; set; }
-        public Guid? EmpresaId { get; set; }
+        public Guid EmpresaId { get; set; }
     }
 }

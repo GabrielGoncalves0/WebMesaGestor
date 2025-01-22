@@ -3,7 +3,7 @@ using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
-using WebMesaGestor.Infra.Repositories;
+using WebMesaGestor.Utils;
 
 namespace WebMesaGestor.Application.Services
 {
@@ -20,123 +20,173 @@ namespace WebMesaGestor.Application.Services
 
         public async Task<Response<IEnumerable<UsuOutputDTO>>> ListarUsuarios()
         {
-            Response<IEnumerable<UsuOutputDTO>> resposta = new Response<IEnumerable<UsuOutputDTO>>();
+            var resposta = new Response<IEnumerable<UsuOutputDTO>>();
             try
             {
-                IEnumerable<Usuario> usuarios = await _usuarioRepository.ListarUsuarios();
-                foreach(var usuario in usuarios)
-                {
-                    if (usuario.EmpresaId != null)
-                    {
-                        usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
-                    }
-                }
+                var usuarios = await _usuarioRepository.ListarUsuarios();
+                await PreencherEmpresas(usuarios);
                 resposta.Dados = UsuarioMap.MapUsuario(usuarios);
                 resposta.Mensagem = "Usuários listados com sucesso";
-                return resposta;
             }
             catch (Exception ex)
             {
                 resposta.Mensagem = ex.Message;
                 resposta.Status = false;
-                return resposta;
             }
+            return resposta;
         }
 
         public async Task<Response<UsuOutputDTO>> UsuarioPorId(Guid id)
         {
-            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            var resposta = new Response<UsuOutputDTO>();
             try
             {
-                Usuario usuario = await _usuarioRepository.UsuarioPorId(id);
-                if (usuario.EmpresaId != null)
-                {
-                    usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
-                }
-
+                var usuario = await _usuarioRepository.UsuarioPorId(id);
+                await PreencherDados(usuario);
                 resposta.Dados = UsuarioMap.MapUsuario(usuario);
                 resposta.Mensagem = "Usuário encontrado com sucesso";
-                return resposta;
             }
             catch (Exception ex)
             {
                 resposta.Mensagem = ex.Message;
                 resposta.Status = false;
-                return resposta;
             }
+            return resposta;
         }
 
         public async Task<Response<UsuOutputDTO>> CriarUsuario(UsuCriacaoDTO usuario)
         {
-            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            var resposta = new Response<UsuOutputDTO>();
             try
             {
-                Usuario map = UsuarioMap.MapUsuario(usuario);
-                Usuario retorno = await _usuarioRepository.CriarUsuario(map);
-                if (retorno.EmpresaId != null)
-                {
-                    retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
-                }
+                ValidarUsuarioCriacao(usuario);
+                var empresa = await BuscarEmpresa(usuario.EmpresaId);
 
+                Usuario map = UsuarioMap.MapUsuario(usuario);
+                var retorno = await _usuarioRepository.CriarUsuario(map);
+                await PreencherDados(retorno);
+
+                retorno.Empresa = await _empresaRepository.EmpresaPorId(usuario.EmpresaId);
                 resposta.Dados = UsuarioMap.MapUsuario(retorno);
                 resposta.Mensagem = "Usuário criado com sucesso";
-                return resposta;
             }
             catch (Exception ex)
             {
                 resposta.Mensagem = ex.Message;
                 resposta.Status = false;
-                return resposta;
             }
+            return resposta;
         }
 
         public async Task<Response<UsuOutputDTO>> AtualizarUsuario(UsuEdicaoDTO usuario)
         {
-            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            var resposta = new Response<UsuOutputDTO>();
             try
             {
-                Usuario buscarUsuario = await _usuarioRepository.UsuarioPorId(usuario.Id);
+                ValidarUsuarioEdicao(usuario);
+                var empresa = await BuscarEmpresa(usuario.EmpresaId);
 
-                buscarUsuario.UsuNome = usuario.UsuNome;
-                buscarUsuario.UsuEmail = usuario.UsuEmail;
-                buscarUsuario.UsuTelefone = usuario.UsuTelefone;
-                buscarUsuario.UsuSenha = usuario.UsuSenha;
-                buscarUsuario.UsuTipo = usuario.UsuTipo;
-                buscarUsuario.EmpresaId = usuario.EmpresaId;
+                var buscarUsuario = await _usuarioRepository.UsuarioPorId(usuario.Id);
+                AtualizarDadosUsuario(buscarUsuario, usuario);
 
-                Usuario retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);
-                if (retorno.EmpresaId != null)
-                {
-                    retorno.Empresa = await _empresaRepository.EmpresaPorId((Guid)retorno.EmpresaId);
-                }
+                var retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);
+                await PreencherDados(retorno);
+
                 resposta.Dados = UsuarioMap.MapUsuario(retorno);
                 resposta.Mensagem = "Usuário atualizado com sucesso";
-                return resposta;
             }
             catch (Exception ex)
             {
                 resposta.Mensagem = ex.Message;
                 resposta.Status = false;
-                return resposta;
             }
+            return resposta;
         }
-        
+
         public async Task<Response<UsuOutputDTO>> DeletarUsuario(Guid id)
         {
-            Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
+            var resposta = new Response<UsuOutputDTO>();
             try
             {
-                Usuario usuario = await _usuarioRepository.DeletarUsuario(id);
+                var usuario = await _usuarioRepository.DeletarUsuario(id);
+                await PreencherDados(usuario);
                 resposta.Dados = UsuarioMap.MapUsuario(usuario);
                 resposta.Mensagem = "Usuário deletado com sucesso";
-                return resposta;
             }
             catch (Exception ex)
             {
                 resposta.Mensagem = ex.Message;
                 resposta.Status = false;
-                return resposta;
             }
+            return resposta;
+        }
+
+        // Métodos auxiliares
+        private async Task PreencherEmpresas(IEnumerable<Usuario> usuarios)
+        {
+            foreach (var usuario in usuarios)
+            {
+                if (usuario.EmpresaId != null)
+                {
+                    usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+                }
+            }
+        }
+
+        private async Task PreencherDados(Usuario usuario)
+        {
+            usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+        }
+
+        private async Task<Empresa> BuscarEmpresa(Guid? empresaId)
+        {
+            if (empresaId == null || empresaId == Guid.Empty)
+            {
+                throw new Exception("Empresa é obrigatória");
+            }
+
+            var empresa = await _empresaRepository.EmpresaPorId((Guid)empresaId);
+
+            if (empresa == null)
+            {
+                throw new Exception("Empresa não encontrada");
+            }
+
+            return empresa;
+        }
+
+        private void ValidarUsuarioCriacao(UsuCriacaoDTO usuario)
+        {
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuNome, "Nome é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuEmail, "Email é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuTelefone, "Telefone é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuSenha, "Senha é obrigatório");
+            if (!Enum.IsDefined(typeof(UsuarioTipo), usuario.UsuTipo))
+            {
+                throw new Exception("Tipo de usuário é obrigatório");
+            }
+        }
+
+        private void ValidarUsuarioEdicao(UsuEdicaoDTO usuario)
+        {
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuNome, "Nome é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuEmail, "Email é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuTelefone, "Telefone é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuSenha, "Senha é obrigatório");
+            if (!Enum.IsDefined(typeof(UsuarioTipo), usuario.UsuTipo))
+            {
+                throw new Exception("Tipo de usuário é obrigatório");
+            }
+        }
+
+        private void AtualizarDadosUsuario(Usuario usuarioExistente, UsuEdicaoDTO usuario)
+        {
+            usuarioExistente.UsuNome = usuario.UsuNome;
+            usuarioExistente.UsuEmail = usuario.UsuEmail;
+            usuarioExistente.UsuTelefone = usuario.UsuTelefone;
+            usuarioExistente.UsuSenha = usuario.UsuSenha;
+            usuarioExistente.UsuTipo = usuario.UsuTipo;
+            usuarioExistente.EmpresaId = usuario.EmpresaId;
         }
     }
 }

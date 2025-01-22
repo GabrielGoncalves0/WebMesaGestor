@@ -38,7 +38,7 @@ namespace WebMesaGestor.Web.Controllers
         [Route("atualizar")]
         public async Task<IActionResult> Put([FromBody] UsuEdicaoDTO usuario)
         {
-            var result = await _usuarioService.AtualizarUsuario(usuario)
+            var result = await _usuarioService.AtualizarUsuario(usuario);
             return Ok(result);
         }
 
