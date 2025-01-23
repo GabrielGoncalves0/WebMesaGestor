@@ -1,10 +1,9 @@
-﻿using System.Globalization;
-using System;
-using WebMesaGestor.Application.DTO.Output;
+﻿using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
 using WebMesaGestor.Application.DTO.Input.Empresa;
+using WebMesaGestor.Utils;
 
 namespace WebMesaGestor.Application.Services
 {
@@ -23,6 +22,13 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Empresa> empresas = await _empresaRepository.ListarEmpresas();
+                if (empresas == null || !empresas.Any())
+                {
+                    resposta.Mensagem = "Nenhuma empresa encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
                 resposta.Dados = EmpresaMap.MapEmpresa(empresas);
                 resposta.Mensagem = "Empresas listadas com sucesso";
                 return resposta;
@@ -41,6 +47,14 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 Empresa empresa = await _empresaRepository.EmpresaPorId(id);
+
+                if (empresa == null)
+                {
+                    resposta.Mensagem = "Empresa não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
                 resposta.Dados = EmpresaMap.MapEmpresa(empresa);
                 resposta.Mensagem = "Empresa encontrada com sucesso";
                 return resposta;
@@ -58,6 +72,7 @@ namespace WebMesaGestor.Application.Services
             Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
             try
             {
+                ValidarUsuarioCriacao(empresa);
                 Empresa map = EmpresaMap.MapEmpresa(empresa);
                 Empresa retorno = await _empresaRepository.CriarEmpresa(map);
 
@@ -78,9 +93,9 @@ namespace WebMesaGestor.Application.Services
             Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
             try
             {
+                ValidarUsuarioEdicao(empresa);
                 Empresa buscarEmpresa = await _empresaRepository.EmpresaPorId(empresa.Id);
-                buscarEmpresa.EmpNome = empresa.EmpNome;
-                buscarEmpresa.EmpCnpj = empresa.EmpCnpj;
+                AtualizarDadosEmpresa(buscarEmpresa, empresa);
                 Empresa retorno = await _empresaRepository.AtualizarEmpresa(buscarEmpresa);
 
                 resposta.Dados = EmpresaMap.MapEmpresa(retorno);
@@ -100,6 +115,13 @@ namespace WebMesaGestor.Application.Services
             Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
             try
             {
+                Empresa empresa = await _empresaRepository.EmpresaPorId(id);
+                if (empresa == null)
+                {
+                    resposta.Mensagem = "Empresa não encontrada para deleção.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 Empresa retorno = await _empresaRepository.DeletarEmpresa(id);
 
                 resposta.Dados = EmpresaMap.MapEmpresa(retorno);
@@ -112,6 +134,29 @@ namespace WebMesaGestor.Application.Services
                 resposta.Status = false;
                 return resposta;
             }
+        }
+
+        private void ValidarUsuarioCriacao(EmpCriacaoDTO empresa)
+        {
+            ValidadorUtils.ValidarMaximo(empresa.EmpNome, 50, "Nome deve conter no máximo 50 caracteres");
+            ValidadorUtils.ValidarMinimo(empresa.EmpNome, 3, "Nome deve conter no minimo 3 caracteres");
+            ValidadorUtils.ValidarMaximo(empresa.EmpCnpj, 18, "Nome deve conter no máximo 18 caracteres");
+            ValidadorUtils.ValidarMinimo(empresa.EmpCnpj, 14, "Nome deve conter no minimo 14 caracteres");
+            ValidadorUtils.ValidarCnpj(empresa.EmpCnpj, "Digite um CNPJ Valido");
+        }
+        private void ValidarUsuarioEdicao(EmpEdicaoDTO empresa)
+        {
+            ValidadorUtils.ValidarMaximo(empresa.EmpNome, 50, "Nome deve conter no máximo 50 caracteres");
+            ValidadorUtils.ValidarMinimo(empresa.EmpNome, 3, "Nome deve conter no minimo 3 caracteres");
+            ValidadorUtils.ValidarMaximo(empresa.EmpCnpj, 18, "Nome deve conter no máximo 18 caracteres");
+            ValidadorUtils.ValidarMinimo(empresa.EmpCnpj, 14, "Nome deve conter no minimo 14 caracteres");
+            ValidadorUtils.ValidarCnpj(empresa.EmpCnpj, "Digite um CNPJ Valido");
+        }
+
+        private void AtualizarDadosEmpresa(Empresa empresaExistente, EmpEdicaoDTO empresa)
+        {
+            empresaExistente.EmpNome = empresa.EmpNome;
+            empresaExistente.EmpCnpj = empresa.EmpCnpj;
         }
     }
 }

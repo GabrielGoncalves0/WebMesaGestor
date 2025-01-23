@@ -9,7 +9,7 @@ namespace WebMesaGestor.Domain.Entities
         public Guid Id { get; set; }
         [StringLength(100)]
         public string EmpNome { get; set; }
-        [StringLength(100)]
+        [StringLength(18)]
         public string EmpCnpj { get; set; }
         public DateTime CriacaoData { get; set; }
     }

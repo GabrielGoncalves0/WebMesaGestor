@@ -11,7 +11,7 @@ namespace WebMesaGestor.Domain.Entities
         public string UsuNome { get; set; }
         [StringLength(50)]
         public string UsuEmail { get; set; }
-        [StringLength(50)]
+        [StringLength(16)]
         public string UsuTelefone { get; set; }
         [StringLength(60)]
         public string UsuSenha { get; set; }

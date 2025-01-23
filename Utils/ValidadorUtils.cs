@@ -246,22 +246,31 @@ namespace WebMesaGestor.Utils
         }
 
         //Validações com Regex
-        public bool ValidarEmail(string email)
+        public static void ValidarEmail(string email, string mensagem)
         {
             Regex regex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-            return regex.IsMatch(email);
+            if (!regex.IsMatch(email))
+            {
+                throw new Exception(mensagem);
+            }
         }
 
-        public bool ValidarSenha(string senha)
+        public static void ValidarSenha(string senha, string mensagem)
         {
             Regex regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$");
-            return regex.IsMatch(senha);
+            if (!regex.IsMatch(senha))
+            {
+                throw new Exception(mensagem);
+            }
         }
 
-        public bool ValidarNumeroTel(string numero)
+        public static void ValidarNumeroTel(string numero, string mensagem)
         {
-            Regex regex = new Regex(@"^\d{10,15}$");
-            return regex.IsMatch(numero);
+            Regex regex = new Regex(@"^\d{10,16}$");
+            if (!regex.IsMatch(numero))
+            {
+                throw new Exception(mensagem);
+            }
         }
     }
 }
