@@ -14,9 +14,9 @@ namespace WebMesaGestor.Domain.Entities
         public Guid Id { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal PedValor { get; set; }
-        public DateTime CriacaoData { get; set; }
         public StatusPedido PedStatus { get; set; }
         public TipoPagPedido PedTipoPag { get; set; }
+        public DateTime CriacaoData { get; set; }
         public Guid? UsuarioId { get; set; }
         public virtual Usuario? Usuario { get; set; }
         public Guid? MesaId { get; set; }

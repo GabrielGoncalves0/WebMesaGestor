@@ -9,6 +9,7 @@ namespace WebMesaGestor.Domain.Entities
         {
         }
         public Guid Id { get; set; }
+        [Range(0, 999999)]
         public int ProCodigo { get; set; }
         [StringLength(100)]
         public string ProDescricao { get; set; }

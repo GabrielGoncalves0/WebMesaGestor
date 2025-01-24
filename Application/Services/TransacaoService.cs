@@ -119,6 +119,7 @@ namespace WebMesaGestor.Application.Services
                 }
                 AtualizarDadosTransacao(buscarTransacao, transacao);
                 Transacao retorno = await _transacaoRepository.AtualizarTransacao(buscarTransacao);
+                await PreencherTransacao(retorno);
 
                 resposta.Dados = TransacaoMap.MapTransacao(retorno);
                 resposta.Mensagem = "Transação atualizada com sucesso";
@@ -235,7 +236,7 @@ namespace WebMesaGestor.Application.Services
             ValidadorUtils.ValidarSeVazioOuNulo(transacao.TraDescricao, "Descricao é obrigatório");
             ValidadorUtils.ValidarMaximo(transacao.TraDescricao, 100, "Descricao deve conter no máximo 100 caracteres");
             ValidadorUtils.ValidarMinimo(transacao.TraDescricao, 3, "Descricao deve conter no minimo 3 caracteres");
-            ValidadorUtils.ValidarDecimalSeVazio(transacao.TraValor, "Descricao é obrigatório");
+            ValidadorUtils.ValidarDecimalSeVazio(transacao.TraValor, "Valor é obrigatório");
             ValidadorUtils.ValidarMaximo(transacao.TraValor, 9999999, "Valor deve ser menor que 9999999");
             ValidadorUtils.ValidarMinimo(transacao.TraValor, 0, "Valor deve ser maior que 0");
             if (!Enum.IsDefined(typeof(TranStatus), transacao.TransacaoStatus))

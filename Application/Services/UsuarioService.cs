@@ -188,16 +188,20 @@ namespace WebMesaGestor.Application.Services
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuNome, "Nome é obrigatório");
             ValidadorUtils.ValidarMaximo(usuario.UsuNome, 50, "Nome deve conter no máximo 50 caracteres");
             ValidadorUtils.ValidarMinimo(usuario.UsuNome, 3, "Nome deve conter no minimo 3 caracteres");
+
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuEmail, "Email é obrigatório");
             ValidadorUtils.ValidarMaximo(usuario.UsuEmail, 50, "Telefone deve conter no máximo 50 caracteres");
             ValidadorUtils.ValidarEmail(usuario.UsuEmail, "Email deve seguir o padrão de e-mail");
+
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuTelefone, "Telefone é obrigatório");
             ValidadorUtils.ValidarMaximo(usuario.UsuTelefone, 16, "Telefone deve conter no máximo 16 caracteres");
             ValidadorUtils.ValidarNumeroTel(usuario.UsuTelefone, "Insira um numero de telefone valido");
+
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuSenha, "Senha é obrigatório");
             ValidadorUtils.ValidarSenha(usuario.UsuSenha, "Senha deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caracter especial");
             ValidadorUtils.ValidarMaximo(usuario.UsuSenha, 30, "Senha deve conter no máximo 30 caracteres");
             ValidadorUtils.ValidarMinimo(usuario.UsuSenha, 5, "Senha deve conter no minimo 5 caracteres");
+
             if (!Enum.IsDefined(typeof(UsuarioTipo), usuario.UsuTipo))
             {
                 throw new Exception("Tipo de usuário é obrigatório");
@@ -209,16 +213,20 @@ namespace WebMesaGestor.Application.Services
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuNome, "Nome é obrigatório");
             ValidadorUtils.ValidarMaximo(usuario.UsuNome, 50, "Nome deve conter no máximo 50 caracteres");
             ValidadorUtils.ValidarMinimo(usuario.UsuNome, 3, "Nome deve conter no minimo 3 caracteres");
+
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuEmail, "Email é obrigatório");
             ValidadorUtils.ValidarMaximo(usuario.UsuEmail, 50, "Telefone deve conter no máximo 50 caracteres");
             ValidadorUtils.ValidarEmail(usuario.UsuEmail, "Email deve seguir o padrão de e-mail");
+
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuTelefone, "Telefone é obrigatório");
             ValidadorUtils.ValidarMaximo(usuario.UsuTelefone, 16, "Telefone deve conter no máximo 16 caracteres");
             ValidadorUtils.ValidarNumeroTel(usuario.UsuTelefone, "Insira um numero de telefone valido");
+
             ValidadorUtils.ValidarSeVazioOuNulo(usuario.UsuSenha, "Senha é obrigatório");
             ValidadorUtils.ValidarSenha(usuario.UsuSenha, "Senha deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caracter especial");
             ValidadorUtils.ValidarMaximo(usuario.UsuSenha, 30, "Senha deve conter no máximo 30 caracteres");
             ValidadorUtils.ValidarMinimo(usuario.UsuSenha, 5, "Senha deve conter no minimo 5 caracteres");
+
             if (!Enum.IsDefined(typeof(UsuarioTipo), usuario.UsuTipo))
             {
                 throw new Exception("Tipo de usuário é obrigatório");
