@@ -1,10 +1,9 @@
-﻿using WebMesaGestor.Application.DTO.Input.Grupo;
-using WebMesaGestor.Application.DTO.Input.Mesa;
-using WebMesaGestor.Application.DTO.Input.Setor;
+﻿using WebMesaGestor.Application.DTO.Input.Setor;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Utils;
 
 namespace WebMesaGestor.Application.Services
 {
@@ -23,6 +22,12 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Setor> setors = await _setorRepository.ListarSetors();
+                if (setors == null)
+                {
+                    resposta.Mensagem = "Nenhuma setor encontrado.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 resposta.Dados = SetorMap.MapSetor(setors);
                 resposta.Mensagem = "Setores listados com sucesso";
                 return resposta;
@@ -41,7 +46,12 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 Setor setor = await _setorRepository.SetorPorId(id);
-
+                if (setor == null)
+                {
+                    resposta.Mensagem = "Setor não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 resposta.Dados = SetorMap.MapSetor(setor);
                 resposta.Mensagem = "Setor encontrado com sucesso";
                 return resposta;
@@ -59,6 +69,7 @@ namespace WebMesaGestor.Application.Services
             Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
             try
             {
+                ValidarSetorCriacao(setor);
                 Setor map = SetorMap.MapSetor(setor);
                 Setor retorno = await _setorRepository.CriarSetor(map);
 
@@ -79,9 +90,15 @@ namespace WebMesaGestor.Application.Services
             Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
             try
             {
+                ValidarSetorEdicao(setor);
                 Setor buscarSetor = await _setorRepository.SetorPorId(setor.Id);
-                buscarSetor.SetDesc = setor.SetDesc;
-                buscarSetor.SetStatus = setor.SetStatus;
+                if (buscarSetor == null)
+                {
+                    resposta.Mensagem = "Setor não encontrado.";
+                    resposta.Status = false;
+                    return resposta;
+                }
+                AtualizarDadosSetor(buscarSetor, setor);
                 Setor retorno = await _setorRepository.AtualizarSetor(buscarSetor);
 
                 resposta.Dados = SetorMap.MapSetor(retorno);
@@ -101,6 +118,13 @@ namespace WebMesaGestor.Application.Services
             Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
             try
             {
+                Setor setor = await _setorRepository.SetorPorId(id);
+                if (setor == null)
+                {
+                    resposta.Mensagem = "Setor não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 Setor retorno = await _setorRepository.DeletarSetor(id);
                 resposta.Dados = SetorMap.MapSetor(retorno);
                 resposta.Mensagem = "Setor deletado com sucesso";
@@ -112,6 +136,32 @@ namespace WebMesaGestor.Application.Services
                 resposta.Status = false;
                 return resposta;
             }
+        }
+
+        private void ValidarSetorCriacao(SetCriacaoDTO setor)
+        {
+            ValidadorUtils.ValidarMaximo(setor.SetDesc, 100, "Setor deve conter no máximo 100 caracteres");
+            ValidadorUtils.ValidarSeVazioOuNulo(setor.SetDesc, "Setor é obrigatório");
+            if (!Enum.IsDefined(typeof(SetorStatus), setor.SetStatus))
+            {
+                throw new Exception("Status do setor é obrigatório");
+            }
+        }
+
+        private void ValidarSetorEdicao(SetEdicaoDTO setor)
+        {
+            ValidadorUtils.ValidarMaximo(setor.SetDesc, 100, "Setor deve conter no máximo 100 caracteres");
+            ValidadorUtils.ValidarSeVazioOuNulo(setor.SetDesc, "Setor é obrigatório");
+            if (!Enum.IsDefined(typeof(SetorStatus), setor.SetStatus))
+            {
+                throw new Exception("Status do setor é obrigatório");
+            }
+        }
+
+        private void AtualizarDadosSetor(Setor setorExistente, SetEdicaoDTO setor)
+        {
+            setorExistente.SetDesc = setor.SetDesc;
+            setorExistente.SetStatus = setor.SetStatus;
         }
     }
 }

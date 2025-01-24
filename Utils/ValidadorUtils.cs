@@ -74,6 +74,23 @@ namespace WebMesaGestor.Utils
                 throw new Exception(mensagem);
             }
         }
+
+        public static void ValidarInteiroSeVazioOuNulo(int? valor, string mensagem)
+        {
+            if (!valor.HasValue || valor.Value < 0)
+            {
+                throw new Exception(mensagem);
+            }
+        }
+
+        public static void ValidarDecimalSeVazioOuNulo(decimal? valor, string mensagem)
+        {
+            if (!valor.HasValue || valor.Value < 0)
+            {
+                throw new Exception(mensagem);
+            }
+        }
+
         public static void ValidarSeEhNulo(object objeto, string mensagem)
         {
             if (objeto == null)

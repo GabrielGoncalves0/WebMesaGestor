@@ -1,8 +1,10 @@
 ﻿using WebMesaGestor.Application.DTO.Input.Categoria;
+using WebMesaGestor.Application.DTO.Input.Empresa;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Utils;
 
 namespace WebMesaGestor.Application.Services
 {
@@ -21,6 +23,12 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Categoria> categorias = await _categoriaRepository.ListarCategorias();
+                if (categorias == null)
+                {
+                    resposta.Mensagem = "Nenhuma categoria encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 resposta.Dados = CategoriaMap.MapCategoria(categorias);
                 resposta.Mensagem = "Categorias listadas com sucesso";
                 return resposta;
@@ -39,7 +47,12 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 Categoria categoria = await _categoriaRepository.CategoriaPorId(id);
-
+                if (categoria == null)
+                {
+                    resposta.Mensagem = "Categoria não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 resposta.Dados = CategoriaMap.MapCategoria(categoria);
                 resposta.Mensagem = "Categorias listadas com sucesso";
                 return resposta;
@@ -57,6 +70,7 @@ namespace WebMesaGestor.Application.Services
             Response<CatOutputDTO> resposta = new Response<CatOutputDTO>();
             try
             {
+                ValidarCategoriaCriacao(categoria);
                 Categoria map = CategoriaMap.MapCategoria(categoria);
                 Categoria retorno = await _categoriaRepository.CriarCategoria(map);
 
@@ -77,8 +91,15 @@ namespace WebMesaGestor.Application.Services
             Response<CatOutputDTO> resposta = new Response<CatOutputDTO>();
             try
             {
+                ValidarCategoriaEdicao(categoria);
                 Categoria buscarCategoria = await _categoriaRepository.CategoriaPorId(categoria.Id);
-                buscarCategoria.CatDesc = categoria.CatDesc;
+                if (buscarCategoria == null)
+                {
+                    resposta.Mensagem = "Categoria não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
+                AtualizarDadosCategoria(buscarCategoria, categoria);
                 Categoria retorno = await _categoriaRepository.AtualizarCategoria(buscarCategoria);
 
                 resposta.Dados = CategoriaMap.MapCategoria(retorno);
@@ -98,6 +119,13 @@ namespace WebMesaGestor.Application.Services
             Response<CatOutputDTO> resposta = new Response<CatOutputDTO>();
             try
             {
+                Categoria categoria = await _categoriaRepository.CategoriaPorId(id);
+                if (categoria == null)
+                {
+                    resposta.Mensagem = "Categoria não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 Categoria retorno = await _categoriaRepository.DeletarCategoria(id);
 
                 resposta.Dados = CategoriaMap.MapCategoria(retorno);
@@ -111,6 +139,22 @@ namespace WebMesaGestor.Application.Services
                 return resposta;
             }
         }
-    }
 
+        private void ValidarCategoriaCriacao(CatCriacaoDTO categoria)
+        {
+            ValidadorUtils.ValidarSeVazioOuNulo(categoria.CatDesc, "Categoria é obrigatório");
+            ValidadorUtils.ValidarMaximo(categoria.CatDesc, 100, "Nome deve conter no máximo 100 caracteres");
+        }
+
+        private void ValidarCategoriaEdicao(CatEdicaoDTO categoria)
+        {
+            ValidadorUtils.ValidarSeVazioOuNulo(categoria.CatDesc, "Categoria é obrigatório");
+            ValidadorUtils.ValidarMaximo(categoria.CatDesc, 100, "Nome deve conter no máximo 100 caracteres");
+        }
+
+        private void AtualizarDadosCategoria(Categoria categoriaExistente, CatEdicaoDTO categoria)
+        {
+            categoriaExistente.CatDesc = categoria.CatDesc;
+        }
+    }
 }

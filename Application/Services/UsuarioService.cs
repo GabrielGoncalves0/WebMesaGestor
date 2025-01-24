@@ -103,7 +103,12 @@ namespace WebMesaGestor.Application.Services
                 ValidarUsuarioEdicao(usuario);
                 Empresa empresa = await BuscarEmpresa(usuario.EmpresaId);
                 Usuario buscarUsuario = await _usuarioRepository.UsuarioPorId(usuario.Id);
-
+                if (buscarUsuario == null)
+                {
+                    resposta.Mensagem = "Usuário não encontrado.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 AtualizarDadosUsuario(buscarUsuario, usuario);
                 Usuario retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);
                 await PreencherDados(retorno);
@@ -125,16 +130,17 @@ namespace WebMesaGestor.Application.Services
             Response<UsuOutputDTO> resposta = new Response<UsuOutputDTO>();
             try
             {
-                Usuario usuario = await _usuarioRepository.DeletarUsuario(id);
+                Usuario usuario = await _usuarioRepository.UsuarioPorId(id);
                 if (usuario == null)
                 {
-                    resposta.Mensagem = "Usuario não encontrada.";
+                    resposta.Mensagem = "Usuario não encontrada para deleção.";
                     resposta.Status = false;
                     return resposta;
                 }
+                Usuario retorno = await _usuarioRepository.DeletarUsuario(id);
 
-                await PreencherDados(usuario);
-                resposta.Dados = UsuarioMap.MapUsuario(usuario);
+                await PreencherDados(retorno);
+                resposta.Dados = UsuarioMap.MapUsuario(retorno);
                 resposta.Mensagem = "Usuário deletado com sucesso";
                 return resposta;
             }

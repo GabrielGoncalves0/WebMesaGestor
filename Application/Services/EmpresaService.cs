@@ -10,7 +10,6 @@ namespace WebMesaGestor.Application.Services
     public class EmpresaService
     {
         private readonly IEmpresaRepository _empresaRepository;
-
         public EmpresaService(IEmpresaRepository empresaRepository)
         {
             _empresaRepository = empresaRepository;
@@ -22,7 +21,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Empresa> empresas = await _empresaRepository.ListarEmpresas();
-                if (empresas == null || !empresas.Any())
+                if (empresas == null)
                 {
                     resposta.Mensagem = "Nenhuma empresa encontrada.";
                     resposta.Status = false;
@@ -95,6 +94,12 @@ namespace WebMesaGestor.Application.Services
             {
                 ValidarUsuarioEdicao(empresa);
                 Empresa buscarEmpresa = await _empresaRepository.EmpresaPorId(empresa.Id);
+                if (buscarEmpresa == null)
+                {
+                    resposta.Mensagem = "Empresa não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 AtualizarDadosEmpresa(buscarEmpresa, empresa);
                 Empresa retorno = await _empresaRepository.AtualizarEmpresa(buscarEmpresa);
 
@@ -138,14 +143,19 @@ namespace WebMesaGestor.Application.Services
 
         private void ValidarUsuarioCriacao(EmpCriacaoDTO empresa)
         {
+            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpNome, "Empresa é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpCnpj, "Cnpj é obrigatório");
             ValidadorUtils.ValidarMaximo(empresa.EmpNome, 50, "Nome deve conter no máximo 50 caracteres");
             ValidadorUtils.ValidarMinimo(empresa.EmpNome, 3, "Nome deve conter no minimo 3 caracteres");
             ValidadorUtils.ValidarMaximo(empresa.EmpCnpj, 18, "Nome deve conter no máximo 18 caracteres");
             ValidadorUtils.ValidarMinimo(empresa.EmpCnpj, 14, "Nome deve conter no minimo 14 caracteres");
             ValidadorUtils.ValidarCnpj(empresa.EmpCnpj, "Digite um CNPJ Valido");
         }
+
         private void ValidarUsuarioEdicao(EmpEdicaoDTO empresa)
         {
+            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpNome, "Empresa é obrigatório");
+            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpCnpj, "Cnpj é obrigatório");
             ValidadorUtils.ValidarMaximo(empresa.EmpNome, 50, "Nome deve conter no máximo 50 caracteres");
             ValidadorUtils.ValidarMinimo(empresa.EmpNome, 3, "Nome deve conter no minimo 3 caracteres");
             ValidadorUtils.ValidarMaximo(empresa.EmpCnpj, 18, "Nome deve conter no máximo 18 caracteres");
