@@ -1,5 +1,4 @@
 ﻿using WebMesaGestor.Application.DTO.Input.Produto;
-using WebMesaGestor.Application.DTO.Input.USuario;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;

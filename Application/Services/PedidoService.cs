@@ -1,10 +1,8 @@
 ﻿using WebMesaGestor.Application.DTO.Input.Pedido;
-using WebMesaGestor.Application.DTO.Input.USuario;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
-using WebMesaGestor.Infra.Repositories;
 
 namespace WebMesaGestor.Application.Services
 {
