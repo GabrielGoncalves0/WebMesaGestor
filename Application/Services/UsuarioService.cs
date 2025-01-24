@@ -76,13 +76,12 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 ValidarUsuarioCriacao(usuario);
-                Empresa empresa = await BuscarEmpresa(usuario.EmpresaId);
+                await ValidarEmpresa(usuario.EmpresaId);
 
                 Usuario map = UsuarioMap.MapUsuario(usuario);
                 Usuario retorno = await _usuarioRepository.CriarUsuario(map);
                 await PreencherEmpresa(retorno);
 
-                retorno.Empresa = await _empresaRepository.EmpresaPorId(usuario.EmpresaId);
                 resposta.Dados = UsuarioMap.MapUsuario(retorno);
                 resposta.Mensagem = "Usuário criado com sucesso";
                 return resposta;
@@ -101,7 +100,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 ValidarUsuarioEdicao(usuario);
-                Empresa empresa = await BuscarEmpresa(usuario.EmpresaId);
+                await ValidarEmpresa(usuario.EmpresaId);
                 Usuario buscarUsuario = await _usuarioRepository.UsuarioPorId(usuario.Id);
                 if (buscarUsuario == null)
                 {
@@ -169,7 +168,7 @@ namespace WebMesaGestor.Application.Services
             usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
         }
 
-        private async Task<Empresa> BuscarEmpresa(Guid? empresaId)
+        private async Task ValidarEmpresa(Guid? empresaId)
         {
             if (empresaId == null || empresaId == Guid.Empty)
             {
@@ -182,8 +181,6 @@ namespace WebMesaGestor.Application.Services
             {
                 throw new Exception("Empresa não encontrada");
             }
-
-            return empresa;
         }
 
         private void ValidarUsuarioCriacao(UsuCriacaoDTO usuario)

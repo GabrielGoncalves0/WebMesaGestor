@@ -1,10 +1,8 @@
 ﻿using WebMesaGestor.Application.DTO.Input.Transacao;
-using WebMesaGestor.Application.DTO.Input.USuario;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
-using WebMesaGestor.Infra.Repositories;
 using WebMesaGestor.Utils;
 
 namespace WebMesaGestor.Application.Services
@@ -30,23 +28,16 @@ namespace WebMesaGestor.Application.Services
             Response<IEnumerable<TraOutputDTO>> resposta = new Response<IEnumerable<TraOutputDTO>>();
             try
             {
-                IEnumerable<Transacao> transacaos = await _transacaoRepository.ListarTransacoes();
-                foreach (var transacao in transacaos)
+                IEnumerable<Transacao> transacoes = await _transacaoRepository.ListarTransacoes();
+                if (transacoes == null)
                 {
-                    if (transacao.UsuarioId != null)
-                    {
-                        transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
-                    }
-                    if (transacao.CaixaId != null)
-                    {
-                        transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
-                    }
-                    if (transacao.PedidoId != null)
-                    {
-                        transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
-                    }
+                    resposta.Mensagem = "Transações não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
                 }
-                resposta.Dados = TransacaoMap.MapTransacao(transacaos);
+                await PreencherTransacoes(transacoes);
+
+                resposta.Dados = TransacaoMap.MapTransacao(transacoes);
                 resposta.Mensagem = "Transacões listadas com sucesso";
                 return resposta;
             }
@@ -64,18 +55,14 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 Transacao transacao = await _transacaoRepository.TransacaoPorId(id);
-                if (transacao.UsuarioId != null)
+                if (transacao == null)
                 {
-                    transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
+                    resposta.Mensagem = "Transação não encontrada.";
+                    resposta.Status = false;
+                    return resposta;
                 }
-                if (transacao.CaixaId != null)
-                {
-                    transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
-                }
-                if (transacao.PedidoId != null)
-                {
-                    transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
-                }
+
+                await PreencherTransacao(transacao);
                 resposta.Dados = TransacaoMap.MapTransacao(transacao);
                 resposta.Mensagem = "Transação encontrada com sucesso";
                 return resposta;
@@ -93,8 +80,15 @@ namespace WebMesaGestor.Application.Services
             Response<TraOutputDTO> resposta = new Response<TraOutputDTO>();
             try
             {
+                validarTransacaoCriacao(transacao);
+                await ValidarUsuario(transacao.UsuarioId);
+                await ValidarCaixa(transacao.CaixaId);
+                await ValidarPedido(transacao.PedidoId);
+
                 Transacao map = TransacaoMap.MapTransacao(transacao);
                 Transacao retorno = await _transacaoRepository.CriarTransacao(map);
+                await PreencherTransacao(retorno);
+
                 resposta.Dados = TransacaoMap.MapTransacao(retorno);
                 resposta.Mensagem = "Transação criada com sucesso";
                 return resposta;
@@ -113,6 +107,9 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 validarTransacaoEdicao(transacao);
+                await ValidarUsuario(transacao.UsuarioId);
+                await ValidarCaixa(transacao.CaixaId);
+                await ValidarPedido(transacao.PedidoId);
                 Transacao buscarTransacao = await _transacaoRepository.TransacaoPorId(transacao.Id);
                 if (buscarTransacao == null)
                 {
@@ -120,7 +117,6 @@ namespace WebMesaGestor.Application.Services
                     resposta.Status = false;
                     return resposta;
                 }
-
                 AtualizarDadosTransacao(buscarTransacao, transacao);
                 Transacao retorno = await _transacaoRepository.AtualizarTransacao(buscarTransacao);
 
@@ -134,7 +130,6 @@ namespace WebMesaGestor.Application.Services
                 resposta.Status = false;
                 return resposta;
             }
-
         }
 
         public async Task<Response<TraOutputDTO>> DeletarTransacao(Guid id)
@@ -190,7 +185,7 @@ namespace WebMesaGestor.Application.Services
             transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
         }
 
-        private async Task<Usuario> BuscarUsuario(Guid? usuarioId)
+        private async Task ValidarUsuario(Guid? usuarioId)
         {
             if (usuarioId == null || usuarioId == Guid.Empty)
             {
@@ -203,11 +198,9 @@ namespace WebMesaGestor.Application.Services
             {
                 throw new Exception("Empresa não encontrada");
             }
-
-            return usuario;
         }
 
-        private async Task<Caixa> BuscarCaixa(Guid? caixaId)
+        private async Task ValidarCaixa(Guid? caixaId)
         {
             if (caixaId == null || caixaId == Guid.Empty)
             {
@@ -220,11 +213,9 @@ namespace WebMesaGestor.Application.Services
             {
                 throw new Exception("Empresa não encontrada");
             }
-
-            return caixa;
         }
 
-        private async Task<Pedido> BuscarPedido(Guid? pedidoId)
+        private async Task ValidarPedido(Guid? pedidoId)
         {
             if (pedidoId == null || pedidoId == Guid.Empty)
             {
@@ -237,8 +228,6 @@ namespace WebMesaGestor.Application.Services
             {
                 throw new Exception("Empresa não encontrada");
             }
-
-            return pedido;
         }
 
         public void validarTransacaoCriacao(TraCriacaoDTO transacao)
@@ -268,6 +257,7 @@ namespace WebMesaGestor.Application.Services
                 throw new Exception("Status de transação é obrigatório");
             }
         }
+
         private void AtualizarDadosTransacao(Transacao transacaoExistente, TraEdicaoDTO transacao)
         {
             transacaoExistente.TraDescricao = transacao.TraDescricao;

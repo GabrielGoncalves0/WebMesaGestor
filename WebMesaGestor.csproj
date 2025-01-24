@@ -7,6 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20250115044238_CriandoBancoDedados.cs" />
+    <Compile Remove="Migrations\20250115044238_CriandoBancoDedados.Designer.cs" />
+    <Compile Remove="Migrations\20250116165223_AtualizandoMudancas.cs" />
+    <Compile Remove="Migrations\20250116165223_AtualizandoMudancas.Designer.cs" />
+    <Compile Remove="Migrations\20250116165301_AtualizandoOpcoes.cs" />
+    <Compile Remove="Migrations\20250116165301_AtualizandoOpcoes.Designer.cs" />
+    <Compile Remove="Migrations\20250116170707_atualizacaoDecimalOpcoes.cs" />
+    <Compile Remove="Migrations\20250116170707_atualizacaoDecimalOpcoes.Designer.cs" />
+    <Compile Remove="Migrations\20250124042902_atualizacaoEntidades.cs" />
+    <Compile Remove="Migrations\20250124042902_atualizacaoEntidades.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
       <PrivateAssets>all</PrivateAssets>
