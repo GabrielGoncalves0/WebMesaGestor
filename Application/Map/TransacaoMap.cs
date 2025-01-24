@@ -14,7 +14,7 @@ namespace WebMesaGestor.Application.Map
                 Id = transacao.Id,
                 TraDescricao = transacao.TraDescricao,
                 TraValor = transacao.TraValor,
-                TransactionStatus = transacao.TransactionStatus,
+                TransacaoStatus = transacao.TransacaoStatus,
                 CriacaoData = transacao.CriacaoData,
                 Usuario = UsuarioMap.MapUsuario(transacao.Usuario),
                 Caixa = CaixaMap.MapCaixa(transacao.Caixa),
@@ -34,7 +34,7 @@ namespace WebMesaGestor.Application.Map
                 Id = Guid.NewGuid(),
                 TraDescricao = transacao.TraDescricao,
                 TraValor = transacao.TraValor,
-                TransactionStatus = transacao.TransactionStatus,
+                TransacaoStatus = transacao.TransacaoStatus,
                 CriacaoData = DateTime.UtcNow,
                 UsuarioId = transacao.UsuarioId,
                 CaixaId = transacao.CaixaId,
@@ -53,7 +53,7 @@ namespace WebMesaGestor.Application.Map
             {
                 TraDescricao = transacao.TraDescricao,
                 TraValor = transacao.TraValor,
-                TransactionStatus = transacao.TransactionStatus,
+                TransacaoStatus = transacao.TransacaoStatus,
                 UsuarioId = transacao.UsuarioId,
                 CaixaId = transacao.CaixaId,
                 PedidoId = transacao.PedidoId

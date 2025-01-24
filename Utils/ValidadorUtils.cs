@@ -77,15 +77,15 @@ namespace WebMesaGestor.Utils
 
         public static void ValidarInteiroSeVazioOuNulo(int? valor, string mensagem)
         {
-            if (!valor.HasValue || valor.Value < 0)
+            if (!valor.HasValue)
             {
                 throw new Exception(mensagem);
             }
         }
 
-        public static void ValidarDecimalSeVazioOuNulo(decimal? valor, string mensagem)
+        public static void ValidarDecimalSeVazio(decimal? valor, string mensagem)
         {
-            if (!valor.HasValue || valor.Value < 0)
+            if (!valor.HasValue)
             {
                 throw new Exception(mensagem);
             }

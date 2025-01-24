@@ -113,8 +113,14 @@ namespace WebMesaGestor.Application.Services
             Response<OpcOutputDTO> resposta = new Response<OpcOutputDTO>();
             try
             {
+                Opcao opcao = await _opcaoRepository.OpcaoPorId(id);
+                if(opcao == null)
+                {
+                    resposta.Mensagem = "Opcao não encontrada para deleção.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 Opcao retorno = await _opcaoRepository.DeletarOpcao(id);
-
                 resposta.Dados = OpcaoMap.MapOpcao(retorno);
                 resposta.Mensagem = "Opcao deletada com sucesso";
                 return resposta;

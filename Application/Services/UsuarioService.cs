@@ -57,7 +57,7 @@ namespace WebMesaGestor.Application.Services
                     return resposta;
                 }
 
-                await PreencherDados(usuario);
+                await PreencherEmpresa(usuario);
                 resposta.Dados = UsuarioMap.MapUsuario(usuario);
                 resposta.Mensagem = "Usuário encontrado com sucesso";
                 return resposta;
@@ -80,7 +80,7 @@ namespace WebMesaGestor.Application.Services
 
                 Usuario map = UsuarioMap.MapUsuario(usuario);
                 Usuario retorno = await _usuarioRepository.CriarUsuario(map);
-                await PreencherDados(retorno);
+                await PreencherEmpresa(retorno);
 
                 retorno.Empresa = await _empresaRepository.EmpresaPorId(usuario.EmpresaId);
                 resposta.Dados = UsuarioMap.MapUsuario(retorno);
@@ -111,7 +111,7 @@ namespace WebMesaGestor.Application.Services
                 }
                 AtualizarDadosUsuario(buscarUsuario, usuario);
                 Usuario retorno = await _usuarioRepository.AtualizarUsuario(buscarUsuario);
-                await PreencherDados(retorno);
+                await PreencherEmpresa(retorno);
 
                 resposta.Dados = UsuarioMap.MapUsuario(retorno);
                 resposta.Mensagem = "Usuário atualizado com sucesso";
@@ -139,7 +139,7 @@ namespace WebMesaGestor.Application.Services
                 }
                 Usuario retorno = await _usuarioRepository.DeletarUsuario(id);
 
-                await PreencherDados(retorno);
+                await PreencherEmpresa(retorno);
                 resposta.Dados = UsuarioMap.MapUsuario(retorno);
                 resposta.Mensagem = "Usuário deletado com sucesso";
                 return resposta;
@@ -164,7 +164,7 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        private async Task PreencherDados(Usuario usuario)
+        private async Task PreencherEmpresa(Usuario usuario)
         {
             usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
         }

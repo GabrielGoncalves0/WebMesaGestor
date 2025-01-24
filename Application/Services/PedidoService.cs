@@ -124,6 +124,13 @@ namespace WebMesaGestor.Application.Services
             Response<PedOutputDTO> resposta = new Response<PedOutputDTO>();
             try
             {
+                Pedido pedido = await _pedidoRepository.PedidoPorId(id);
+                if(pedido == null)
+                {
+                    resposta.Mensagem ="Pedido não encontrado para deleção";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 Pedido retorno = await _pedidoRepository.DeletarPedido(id);
 
                 resposta.Dados = PedidoMap.MapPedido(retorno);

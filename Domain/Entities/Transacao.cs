@@ -1,4 +1,7 @@
-﻿using System.Transactions;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Transactions;
 
 namespace WebMesaGestor.Domain.Entities
 {
@@ -6,9 +9,11 @@ namespace WebMesaGestor.Domain.Entities
     public class Transacao
     {
         public Guid Id { get; set; }
+        [StringLength(100)]
         public string TraDescricao { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TraValor { get; set; }
-        public TranStatus TransactionStatus { get; set; }
+        public TranStatus TransacaoStatus { get; set; }
         public DateTime CriacaoData { get; set; }
         public Guid? UsuarioId { get; set; }
         public virtual Usuario? Usuario { get; set; }

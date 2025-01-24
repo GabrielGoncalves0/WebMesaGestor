@@ -101,6 +101,13 @@ namespace WebMesaGestor.Application.Services
             Response<GrupOpcOutputDTO> resposta = new Response<GrupOpcOutputDTO>();
             try
             {
+                GrupoOpcoes grupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(id);
+                if (grupoOpcao == null)
+                {
+                    resposta.Mensagem = "Grupo de opcoes não encontrado para deleção.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 GrupoOpcoes retorno = await _grupoOpcaoRepository.DeletarGrupoOpcao(id);
                 resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(retorno);
                 resposta.Mensagem = "Grupo deletado com sucesso";

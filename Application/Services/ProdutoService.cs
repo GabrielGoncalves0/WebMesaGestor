@@ -127,6 +127,13 @@ namespace WebMesaGestor.Application.Services
             Response<ProOutputDTO> resposta = new Response<ProOutputDTO>();
             try
             {
+                Produto produto = await _produtoRepository.ProdutoPorId(id);
+                if(produto == null)
+                {
+                    resposta.Mensagem = "Produto não encontrado para delação.";
+                    resposta.Status = false;
+                    return resposta;
+                }
                 Produto retorno = await _produtoRepository.DeletarProduto(id);
                 resposta.Dados = ProdutoMap.MapProduto(retorno);
                 resposta.Mensagem = "Produto deletado com sucesso";

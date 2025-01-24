@@ -6,7 +6,7 @@ namespace WebMesaGestor.Application.DTO.Input.Transacao
     {
         public string TraDescricao { get; set; }
         public decimal TraValor { get; set; }
-        public TranStatus TransactionStatus { get; set; }
+        public TranStatus TransacaoStatus { get; set; }
         public Guid? UsuarioId { get; set; }
         public Guid? CaixaId { get; set; }
         public Guid? PedidoId { get; set; }
