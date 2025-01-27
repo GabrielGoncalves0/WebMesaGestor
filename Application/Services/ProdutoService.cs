@@ -57,7 +57,6 @@ namespace WebMesaGestor.Application.Services
                     resposta.Status = false;
                     return resposta;
                 }
-
                 await PreencherProduto(produto);
                 resposta.Dados = ProdutoMap.MapProduto(produto);
                 resposta.Mensagem = "Produto encontrado com sucesso";
@@ -171,8 +170,14 @@ namespace WebMesaGestor.Application.Services
 
         private async Task PreencherProduto(Produto produto)
         {
-            produto.Categoria = await _categoriaRepository.CategoriaPorId((Guid)produto.CategoriaId);
-            produto.Setor = await _setorRepository.SetorPorId((Guid)produto.SetorId);
+            if (produto.CategoriaId != null)
+            {
+                produto.Categoria = await _categoriaRepository.CategoriaPorId((Guid)produto.CategoriaId);
+            }
+            if (produto.SetorId != null)
+            {
+                produto.Setor = await _setorRepository.SetorPorId((Guid)produto.SetorId);
+            }
         }
 
         private async Task ValidarSetor(Guid? setorId)

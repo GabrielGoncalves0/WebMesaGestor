@@ -174,8 +174,14 @@ namespace WebMesaGestor.Application.Services
 
         private async Task PreencherPedido(Pedido pedido)
         {
-            pedido.Usuario = await _usuarioRepository.UsuarioPorId((Guid)pedido.UsuarioId);
-            pedido.Mesa = await _mesaRepository.MesaPorId((Guid)pedido.MesaId);
+            if (pedido.UsuarioId != null)
+            {
+                pedido.Usuario = await _usuarioRepository.UsuarioPorId((Guid)pedido.UsuarioId);
+            }
+            if (pedido.MesaId != null)
+            {
+                pedido.Mesa = await _mesaRepository.MesaPorId((Guid)pedido.MesaId);
+            }
         }
 
         private async Task ValidarUsuario(Guid? usuarioId)

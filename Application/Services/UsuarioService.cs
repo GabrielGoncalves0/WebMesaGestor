@@ -165,7 +165,10 @@ namespace WebMesaGestor.Application.Services
 
         private async Task PreencherEmpresa(Usuario usuario)
         {
-            usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+            if (usuario.EmpresaId != null)
+            {
+                usuario.Empresa = await _empresaRepository.EmpresaPorId((Guid)usuario.EmpresaId);
+            }
         }
 
         private async Task ValidarEmpresa(Guid? empresaId)

@@ -9,7 +9,7 @@ namespace WebMesaGestor.Application.DTO.Output
         public decimal? CaiValFechamento { get; set; }
         public DateTime AberturaData { get; set; }
         public DateTime? FechamentoData { get; set; }
-        public CaixaStatus CaiStatus { get; set; }
+        public CaixaStatus? CaiStatus { get; set; }
         public virtual UsuOutputDTO? Usuario { get; set; }
     }
 }

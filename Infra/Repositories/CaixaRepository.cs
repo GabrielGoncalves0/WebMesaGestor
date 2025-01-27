@@ -24,22 +24,27 @@ namespace WebMesaGestor.Infra.Repositories
             return await _appDbContext.Caixas.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
         }
 
+        public async Task<Caixa> UltimoCaixa() 
+        {
+            return await _appDbContext.Caixas.Where(c => c.CaiStatus == CaixaStatus.Fechado)
+            .OrderByDescending(c => c.FechamentoData).FirstOrDefaultAsync();
+        }
+
         public async Task<Caixa> AbrirCaixa(Caixa caixa)
         {
-            try
-            {
-                await _appDbContext.Caixas.AddAsync(caixa);
-                await _appDbContext.SaveChangesAsync();
-                return caixa;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
+            await _appDbContext.Caixas.AddAsync(caixa);
+            await _appDbContext.SaveChangesAsync();
+            return caixa;
         }
 
         public async Task<Caixa> FecharCaixa(Caixa caixa)
+        {
+            _appDbContext.Caixas.Update(caixa);
+            await _appDbContext.SaveChangesAsync();
+            return caixa;
+        }
+
+        public async Task<Caixa> AtualizarCaixa(Caixa caixa)
         {
             _appDbContext.Caixas.Update(caixa);
             await _appDbContext.SaveChangesAsync();

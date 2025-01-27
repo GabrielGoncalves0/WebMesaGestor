@@ -12,8 +12,8 @@ using WebMesaGestor.Infra.Data;
 namespace WebMesaGestor.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250124160800_CriandoBancoDeDados")]
-    partial class CriandoBancoDeDados
+    [Migration("20250127173102_AtualizandoCaixa")]
+    partial class AtualizandoCaixa
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,14 +34,17 @@ namespace WebMesaGestor.Migrations
                     b.Property<DateTime>("AberturaData")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("CaiStatus")
+                    b.Property<int?>("CaiStatus")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("CaiValFechamento")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal>("CaiValInicial")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("CaiValTotal")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTime?>("FechamentoData")
                         .HasColumnType("datetime(6)");
@@ -170,7 +173,7 @@ namespace WebMesaGestor.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("OpcaoValor")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
@@ -198,7 +201,7 @@ namespace WebMesaGestor.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("PedValor")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<Guid?>("UsuarioId")
                         .HasColumnType("char(36)");
@@ -233,7 +236,7 @@ namespace WebMesaGestor.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<decimal>("ProPreco")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("ProUnidade")
                         .IsRequired()
@@ -295,7 +298,7 @@ namespace WebMesaGestor.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<decimal>("TraValor")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("TransacaoStatus")
                         .HasColumnType("int");

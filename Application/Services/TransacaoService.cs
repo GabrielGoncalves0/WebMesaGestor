@@ -181,9 +181,18 @@ namespace WebMesaGestor.Application.Services
 
         private async Task PreencherTransacao(Transacao transacao)
         {
-            transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
-            transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
-            transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
+            if (transacao.UsuarioId != null)
+            {
+                transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
+            }
+            if (transacao.CaixaId != null)
+            {
+                transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId); ;
+            }
+            if (transacao.PedidoId != null)
+            {
+                transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
+            }
         }
 
         private async Task ValidarUsuario(Guid? usuarioId)

@@ -11,7 +11,7 @@ namespace WebMesaGestor.Domain.Entities
         public Guid Id { get; set; }
         [StringLength(100)]
         public string TraDescricao { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "decimal(10,2)")]
         public decimal TraValor { get; set; }
         public TranStatus TransacaoStatus { get; set; }
         public DateTime CriacaoData { get; set; }

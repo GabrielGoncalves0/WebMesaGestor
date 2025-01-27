@@ -15,7 +15,7 @@ namespace WebMesaGestor.Domain.Entities
         public string ProDescricao { get; set; }
         [StringLength(30)]
         public string ProUnidade { get; set; }
-        [Column(TypeName ="decimal(18,2)")]
+        [Column(TypeName ="decimal(10,2)")]
         public  decimal ProPreco { get; set; }
         public DateTime CriacaoData { get; set; }
         public Guid? CategoriaId { get; set; }

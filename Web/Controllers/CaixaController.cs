@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebMesaGestor.Application.DTO.Input.Caixa;
 using WebMesaGestor.Application.Services;
+using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Web.Controllers
 {
@@ -13,6 +14,14 @@ namespace WebMesaGestor.Web.Controllers
         public CaixaController(CaixaService caixaService)
         {
             _caixaService = caixaService;
+        }
+
+        [HttpGet]
+        [Route("buscar/{id}")]
+        public async Task<IActionResult> Get([FromRoute] Guid id)
+        {
+            var caixa = await _caixaService.CaixaPorId(id);
+            return Ok(caixa);
         }
 
         [HttpGet]
@@ -39,11 +48,11 @@ namespace WebMesaGestor.Web.Controllers
             return Ok(caixa);
         }
 
-        [HttpGet]
-        [Route("buscar/{id}")]
-        public async Task<IActionResult> Get([FromRoute] Guid id)
+        [HttpPut]
+        [Route("atualizar")]
+        public async Task<IActionResult> PutValor([FromBody] CaiAtualizarDTO caiAtualizarDTO)
         {
-            var caixa = await _caixaService.CaixaPorId(id);
+            var caixa = await _caixaService.AtualizarCaixa(caiAtualizarDTO);
             return Ok(caixa);
         }
 
@@ -54,5 +63,30 @@ namespace WebMesaGestor.Web.Controllers
             var caixa = await _caixaService.DeletarCaixa(id);
             return Ok(caixa );
         }
+
+        [HttpGet]
+        [Route("reabrirUltimo")]
+        public async Task<IActionResult> GetUltimo()
+        {
+            var caixa = await _caixaService.ReabrirUltimoCaixa();
+            return Ok(caixa);
+        }
+
+        [HttpPut]
+        [Route("sangria/{id}")]
+        public async Task<IActionResult> SangriaCaixa(Guid id, decimal valor) 
+        {
+            var caixa = await _caixaService.SangriaCaixa(id, valor);
+            return Ok(caixa);
+        }
+
+        [HttpPut]
+        [Route("suprimento/{id}")]
+        public async Task<IActionResult> SuprimentoCaixa(Guid id, decimal valor)
+        {
+            var caixa = await _caixaService.SuprimentoCaixa(id, valor);
+            return Ok(caixa);
+        }
+
     }
 }

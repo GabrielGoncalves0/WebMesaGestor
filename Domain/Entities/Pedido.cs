@@ -12,7 +12,7 @@ namespace WebMesaGestor.Domain.Entities
         }
         [Key]
         public Guid Id { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "decimal(10,2)")]
         public decimal PedValor { get; set; }
         public StatusPedido PedStatus { get; set; }
         public TipoPagPedido PedTipoPag { get; set; }

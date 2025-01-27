@@ -1,9 +1,11 @@
-﻿using WebMesaGestor.Application.DTO.Input.Caixa;
+﻿using System.Drawing;
+using WebMesaGestor.Application.DTO.Input.Caixa;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Application.Map;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
-using WebMesaGestor.Infra.Repositories;
+using WebMesaGestor.Infra.Data;
+using WebMesaGestor.Utils;
 
 namespace WebMesaGestor.Application.Services
 {
@@ -17,7 +19,6 @@ namespace WebMesaGestor.Application.Services
         {
             _caixaRepository = caixaRepository;
             _usuarioRepository = usuarioRepository;
-
         }
 
         public async Task<Response<IEnumerable<CaiOutputDTO>>> ListarCaixas()
@@ -109,6 +110,43 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
+        public async Task<Response<CaiOutputDTO>> AtualizarCaixa(CaiAtualizarDTO caixa)
+        {
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            try
+            {
+                Caixa buscarCaixa = await _caixaRepository.CaixaPorId(caixa.Id);
+                if (buscarCaixa == null)
+                {
+                    resposta.Mensagem = "Caixa não encontrado.";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
+                if (caixa.CaiValTotal.HasValue)
+                {
+                    buscarCaixa.CaiValTotal = caixa.CaiValTotal.Value;
+                }
+
+                if (caixa.CaiStatus.HasValue)
+                {
+                    buscarCaixa.CaiStatus = caixa.CaiStatus.Value;
+                }
+
+                Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarCaixa);
+
+                resposta.Dados = CaixaMap.MapCaixa(retorno);
+                resposta.Mensagem = "Caixa atualizado com sucesso";
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
+        }
+
         public async Task<Response<CaiOutputDTO>> DeletarCaixa(Guid id)
         {
             Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
@@ -127,6 +165,57 @@ namespace WebMesaGestor.Application.Services
                 resposta.Status = false;
                 return resposta;
             }
+        }
+
+        public async Task<Response<CaiOutputDTO>> SangriaCaixa(Guid id, decimal valor)
+        {
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            Caixa buscarCaixa = await _caixaRepository.CaixaPorId(id);
+            if (buscarCaixa == null)
+            {
+                resposta.Mensagem = "Caixa não encontrado.";
+                resposta.Status = false;
+                return resposta;
+            }
+            buscarCaixa.CaiValTotal -= valor;
+            Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarCaixa);
+            resposta.Dados = CaixaMap.MapCaixa(retorno);
+            resposta.Mensagem = "Suprimento realizado com sucesso";
+            return resposta;
+        }
+
+        public async Task<Response<CaiOutputDTO>> SuprimentoCaixa(Guid id, decimal valor)
+        {
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            Caixa buscarCaixa = await _caixaRepository.CaixaPorId(id);
+            if (buscarCaixa == null)
+            {
+                resposta.Mensagem = "Caixa não encontrado.";
+                resposta.Status = false;
+                return resposta;
+            }
+            buscarCaixa.CaiValTotal += valor;
+            Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarCaixa);
+            resposta.Dados = CaixaMap.MapCaixa(retorno);
+            resposta.Mensagem = "Suprimento realizado com sucesso";
+            return resposta;
+        }
+
+        public async Task<Response<CaiOutputDTO>> ReabrirUltimoCaixa()
+        {
+            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            Caixa buscarUltimoCaixa = await _caixaRepository.UltimoCaixa();
+            if (buscarUltimoCaixa == null)
+            {
+                resposta.Mensagem = "Caixa não encontrado.";
+                resposta.Status = false;
+                return resposta;
+            }
+            buscarUltimoCaixa.CaiStatus = CaixaStatus.Aberto;
+            Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarUltimoCaixa);
+            resposta.Dados = CaixaMap.MapCaixa(retorno);
+            resposta.Mensagem = "Caixa reaberto com sucesso";
+            return resposta;
         }
     }
 }
