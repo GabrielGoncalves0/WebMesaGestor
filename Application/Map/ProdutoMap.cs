@@ -16,8 +16,8 @@ namespace WebMesaGestor.Application.Map
                 ProUnidade = produto.ProUnidade,
                 ProPreco = produto.ProPreco,
                 CriacaoData = produto.CriacaoData,
-                Categoria = CategoriaMap.MapCategoria(produto.Categoria),
-                Setor = SetorMap.MapSetor(produto.Setor)
+                Categoria = produto.Categoria != null ? CategoriaMap.MapCategoria(produto.Categoria) : null,
+                Setor = produto.Setor != null ? SetorMap.MapSetor(produto.Setor) : null
             };
         }
 

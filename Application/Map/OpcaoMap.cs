@@ -15,7 +15,7 @@ namespace WebMesaGestor.Application.Map
                 OpcaoValor = opcao.OpcaoValor,
                 OpcaoQuantMax = opcao.OpcaoQuantMax,
                 CriacaoData = opcao.CriacaoData,
-                GrupoOpcoes = GrupoOpcaoMap.MapGrupoOpcao(opcao.GrupoOpcoes),
+                GrupoOpcoes = opcao.GrupoOpcoes != null ? GrupoOpcaoMap.MapGrupoOpcao(opcao.GrupoOpcoes) : null,
             };
         }
 

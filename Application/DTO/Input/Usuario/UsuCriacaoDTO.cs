@@ -1,4 +1,5 @@
-﻿using WebMesaGestor.Domain.Entities;
+﻿using System.Text.Json.Serialization;
+using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Application.DTO.Input.USuario
 {

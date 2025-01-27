@@ -1,4 +1,5 @@
-﻿using WebMesaGestor.Domain.Entities;
+﻿using System.Text.Json.Serialization;
+using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Application.DTO.Output
 {
@@ -6,6 +7,7 @@ namespace WebMesaGestor.Application.DTO.Output
     {
         public Guid? Id { get; set; }
         public string SetDesc { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public SetorStatus SetStatus { get; set; }
         public DateTime CriacaoData { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using WebMesaGestor.Domain.Entities;
+﻿using System.Text.Json.Serialization;
+using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Application.DTO.Output
 {
@@ -7,8 +8,10 @@ namespace WebMesaGestor.Application.DTO.Output
         public Guid? Id { get; set; }
         public string GrupOpcDesc { get; set; }
         public int GrupOpcMax { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public GrupOpcTipo GrupOpcTipo { get; set; }
         public DateTime CriacaoData { get; set; }
-        public ProOutputDTO? produto { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ProOutputDTO? Produto { get; set; }
     }
 }

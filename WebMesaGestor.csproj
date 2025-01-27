@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Application\DTO\NovaPasta\**" />
+    <Content Remove="Application\DTO\NovaPasta\**" />
+    <EmbeddedResource Remove="Application\DTO\NovaPasta\**" />
+    <None Remove="Application\DTO\NovaPasta\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Application\DTO\Auxiliares.cs" />
     <Compile Remove="Migrations\20250115044238_CriandoBancoDedados.cs" />
     <Compile Remove="Migrations\20250115044238_CriandoBancoDedados.Designer.cs" />
     <Compile Remove="Migrations\20250116165223_AtualizandoMudancas.cs" />

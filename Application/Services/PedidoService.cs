@@ -219,15 +219,6 @@ namespace WebMesaGestor.Application.Services
             ValidadorUtils.ValidarDecimalSeVazio(pedido.PedValor, "Valor é obrigatório");
             ValidadorUtils.ValidarMaximo(pedido.PedValor, 9999999, "Valor deve ser menor que 9999999");
             ValidadorUtils.ValidarMinimo(pedido.PedValor, 0, "Valor deve ser maior que 0");
-
-            if (!Enum.IsDefined(typeof(StatusPedido), pedido.PedStatus))
-            {
-                throw new Exception("Status do pedido é obrigatório");
-            }
-            if (!Enum.IsDefined(typeof(TipoPagPedido), pedido.PedTipoPag))
-            {
-                throw new Exception("Tipo de pagamento é obrigatório");
-            }
         }
 
         private void ValidarPedidoEdicao(PedEdicaoDTO pedido)

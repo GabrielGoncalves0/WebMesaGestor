@@ -1,6 +1,7 @@
 ﻿using WebMesaGestor.Application.DTO.Input.Pedido;
 using WebMesaGestor.Application.DTO.Output;
 using WebMesaGestor.Domain.Entities;
+using static WebMesaGestor.Domain.Entities.Pedido;
 
 namespace WebMesaGestor.Application.Map
 {
@@ -11,10 +12,11 @@ namespace WebMesaGestor.Application.Map
             return new PedOutputDTO
             {
                 Id = pedido.Id,
+                PedValor = pedido.PedValor,
                 PedStatus = pedido.PedStatus,
                 PedTipoPag = pedido.PedTipoPag,
-                Usuario = UsuarioMap.MapUsuario(pedido.Usuario),
-                Mesa = MesaMap.MapMesa(pedido.Mesa),
+                Usuario = pedido.Usuario != null ? UsuarioMap.MapUsuario(pedido.Usuario) : null,
+                Mesa = pedido.Mesa != null ? MesaMap.MapMesa(pedido.Mesa) : null,
                 CriacaoData = pedido.CriacaoData,
             };
         }
@@ -29,8 +31,9 @@ namespace WebMesaGestor.Application.Map
             return new Pedido
             {
                 Id = Guid.NewGuid(),
-                PedStatus = pedido.PedStatus,
-                PedTipoPag = pedido.PedTipoPag,
+                PedValor = pedido.PedValor,
+                PedStatus = StatusPedido.aberto,
+                PedTipoPag = TipoPagPedido.nenhum,
                 UsuarioId = pedido.UsuarioId,
                 MesaId = pedido.MesaId,
                 CriacaoData = DateTime.UtcNow
@@ -46,6 +49,7 @@ namespace WebMesaGestor.Application.Map
         {
             return new Pedido
             {
+                PedValor = pedido.PedValor,
                 PedStatus = pedido.PedStatus,
                 PedTipoPag = pedido.PedTipoPag,
                 UsuarioId = pedido.UsuarioId,

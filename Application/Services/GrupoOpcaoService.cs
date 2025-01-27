@@ -163,7 +163,7 @@ namespace WebMesaGestor.Application.Services
         {
             if (grupoOpcao.ProdutoId != null)
             {
-                grupoOpcao.Produto = await _produtoRepository.ProdutoPorId((Guid)grupoOpcao.ProdutoId);
+                grupoOpcao.Produto = await _produtoRepository.ProdutoPorId((Guid)grupoOpcao.ProdutoId); 
             }
         }
 

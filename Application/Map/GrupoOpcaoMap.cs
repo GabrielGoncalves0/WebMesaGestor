@@ -15,10 +15,10 @@ namespace WebMesaGestor.Application.Map
                 GrupOpcMax = grupoOpcao.GrupOpcMax,
                 GrupOpcTipo = grupoOpcao.GrupOpcTipo,
                 CriacaoData = grupoOpcao.CriacaoData,
-                produto = ProdutoMap.MapProduto(grupoOpcao.Produto),
+                Produto = grupoOpcao.Produto != null ? ProdutoMap.MapProduto(grupoOpcao.Produto) : null,
             };
         }
-
+        
         public static IEnumerable<GrupOpcOutputDTO> MapGrupoOpcao(this IEnumerable<GrupoOpcoes> grupoOpcao)
         {
             return grupoOpcao.Select(x => x.MapGrupoOpcao()).ToList();
