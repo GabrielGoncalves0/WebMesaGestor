@@ -26,17 +26,9 @@ namespace WebMesaGestor.Infra.Repositories
 
         public async Task<Usuario> CriarUsuario(Usuario usuario)
         {
-            try
-            {
-                await _appDbContext.Usuarios.AddAsync(usuario);
-                await _appDbContext.SaveChangesAsync();
-                return usuario;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
+            await _appDbContext.Usuarios.AddAsync(usuario);
+            await _appDbContext.SaveChangesAsync();
+            return usuario;
         }
 
         public async Task<Usuario> AtualizarUsuario(Usuario usuario)

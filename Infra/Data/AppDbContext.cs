@@ -20,5 +20,7 @@ namespace WebMesaGestor.Infra.Data
         public DbSet<Produto> Produtos { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<Transacao> Transacoes { get; set; }
+        public DbSet<ProdutoPedido> ProdutoPedido { get; set; }
+        public DbSet<OpcaoProPed> OpcaoProPed { get; set; }
     }
 }
