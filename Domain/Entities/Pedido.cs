@@ -5,7 +5,7 @@ namespace WebMesaGestor.Domain.Entities
 {
     public class Pedido
     {
-        public enum StatusPedido { aberto, fechado, pago }
+        public enum StatusPedido { aberto, pago }
         public enum TipoPagPedido { pix, cartao, avista, nenhum }
         public Pedido()
         {

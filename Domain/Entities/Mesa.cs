@@ -2,7 +2,7 @@
 
 namespace WebMesaGestor.Domain.Entities
 {
-    public enum MesaStatus { Livre, Ocupada, SemMovimento }
+    public enum MesaStatus { Livre, Ocupada, SemMovimento, Pagamento }
     public class Mesa
     {
         public Mesa()
