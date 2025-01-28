@@ -27,6 +27,7 @@ builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<IOpcaoRepository, OpcaoRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IOpcProPedRepository, OpcProPedRepository>();
+builder.Services.AddScoped<IProPedRepository, ProPedRepository>();
 
 // Services
 builder.Services.AddScoped<CaixaService>();

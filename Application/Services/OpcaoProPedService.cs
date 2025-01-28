@@ -100,7 +100,7 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<Response<OpcProPedOutputDTO>> AtualizarUsuario(OpcProPedEdicaoDTO opcProPed)
+        public async Task<Response<OpcProPedOutputDTO>> AtualizarOpcaoProPed(OpcProPedEdicaoDTO opcProPed)
         {
             Response<OpcProPedOutputDTO> resposta = new Response<OpcProPedOutputDTO>();
             try
