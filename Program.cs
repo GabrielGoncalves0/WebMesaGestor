@@ -41,6 +41,7 @@ builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<OpcaoService>();
 builder.Services.AddScoped<PedidoService>();
 builder.Services.AddScoped<OpcaoProPedService>();
+builder.Services.AddScoped<ProPedService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

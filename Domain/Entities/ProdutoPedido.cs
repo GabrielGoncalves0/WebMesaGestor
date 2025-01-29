@@ -13,7 +13,7 @@ namespace WebMesaGestor.Domain.Entities
         public Guid Id { get; set; }
         public int PedQuant { get; set; }
         public int PedDesconto { get; set; }
-        public StatusProPed statusProPed { get; set; }
+        public StatusProPed StatusProPed { get; set; }
         public DateTime CriacaoData { get; set; }
         public virtual Produto Produto { get; set; }
         public Guid ProdutoId { get; set; }
