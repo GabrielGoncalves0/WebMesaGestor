@@ -29,7 +29,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Transacao> transacoes = await _transacaoRepository.ListarTransacoes();
-                if (transacoes == null || !transacoes.Any()) 
+                if (transacoes == null || !transacoes.Any())
                 {
                     resposta.Mensagem = "Transações não encontrada.";
                     resposta.Status = false;
@@ -87,42 +87,13 @@ namespace WebMesaGestor.Application.Services
 
                 Transacao map = TransacaoMap.MapTransacao(transacao);
                 Transacao retorno = await _transacaoRepository.CriarTransacao(map);
+
+                await ProcessarTransacao(map, transacao);
+
                 await PreencherTransacao(retorno);
 
                 resposta.Dados = TransacaoMap.MapTransacao(retorno);
                 resposta.Mensagem = "Transação criada com sucesso";
-                return resposta;
-            }
-            catch (Exception ex)
-            {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
-        }
-
-        public async Task<Response<TraOutputDTO>> AtualizarTransacao(TraEdicaoDTO transacao)
-        {
-            Response<TraOutputDTO> resposta = new Response<TraOutputDTO>();
-            try
-            {
-                validarTransacaoEdicao(transacao);
-                await ValidarUsuario(transacao.UsuarioId);
-                await ValidarCaixa(transacao.CaixaId);
-                await ValidarPedido(transacao.PedidoId);
-                Transacao buscarTransacao = await _transacaoRepository.TransacaoPorId(transacao.Id);
-                if (buscarTransacao == null)
-                {
-                    resposta.Mensagem = "Transação não encontrada.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-                AtualizarDadosTransacao(buscarTransacao, transacao);
-                Transacao retorno = await _transacaoRepository.AtualizarTransacao(buscarTransacao);
-                await PreencherTransacao(retorno);
-
-                resposta.Dados = TransacaoMap.MapTransacao(retorno);
-                resposta.Mensagem = "Transação atualizada com sucesso";
                 return resposta;
             }
             catch (Exception ex)
@@ -139,13 +110,42 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 Transacao transacao = await _transacaoRepository.TransacaoPorId(id);
-                if(transacao == null)
+                if (transacao == null)
                 {
                     resposta.Mensagem = "Transação não encontrada para deleção.";
                     resposta.Status = false;
                     return resposta;
                 }
+                Caixa caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId);
+                if (caixa == null)
+                {
+                    resposta.Mensagem = "Caixa não encontrado para atualização de valor";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
+                if (transacao.TransacaoStatus == TranStatus.Suprimento)
+                {
+                    caixa.CaiValTotal -= transacao.TraValor;
+                }
+                else if (transacao.TransacaoStatus == TranStatus.Sangria)
+                {
+                    caixa.CaiValTotal += transacao.TraValor;
+                }
+                else if (transacao.PedidoId != null)
+                {
+                    var pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
+                    if (pedido != null)
+                    {
+                        caixa.CaiValTotal -= pedido.PedValor;
+                    }
+                }
+
+                await _caixaRepository.AtualizarCaixa(caixa);
+
                 Transacao retorno = await _transacaoRepository.DeletarTransacao(id);
+
+                await PreencherTransacao(retorno);
                 resposta.Dados = TransacaoMap.MapTransacao(retorno);
                 resposta.Mensagem = "Transação deletada com sucesso";
                 return resposta;
@@ -156,10 +156,45 @@ namespace WebMesaGestor.Application.Services
                 resposta.Status = false;
                 return resposta;
             }
-
         }
 
-        // Métodos auxiliares
+        private async Task ProcessarSuprimentoOuSangria(Guid caixaId, decimal valor, bool isSuprimento)
+        {
+            Caixa caixa = await _caixaRepository.CaixaPorId(caixaId);
+            if (caixa == null)
+            {
+                throw new Exception("Caixa não encontrado.");
+            }
+
+            if (isSuprimento)
+            {
+                caixa.CaiValTotal += valor;
+            }
+            else
+            {
+                if (caixa.CaiValTotal < valor)
+                {
+                    throw new Exception("Valor de sangria é maior que o valor disponível no caixa.");
+                }
+                caixa.CaiValTotal -= valor;
+            }
+
+            await _caixaRepository.AtualizarCaixa(caixa);
+        }
+
+        private async Task ProcessarEntradaNoCaixa(Guid caixaId, decimal valorPedido)
+        {
+            Caixa caixa = await _caixaRepository.CaixaPorId(caixaId);
+            if (caixa == null)
+            {
+                throw new Exception("Caixa não encontrado.");
+            }
+
+            caixa.CaiValTotal += valorPedido;
+
+            await _caixaRepository.AtualizarCaixa(caixa);
+        }
+
         private async Task PreencherTransacoes(IEnumerable<Transacao> transacoes)
         {
             foreach (var transacao in transacoes)
@@ -236,7 +271,7 @@ namespace WebMesaGestor.Application.Services
 
             if (pedido == null)
             {
-                throw new Exception("Empresa não encontrada");
+                throw new Exception("Pedido não encontrado");
             }
         }
 
@@ -276,6 +311,27 @@ namespace WebMesaGestor.Application.Services
             transacaoExistente.UsuarioId = transacao.UsuarioId;
             transacaoExistente.CaixaId = transacao.CaixaId;
             transacaoExistente.PedidoId = transacao.PedidoId;
+        }
+
+        private async Task ProcessarTransacao(Transacao map, TraCriacaoDTO transacao)
+        {
+            if (transacao.TransacaoStatus == TranStatus.Suprimento)
+            {
+                await ProcessarSuprimentoOuSangria((Guid)transacao.CaixaId, transacao.TraValor, true);
+            }
+            if (transacao.TransacaoStatus == TranStatus.Sangria)
+            {
+                await ProcessarSuprimentoOuSangria((Guid)transacao.CaixaId, transacao.TraValor, false);
+            }
+            if (transacao.PedidoId != null)
+            {
+                var pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
+                if (pedido == null)
+                {
+                    throw new Exception("Pedido não encontrado.");
+                }
+                await ProcessarEntradaNoCaixa((Guid)transacao.CaixaId, pedido.PedValor);
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ builder.Services.AddScoped<IOpcaoRepository, OpcaoRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IOpcProPedRepository, OpcProPedRepository>();
 builder.Services.AddScoped<IProPedRepository, ProPedRepository>();
+builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 
 // Services
 builder.Services.AddScoped<CaixaService>();
@@ -42,6 +43,7 @@ builder.Services.AddScoped<OpcaoService>();
 builder.Services.AddScoped<PedidoService>();
 builder.Services.AddScoped<OpcaoProPedService>();
 builder.Services.AddScoped<ProPedService>();
+builder.Services.AddScoped<TransacaoService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

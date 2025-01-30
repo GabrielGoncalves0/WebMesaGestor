@@ -32,15 +32,6 @@ namespace WebMesaGestor.Web.Controllers
             return Ok(transacao);
         }
 
-
-        [HttpPut]
-        [Route("atualizar")]
-        public async Task<IActionResult> Put([FromBody] TraEdicaoDTO traEdicaoDTO)
-        {
-            var transacao = await _transacaoService.AtualizarTransacao(traEdicaoDTO);
-            return Ok(transacao);
-        }
-
         [HttpGet]
         [Route("buscar/{id}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)

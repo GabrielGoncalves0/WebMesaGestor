@@ -37,13 +37,6 @@ namespace WebMesaGestor.Infra.Repositories
             return caixa;
         }
 
-        public async Task<Caixa> FecharCaixa(Caixa caixa)
-        {
-            _appDbContext.Caixas.Update(caixa);
-            await _appDbContext.SaveChangesAsync();
-            return caixa;
-        }
-
         public async Task<Caixa> AtualizarCaixa(Caixa caixa)
         {
             _appDbContext.Caixas.Update(caixa);

@@ -7,6 +7,6 @@ namespace WebMesaGestor.Application.DTO.Input.Caixa
     public class CaiFecharDTO
     {
         public Guid Id { get; set; }
-        public decimal? CaiValFechamento { get; set; }
+        public decimal CaiValFechamento { get; set; }
     }
 }

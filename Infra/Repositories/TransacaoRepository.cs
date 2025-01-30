@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
 using WebMesaGestor.Infra.Data;
 
 namespace WebMesaGestor.Infra.Repositories
 {
-    public class TransacaoRepository
+    public class TransacaoRepository : ITransacaoRepository
     {
         private readonly AppDbContext _appDbContext;
 

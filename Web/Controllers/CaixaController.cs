@@ -71,22 +71,5 @@ namespace WebMesaGestor.Web.Controllers
             var caixa = await _caixaService.ReabrirUltimoCaixa();
             return Ok(caixa);
         }
-
-        [HttpPut]
-        [Route("sangria/{id}")]
-        public async Task<IActionResult> SangriaCaixa(Guid id, decimal valor) 
-        {
-            var caixa = await _caixaService.SangriaCaixa(id, valor);
-            return Ok(caixa);
-        }
-
-        [HttpPut]
-        [Route("suprimento/{id}")]
-        public async Task<IActionResult> SuprimentoCaixa(Guid id, decimal valor)
-        {
-            var caixa = await _caixaService.SuprimentoCaixa(id, valor);
-            return Ok(caixa);
-        }
-
     }
 }

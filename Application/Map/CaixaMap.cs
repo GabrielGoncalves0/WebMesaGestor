@@ -13,10 +13,11 @@ namespace WebMesaGestor.Application.Map
                 Id = caixa.Id,
                 CaiValInicial = caixa.CaiValInicial,
                 CaiValFechamento = caixa.CaiValFechamento,
+                CaiValTotal = caixa.CaiValTotal,
                 AberturaData = caixa.AberturaData,
                 FechamentoData = caixa.FechamentoData,
                 CaiStatus = caixa.CaiStatus,
-                Usuario = UsuarioMap.MapUsuario(caixa.Usuario)
+                Usuario = caixa.Usuario != null ? UsuarioMap.MapUsuario(caixa.Usuario) : null
             };
         }
 
@@ -38,21 +39,6 @@ namespace WebMesaGestor.Application.Map
         }
 
         public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiAbrirDTO> caixa)
-        {
-            return caixa.Select(x => x.MapCaixa()).ToList();
-        }
-
-        public static Caixa MapCaixa(this CaiFecharDTO caixa)
-        {
-            return new Caixa
-            {
-                CaiValFechamento = caixa.CaiValFechamento,
-                FechamentoData = DateTime.UtcNow,
-                CaiStatus = CaixaStatus.Fechado
-            };
-        }
-
-        public static IEnumerable<Caixa> MapCaixa(this IEnumerable<CaiFecharDTO> caixa)
         {
             return caixa.Select(x => x.MapCaixa()).ToList();
         }

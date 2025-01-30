@@ -7,7 +7,6 @@ namespace WebMesaGestor.Domain.Interfaces
         Task<IEnumerable<Transacao>> ListarTransacoes();
         Task<Transacao> TransacaoPorId(Guid id);
         Task<Transacao> CriarTransacao(Transacao transacao);
-        Task<Transacao> AtualizarTransacao(Transacao transacao);
         Task<Transacao> DeletarTransacao(Guid id);
     }
 }
