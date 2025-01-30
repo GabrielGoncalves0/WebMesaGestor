@@ -31,7 +31,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<ProdutoPedido> produtosPed = await _produtoPedidoRepository.ListarProdutosPorPedId(id);
-                if (produtosPed == null)
+                if (produtosPed == null || !produtosPed.Any())
                 {
                     resposta.Mensagem = "Produtos por pedido não encontrado.";
                     resposta.Status = false;
@@ -114,8 +114,6 @@ namespace WebMesaGestor.Application.Services
             Response<ProPedOutputDTO> resposta = new Response<ProPedOutputDTO>();
             try
             {
-                await ValidarPedido(proPedEdicaoDTO.PedidoId);
-                await ValidarProduto(proPedEdicaoDTO.ProdutoId);
                 ProdutoPedido buscarProPed = await _produtoPedidoRepository.ProPedId(proPedEdicaoDTO.Id);
                 if (buscarProPed == null)
                 {
@@ -123,11 +121,8 @@ namespace WebMesaGestor.Application.Services
                     resposta.Status = false;
                     return resposta;
                 }
-                AtualizarDadosProdutoPed(buscarProPed, proPedEdicaoDTO);
-                
+                buscarProPed.StatusProPed = proPedEdicaoDTO.StatusProPed;
                 ProdutoPedido retorno = await _produtoPedidoRepository.AtualizarProPed(buscarProPed);
-                await AtualizarValorUpdate(retorno);
-                await PreencherProdutoPed(retorno);
 
                 resposta.Dados = ProdutoPedidoMap.MapProPed(retorno);
                 resposta.Mensagem = "Produto do pedido atualizado com sucesso";
@@ -232,8 +227,10 @@ namespace WebMesaGestor.Application.Services
         {
             Pedido pedido = await _pedidoRepository.PedidoPorId(produtoPedido.PedidoId);
             Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
-            
-            pedido.PedValor += produto.ProPreco * produtoPedido.PedQuant;
+
+            decimal valorTotalProdutoComDesconto = (produto.ProPreco * produtoPedido.PedQuant) - ((produto.ProPreco * produtoPedido.PedQuant) * (produtoPedido.PedDesconto / 100));
+            pedido.PedValor += valorTotalProdutoComDesconto;
+
             await _pedidoRepository.AtualizarPedido(pedido);
         }
 
@@ -243,15 +240,6 @@ namespace WebMesaGestor.Application.Services
             Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
 
             pedido.PedValor -= produto.ProPreco;
-            await _pedidoRepository.AtualizarPedido(pedido);
-        }
-
-        private async Task AtualizarValorUpdate(ProdutoPedido produtoPedido)
-        {
-            Pedido pedido = await _pedidoRepository.PedidoPorId(produtoPedido.PedidoId);
-            Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
-
-            pedido.PedValor -= produto.ProPreco * produtoPedido.PedQuant;
             await _pedidoRepository.AtualizarPedido(pedido);
         }
 
@@ -269,25 +257,10 @@ namespace WebMesaGestor.Application.Services
 
         private void ValidarProdutoPedEdicao(ProPedEdicaoDTO produtoPedido)
         {
-            ValidadorUtils.ValidarInteiroSeVazioOuNulo(produtoPedido.ProPedQuant, "Quantidade é obrigatório");
-            ValidadorUtils.ValidarMaximo(produtoPedido.ProPedQuant, 10, "Quantidade deve conter no máximo 10 caracteres");
-            ValidadorUtils.ValidarMinimo(produtoPedido.ProPedQuant, 1, "Quantidade deve conter no minimo 3 caracteres");
-            ValidadorUtils.ValidarNegativo(produtoPedido.ProPedQuant, "Quantidade deve ser maior que 0");
-
-            ValidadorUtils.ValidarInteiroSeVazioOuNulo(produtoPedido.ProPedDesconto, "Desconto é obrigatório");
-            ValidadorUtils.ValidarMaximo(produtoPedido.ProPedDesconto, 3, "Desconto deve conter no máximo 3 caracteres");
-            ValidadorUtils.ValidarNegativo(produtoPedido.ProPedDesconto, "Desconto deve ser maior que 0");
-
             if (!Enum.IsDefined(typeof(StatusProPed), produtoPedido.StatusProPed))
             {
                 throw new Exception("Status do produto do pedido é obrigatório");
             }
-        }
-
-        private void AtualizarDadosProdutoPed(ProdutoPedido produtoPedExistente, ProPedEdicaoDTO produtoPed)
-        {
-            produtoPedExistente.ProdutoId = produtoPed.ProdutoId;
-            produtoPedExistente.PedidoId = produtoPed.PedidoId;
         }
     }
 }

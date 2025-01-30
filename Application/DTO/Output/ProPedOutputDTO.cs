@@ -11,7 +11,9 @@ namespace WebMesaGestor.Application.DTO.Output
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public StatusProPed StatusProPed { get; set; }
         public DateTime CriacaoData { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public virtual ProOutputDTO? Produto { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public virtual PedOutputDTO? Pedido { get; set; }
 
     }

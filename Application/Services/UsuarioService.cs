@@ -24,7 +24,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Usuario> usuarios = await _usuarioRepository.ListarUsuarios();
-                if (usuarios == null)
+                if (usuarios == null || !usuarios.Any())
                 {
                     resposta.Mensagem = "Usuarios não encontrado.";
                     resposta.Status = false;

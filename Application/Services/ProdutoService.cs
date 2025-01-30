@@ -26,7 +26,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Produto> produtos = await _produtoRepository.ListarProdutos();
-                if (produtos == null)
+                if (produtos == null || !produtos.Any())
                 {
                     resposta.Mensagem = "Produtos não encontrado.";
                     resposta.Status = false;

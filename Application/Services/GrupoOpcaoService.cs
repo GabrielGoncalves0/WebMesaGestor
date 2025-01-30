@@ -25,7 +25,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<GrupoOpcoes> grupoOpcao = await _grupoOpcaoRepository.ListarGrupoOpcoes();
-                if(grupoOpcao == null)
+                if(grupoOpcao == null || !grupoOpcao.Any())
                 {
                     resposta.Mensagem = "Grupo de opcões não encontrado.";
                     resposta.Status = false;

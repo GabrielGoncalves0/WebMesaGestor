@@ -49,11 +49,7 @@ namespace WebMesaGestor.Application.Map
         {
             return new ProdutoPedido
             {
-                PedQuant = proPedEdicaoDTO.ProPedQuant,
-                PedDesconto = proPedEdicaoDTO.ProPedDesconto,
                 StatusProPed = proPedEdicaoDTO.StatusProPed,
-                ProdutoId = proPedEdicaoDTO.ProdutoId,
-                PedidoId = proPedEdicaoDTO.PedidoId,
             };
         }
 

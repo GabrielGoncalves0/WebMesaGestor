@@ -29,7 +29,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Pedido> pedidos = await _pedidoRepository.ListarPedidos();
-                if (pedidos == null)
+                if (pedidos == null || !pedidos.Any())
                 {
                     resposta.Mensagem = "Pedidos não encontrado.";
                     resposta.Status = false;

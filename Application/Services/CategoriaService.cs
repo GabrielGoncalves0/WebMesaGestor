@@ -23,7 +23,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Categoria> categorias = await _categoriaRepository.ListarCategorias();
-                if (categorias == null)
+                if (categorias == null || !categorias.Any())
                 {
                     resposta.Mensagem = "Nenhuma categoria encontrada.";
                     resposta.Status = false;

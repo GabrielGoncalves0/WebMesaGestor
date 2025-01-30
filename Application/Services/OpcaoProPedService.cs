@@ -30,7 +30,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<OpcaoProPed> opcaoProPed = await _opcProPedRepository.ListarOpcoesPorProPedId(id);
-                if (opcaoProPed == null)
+                if (opcaoProPed == null || !opcaoProPed.Any())
                 {
                     resposta.Mensagem = "Opções por produto não encontrado.";
                     resposta.Status = false;

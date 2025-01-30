@@ -21,7 +21,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Empresa> empresas = await _empresaRepository.ListarEmpresas();
-                if (empresas == null)
+                if (empresas == null || !empresas.Any())
                 {
                     resposta.Mensagem = "Nenhuma empresa encontrada.";
                     resposta.Status = false;

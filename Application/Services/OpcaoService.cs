@@ -23,7 +23,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Opcao> opcoes = await _opcaoRepository.ListarOpcoes();
-                if (opcoes == null)
+                if (opcoes == null || !opcoes.Any())
                 {
                     resposta.Mensagem = "Opções não encontrado.";
                     resposta.Status = false;

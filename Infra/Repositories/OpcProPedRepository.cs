@@ -16,7 +16,7 @@ namespace WebMesaGestor.Infra.Repositories
 
         public async Task<IEnumerable<OpcaoProPed>> ListarOpcoesPorProPedId(Guid id)
         {
-            return await _appDbContext.OpcaoProPed.Where(opc => opc.Id == id).ToListAsync();
+            return await _appDbContext.OpcaoProPed.Where(opc => opc.ProdutoPedidoId == id).ToListAsync();
         }
 
         public async Task<OpcaoProPed> OpcaoProPedId(Guid id)

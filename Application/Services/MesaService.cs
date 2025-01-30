@@ -22,7 +22,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Mesa> mesas = await _mesaRepository.ListarMesas();
-                if (mesas == null)
+                if (mesas == null || !mesas.Any())
                 {
                     resposta.Mensagem = "Nenhuma mesa encontrada.";
                     resposta.Status = false;

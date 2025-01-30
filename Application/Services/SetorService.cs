@@ -22,7 +22,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Setor> setors = await _setorRepository.ListarSetors();
-                if (setors == null)
+                if (setors == null || !setors.Any())
                 {
                     resposta.Mensagem = "Nenhuma setor encontrado.";
                     resposta.Status = false;

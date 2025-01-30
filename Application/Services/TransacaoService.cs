@@ -29,7 +29,7 @@ namespace WebMesaGestor.Application.Services
             try
             {
                 IEnumerable<Transacao> transacoes = await _transacaoRepository.ListarTransacoes();
-                if (transacoes == null)
+                if (transacoes == null || !transacoes.Any()) 
                 {
                     resposta.Mensagem = "Transações não encontrada.";
                     resposta.Status = false;
