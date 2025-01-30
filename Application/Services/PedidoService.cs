@@ -79,7 +79,6 @@ namespace WebMesaGestor.Application.Services
             Response<PedOutputDTO> resposta = new Response<PedOutputDTO>();
             try
             {
-                ValidarPedidoCriacao(pedido);
                 await ValidarMesa(pedido.MesaId);
                 await ValidarUsuario(pedido.UsuarioId);
 
@@ -212,13 +211,6 @@ namespace WebMesaGestor.Application.Services
             {
                 throw new Exception("Mesa não encontrada");
             }
-        }
-
-        private void ValidarPedidoCriacao(PedCriacaoDTO pedido)
-        {
-            ValidadorUtils.ValidarDecimalSeVazio(pedido.PedValor, "Valor é obrigatório");
-            ValidadorUtils.ValidarMaximo(pedido.PedValor, 9999999, "Valor deve ser menor que 9999999");
-            ValidadorUtils.ValidarMinimo(pedido.PedValor, 0, "Valor deve ser maior que 0");
         }
 
         private void ValidarPedidoEdicao(PedEdicaoDTO pedido)

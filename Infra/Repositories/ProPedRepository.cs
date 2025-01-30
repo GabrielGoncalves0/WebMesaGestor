@@ -21,7 +21,7 @@ namespace WebMesaGestor.Infra.Repositories
 
         public async Task<ProdutoPedido> ProPedId(Guid id)
         {
-            return await _appDbContext.ProdutoPedido.FirstOrDefaultAsync(opc => opc.PedidoId == new Guid(id.ToString()));
+            return await _appDbContext.ProdutoPedido.FirstOrDefaultAsync(pp => pp.Id == new Guid(id.ToString()));
         }
 
         public async Task<ProdutoPedido> CriarProPed(ProdutoPedido produtoPedido)
@@ -40,10 +40,10 @@ namespace WebMesaGestor.Infra.Repositories
 
         public async Task<ProdutoPedido> DeletarProPed(Guid id)
         {
-            ProdutoPedido opcaoProPed = await ProPedId(id);
-            _appDbContext.ProdutoPedido.Remove(opcaoProPed);
+            ProdutoPedido produtoPed = await ProPedId(id);
+            _appDbContext.ProdutoPedido.Remove(produtoPed);
             await _appDbContext.SaveChangesAsync();
-            return opcaoProPed;
+            return produtoPed;
         }
     }
 }

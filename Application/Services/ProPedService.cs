@@ -38,7 +38,7 @@ namespace WebMesaGestor.Application.Services
                     return resposta;
                 }
 
-                await PreencherProdutosPed(produtosPed);
+                await PreencherProdutoPed(produtosPed);
                 resposta.Dados = ProdutoPedidoMap.MapProPed(produtosPed);
                 resposta.Mensagem = "Produtos por pedido listados com sucesso";
                 return resposta;
@@ -77,20 +77,28 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<Response<ProPedOutputDTO>> CriarProPed(ProPedCriacaoDTO proPedCriacaoDTO)
+        public async Task<Response<IEnumerable<ProPedOutputDTO>>> CriarProPed(ProPedCriacaoDTO proPedCriacaoDTO)
         {
-            Response<ProPedOutputDTO> resposta = new Response<ProPedOutputDTO>();
+            Response<IEnumerable<ProPedOutputDTO>> resposta = new Response<IEnumerable<ProPedOutputDTO>>();
             try
             {
+                var listaProdutoPedido = new List<ProdutoPedido>();
+
                 await ValidarPedido(proPedCriacaoDTO.PedidoId);
                 await ValidarProduto(proPedCriacaoDTO.ProdutoId);
 
-                ProdutoPedido map = ProdutoPedidoMap.MapProPed(proPedCriacaoDTO);
-                ProdutoPedido retorno = await _produtoPedidoRepository.CriarProPed(map);
-                await PreencherProdutoPed(retorno);
+                for (int i = 0; i < proPedCriacaoDTO.ProPedQuant; i++)
+                {
+                    ProdutoPedido map = ProdutoPedidoMap.MapProPed(proPedCriacaoDTO);
+                    map.PedQuant = 1;
+                    ProdutoPedido retorno = await _produtoPedidoRepository.CriarProPed(map);
+                    await PreencherProdutoPed(retorno);
+                    await AtualizarValorCriacao(retorno);
+                    listaProdutoPedido.Add(retorno);
+                }
 
-                resposta.Dados = ProdutoPedidoMap.MapProPed(retorno);
-                resposta.Mensagem = "Produto do pedido criado com sucesso";
+                resposta.Dados = ProdutoPedidoMap.MapProPed(listaProdutoPedido);
+                resposta.Mensagem = "Produtos do pedido criados com sucesso";
                 return resposta;
             }
             catch (Exception ex)
@@ -101,7 +109,7 @@ namespace WebMesaGestor.Application.Services
             }
         }
 
-        public async Task<Response<ProPedOutputDTO>> AtualizarOpcaoProPed(ProPedEdicaoDTO proPedEdicaoDTO)
+        public async Task<Response<ProPedOutputDTO>> AtualizarProPed(ProPedEdicaoDTO proPedEdicaoDTO)
         {
             Response<ProPedOutputDTO> resposta = new Response<ProPedOutputDTO>();
             try
@@ -116,7 +124,9 @@ namespace WebMesaGestor.Application.Services
                     return resposta;
                 }
                 AtualizarDadosProdutoPed(buscarProPed, proPedEdicaoDTO);
+                
                 ProdutoPedido retorno = await _produtoPedidoRepository.AtualizarProPed(buscarProPed);
+                await AtualizarValorUpdate(retorno);
                 await PreencherProdutoPed(retorno);
 
                 resposta.Dados = ProdutoPedidoMap.MapProPed(retorno);
@@ -143,6 +153,8 @@ namespace WebMesaGestor.Application.Services
                     resposta.Status = false;
                     return resposta;
                 }
+                await AtualizarValorDelete(produtoPed);
+
                 ProdutoPedido retorno = await _produtoPedidoRepository.DeletarProPed(id);
 
                 await PreencherProdutoPed(retorno);
@@ -159,7 +171,7 @@ namespace WebMesaGestor.Application.Services
         }
 
         // Métodos auxiliares
-        private async Task PreencherProdutosPed(IEnumerable<ProdutoPedido> produtosPed)
+        private async Task PreencherProdutoPed(IEnumerable<ProdutoPedido> produtosPed)
         {
             foreach (var produtoPed in produtosPed)
             {
@@ -214,6 +226,33 @@ namespace WebMesaGestor.Application.Services
             {
                 throw new Exception("Pedido não encontrado");
             }
+        }
+
+        private async Task AtualizarValorCriacao(ProdutoPedido produtoPedido)
+        {
+            Pedido pedido = await _pedidoRepository.PedidoPorId(produtoPedido.PedidoId);
+            Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
+            
+            pedido.PedValor += produto.ProPreco * produtoPedido.PedQuant;
+            await _pedidoRepository.AtualizarPedido(pedido);
+        }
+
+        private async Task AtualizarValorDelete(ProdutoPedido produtoPedido)
+        {
+            Pedido pedido = await _pedidoRepository.PedidoPorId(produtoPedido.PedidoId);
+            Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
+
+            pedido.PedValor -= produto.ProPreco;
+            await _pedidoRepository.AtualizarPedido(pedido);
+        }
+
+        private async Task AtualizarValorUpdate(ProdutoPedido produtoPedido)
+        {
+            Pedido pedido = await _pedidoRepository.PedidoPorId(produtoPedido.PedidoId);
+            Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
+
+            pedido.PedValor -= produto.ProPreco * produtoPedido.PedQuant;
+            await _pedidoRepository.AtualizarPedido(pedido);
         }
 
         private void ValidarProdutoPedCriacao(ProPedCriacaoDTO produtoPedido)

@@ -9,7 +9,7 @@ namespace WebMesaGestor.Application.DTO.Output
         public int PedQuant { get; set; }
         public int PedDesconto { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public StatusProPed statusProPed { get; set; }
+        public StatusProPed StatusProPed { get; set; }
         public DateTime CriacaoData { get; set; }
         public virtual ProOutputDTO? Produto { get; set; }
         public virtual PedOutputDTO? Pedido { get; set; }

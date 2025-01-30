@@ -31,7 +31,7 @@ namespace WebMesaGestor.Application.Map
             return new Pedido
             {
                 Id = Guid.NewGuid(),
-                PedValor = pedido.PedValor,
+                PedValor = 0,
                 PedStatus = StatusPedido.aberto,
                 PedTipoPag = TipoPagPedido.nenhum,
                 UsuarioId = pedido.UsuarioId,

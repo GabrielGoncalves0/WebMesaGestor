@@ -15,6 +15,7 @@ namespace WebMesaGestor.Application.Map
                 PedQuant = produtoPedido.PedQuant,
                 PedDesconto = produtoPedido.PedDesconto,
                 CriacaoData = produtoPedido.CriacaoData,
+                StatusProPed = produtoPedido.StatusProPed,
                 Produto = produtoPedido.Produto != null ? ProdutoMap.MapProduto(produtoPedido.Produto) : null,
                 Pedido = produtoPedido.Pedido != null ? PedidoMap.MapPedido(produtoPedido.Pedido) : null
             };
@@ -30,11 +31,12 @@ namespace WebMesaGestor.Application.Map
             return new ProdutoPedido
             {
                 Id = Guid.NewGuid(),
-                PedQuant = proPedCriacaoDTO.PedQuant,
-                PedDesconto = proPedCriacaoDTO.PedDesconto,
-                CriacaoData = DateTime.UtcNow,
+                PedQuant = proPedCriacaoDTO.ProPedQuant,
+                PedDesconto = proPedCriacaoDTO.ProPedDesconto,
                 ProdutoId = proPedCriacaoDTO.ProdutoId,
                 PedidoId = proPedCriacaoDTO.PedidoId,
+                StatusProPed = StatusProPed.Nao_pago,
+                CriacaoData = DateTime.UtcNow,
             };
         }
 
@@ -47,8 +49,9 @@ namespace WebMesaGestor.Application.Map
         {
             return new ProdutoPedido
             {
-                PedQuant = proPedEdicaoDTO.PedQuant,
-                PedDesconto = proPedEdicaoDTO.PedDesconto,
+                PedQuant = proPedEdicaoDTO.ProPedQuant,
+                PedDesconto = proPedEdicaoDTO.ProPedDesconto,
+                StatusProPed = proPedEdicaoDTO.StatusProPed,
                 ProdutoId = proPedEdicaoDTO.ProdutoId,
                 PedidoId = proPedEdicaoDTO.PedidoId,
             };
