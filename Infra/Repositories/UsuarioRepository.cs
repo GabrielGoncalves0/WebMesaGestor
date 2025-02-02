@@ -24,6 +24,11 @@ namespace WebMesaGestor.Infra.Repositories
             return await _appDbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
         }
 
+        public async Task<Usuario> UsuarioPorEmail(string email)
+        {
+            return await _appDbContext.Usuarios.FirstOrDefaultAsync(u => u.UsuEmail == email);
+        }
+
         public async Task<Usuario> CriarUsuario(Usuario usuario)
         {
             await _appDbContext.Usuarios.AddAsync(usuario);

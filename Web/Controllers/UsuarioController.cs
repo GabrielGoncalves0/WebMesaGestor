@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebMesaGestor.Application.DTO.Input.USuario;
 using WebMesaGestor.Application.Services;
@@ -7,6 +8,7 @@ using WebMesaGestor.Domain.Entities;
 namespace WebMesaGestor.Web.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class UsuarioController : ControllerBase
     {
