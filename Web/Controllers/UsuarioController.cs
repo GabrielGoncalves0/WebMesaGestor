@@ -8,7 +8,6 @@ using WebMesaGestor.Domain.Entities;
 namespace WebMesaGestor.Web.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("api/[controller]")]
     public class UsuarioController : ControllerBase
     {
@@ -20,6 +19,7 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("buscarTodos")]
         public async Task<IActionResult> Get()
         {
@@ -28,6 +28,7 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("cadastrar")]
         public async Task<IActionResult> Post([FromBody] UsuCriacaoDTO usuario)
         {
@@ -37,6 +38,7 @@ namespace WebMesaGestor.Web.Controllers
 
 
         [HttpPut]
+        [Authorize]
         [Route("atualizar")]
         public async Task<IActionResult> Put([FromBody] UsuEdicaoDTO usuario)
         {
@@ -53,6 +55,7 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("deletar/{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {

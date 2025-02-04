@@ -25,7 +25,7 @@ namespace WebMesaGestor.Application.Services
         {
             var user = await _usuarioRepository.UsuarioPorEmail(login.Email);
 
-            if (user.UsuEmail == login.Email || login.Password != user.UsuSenha)
+            if (user.UsuEmail != login.Email || login.Password != user.UsuSenha)
             {
                 return String.Empty;
             }
