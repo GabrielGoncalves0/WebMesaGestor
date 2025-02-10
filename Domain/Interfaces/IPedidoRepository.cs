@@ -4,10 +4,10 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface IPedidoRepository
     {
-        Task<IEnumerable<Pedido>> ListarPedidos();
-        Task<Pedido> PedidoPorId(Guid id);
+        Task<IEnumerable<Pedido>> ObterPedidos();
+        Task<Pedido> ObterPedidoPorId(Guid id);
         Task<Pedido> CriarPedido(Pedido pedido);
         Task<Pedido> AtualizarPedido(Pedido pedido);
-        Task<Pedido> DeletarPedido(Guid id);
+        Task<bool> DeletarPedido(Guid id);
     }
 }

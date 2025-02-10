@@ -4,11 +4,11 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface ICaixaRepository
     {
-        Task<IEnumerable<Caixa>> ListarCaixas();
+        Task<IEnumerable<Caixa>> ObterCaixas();
+        Task<Caixa> ObterCaixaPorId(Guid id);
         Task<Caixa> AbrirCaixa(Caixa caixa);
         Task<Caixa> AtualizarCaixa(Caixa caixa);
-        Task<Caixa> DeletarCaixa(Guid id);
-        Task<Caixa> CaixaPorId(Guid id);
+        Task<bool> DeletarCaixa(Guid id);
         Task<Caixa> UltimoCaixa();
     }
 }

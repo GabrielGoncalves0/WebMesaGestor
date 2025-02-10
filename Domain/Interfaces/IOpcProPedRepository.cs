@@ -4,10 +4,10 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface IOpcProPedRepository
     {
-        Task<IEnumerable<OpcaoProPed>> ListarOpcoesPorProPedId(Guid id);
-        Task<OpcaoProPed> OpcaoProPedId(Guid id);
+        Task<IEnumerable<OpcaoProPed>> ObterOpcoesPorProPedId(Guid id);
+        Task<OpcaoProPed> ObterOpcaoProPedId(Guid id);
         Task<OpcaoProPed> CriarOpcaoProdPed(OpcaoProPed opcaoProPed);
         Task<OpcaoProPed> AtualizarOpcaoProdPed(OpcaoProPed opcaoProPed);
-        Task<OpcaoProPed> DeletarOpcaoProdPed(Guid id);
+        Task<bool> DeletarOpcaoProdPed(Guid id);
     }
 }

@@ -9,6 +9,6 @@ namespace WebMesaGestor.Application.DTO.Input.Grupo
         public string GrupOpcDesc { get; set; }
         public GrupOpcTipo GrupOpcTipo { get; set; }
         public int GrupOpcMax { get; set; }
-        public Guid? ProdutoId { get; set; }
+        public Guid ProdutoId { get; set; }
     }
 }

@@ -11,6 +11,6 @@ namespace WebMesaGestor.Domain.Entities
         public Guid Id { get; set; }
         [StringLength(100)]
         public string CatDesc { get; set; }
-        public DateTime CriacaoData { get; set; }
+        public DateTime DataCriacao { get; set; }
     }
 }

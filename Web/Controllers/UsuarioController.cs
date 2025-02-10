@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebMesaGestor.Application.DTO.Input.USuario;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Input.Usuario;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.DTO.Response;
 using WebMesaGestor.Application.Services;
 using WebMesaGestor.Domain.Entities;
 
 namespace WebMesaGestor.Web.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class UsuarioController : ControllerBase
     {
         private readonly UsuarioService _usuarioService;
@@ -19,48 +22,87 @@ namespace WebMesaGestor.Web.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         [Route("buscarTodos")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> ListarUsuarios()
         {
-            var usuarios = await _usuarioService.ListarUsuarios();
+            var usuarios = await _usuarioService.ObterTodosUsuarios();
+
+            if (usuarios == null)
+            {
+                usuarios = new List<UsuarioDTO>();
+            }
+
             return Ok(usuarios);
-        }
-
-        [HttpPost]
-        [Authorize]
-        [Route("cadastrar")]
-        public async Task<IActionResult> Post([FromBody] UsuCriacaoDTO usuario)
-        {
-            var result = await _usuarioService.CriarUsuario(usuario);
-            return Ok(result);
-        }
-
-
-        [HttpPut]
-        [Authorize]
-        [Route("atualizar")]
-        public async Task<IActionResult> Put([FromBody] UsuEdicaoDTO usuario)
-        {
-            var result = await _usuarioService.AtualizarUsuario(usuario);
-            return Ok(result);
         }
 
         [HttpGet]
         [Route("buscar/{id}")]
-        public async Task<IActionResult> Get([FromRoute] Guid id)
+        public async Task<IActionResult> ObterUsuarioPorId(Guid id)
         {
-            var usuario = await _usuarioService.UsuarioPorId(id);
+            var usuario = await _usuarioService.ObterUsuarioPorId(id);
+
+            if (usuario == null)
+            {
+                return NotFound(new ErrorResponse { Mensagem = UsuarioMessages.UsuarioNaoEncontrado });
+            }
+
             return Ok(usuario);
         }
 
-        [HttpDelete]
-        [Authorize]
-        [Route("deletar/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        [HttpPost]
+        [Route("cadastrar")]
+        public async Task<IActionResult> CriarUsuario([FromBody] UsuCriacaoDTO usuarioDTO)
         {
-            var usuario = await _usuarioService.DeletarUsuario(id);
-            return Ok(usuario);
+            var resultado = await _usuarioService.CriarUsuario(usuarioDTO);
+
+            if (resultado.Sucesso)
+            {
+                return CreatedAtAction(nameof(ObterUsuarioPorId), new { id = resultado.Id }, resultado);
+            }
+
+            return BadRequest(new ValidationErrorResponse { Errors = resultado.Erros });
+        }
+
+        [HttpPut]
+        [Route("atualizar")]
+        public async Task<IActionResult> AtualizarUsuario([FromBody] UsuEdicaoDTO usuarioDTO)
+        {
+            var usuarioExistente = await _usuarioService.ObterUsuarioPorId(usuarioDTO.Id);
+
+            if (usuarioExistente == null)
+            {
+                return NotFound(new { mensagem = UsuarioMessages.UsuarioNaoEncontrado });
+            }
+
+            var resultado = await _usuarioService.AtualizarUsuario(usuarioDTO);
+
+            if (resultado.Sucesso)
+            {
+                return Ok(new { mensagem = UsuarioMessages.UsuarioAtualizadoComSucesso });
+            }
+
+            return BadRequest(new { mensagem = UsuarioMessages.ErroAoAtualizarUsuario, erros = resultado.Erros });
+        }
+
+        [HttpDelete]
+        [Route("deletar/{id}")]
+        public async Task<IActionResult> DeletarUsuario(Guid id)
+        {
+            var usuarioExistente = await _usuarioService.ObterUsuarioPorId(id);
+
+            if (usuarioExistente == null)
+            {
+                return NotFound(new { mensagem = UsuarioMessages.UsuarioNaoEncontrado });
+            }   
+
+            var resultado = await _usuarioService.DeletarUsuario(id);
+
+            if (resultado.Sucesso)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new { mensagem = UsuarioMessages.ErroAoDeletarUsuario});
         }
     }
 }

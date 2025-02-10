@@ -11,6 +11,6 @@ namespace WebMesaGestor.Domain.Entities
         public string EmpNome { get; set; }
         [StringLength(18)]
         public string EmpCnpj { get; set; }
-        public DateTime CriacaoData { get; set; }
+        public DateTime DataCriacao { get; set; }
     }
 }

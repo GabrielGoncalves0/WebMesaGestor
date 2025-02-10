@@ -4,10 +4,10 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface ISetorRepository
     {
-        Task<IEnumerable<Setor>> ListarSetors();
-        Task<Setor> SetorPorId(Guid id);
+        Task<IEnumerable<Setor>> ObterTodosSetores();
+        Task<Setor> ObterSetorPorId(Guid id);
         Task<Setor> CriarSetor(Setor setor);
         Task<Setor> AtualizarSetor(Setor setor);
-        Task<Setor> DeletarSetor(Guid id);
+        Task<bool> DeletarSetor(Guid id);
     }
 }

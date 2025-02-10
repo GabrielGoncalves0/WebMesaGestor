@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebMesaGestor.Domain.Entities
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum CaixaStatus { Aberto, Fechado }
     public class Caixa
     {

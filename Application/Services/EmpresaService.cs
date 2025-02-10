@@ -1,172 +1,128 @@
-﻿using WebMesaGestor.Application.DTO.Output;
-using WebMesaGestor.Application.Map;
+﻿using AutoMapper;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.DTO.Input.Empresa;
+using WebMesaGestor.Application.Validations.Empresa;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
-using WebMesaGestor.Application.DTO.Input.Empresa;
-using WebMesaGestor.Utils;
+using WebMesaGestor.Infra.Repositories;
 
 namespace WebMesaGestor.Application.Services
 {
     public class EmpresaService
     {
         private readonly IEmpresaRepository _empresaRepository;
-        public EmpresaService(IEmpresaRepository empresaRepository)
+        private readonly IMapper _mapper;
+        public EmpresaService(IEmpresaRepository empresaRepository, IMapper mapper)
         {
             _empresaRepository = empresaRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Response<IEnumerable<EmpOutputDTO>>> ListarEmpresas()
+        public async Task<IEnumerable<EmpresaDTO>> ObterTodasEmpresas()
         {
-            Response<IEnumerable<EmpOutputDTO>> resposta = new Response<IEnumerable<EmpOutputDTO>>();
-            try
+            var empresas = await _empresaRepository.ObterTodasEmpresas();
+            return _mapper.Map<IEnumerable<EmpresaDTO>>(empresas);
+        }
+
+        public async Task<EmpresaDTO> ObterEmpresaPorId(Guid id)
+        {
+            var empresa = await _empresaRepository.ObterEmpresaPorId(id);
+
+            if (empresa == null)
             {
-                IEnumerable<Empresa> empresas = await _empresaRepository.ListarEmpresas();
-                if (empresas == null || !empresas.Any())
+                return null;
+            }
+
+            return _mapper.Map<EmpresaDTO>(empresa);
+        }
+
+        public async Task<Response<EmpresaDTO>> CriarEmpresa(EmpCriacaoDTO empresaDTO)
+        {
+            var validationResult = new EmpresaCriacaoValidator().Validate(empresaDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<EmpresaDTO>
                 {
-                    resposta.Mensagem = "Nenhuma empresa encontrada.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-
-                resposta.Dados = EmpresaMap.MapEmpresa(empresas);
-                resposta.Mensagem = "Empresas listadas com sucesso";
-                return resposta;
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
             }
-            catch (Exception ex)
+
+            var empresa = _mapper.Map<Empresa>(empresaDTO);
+            await _empresaRepository.CriarEmpresa(empresa);
+
+            return new Response<EmpresaDTO>
             {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
-        }   
+                Sucesso = true,
+                Id = empresa.Id,
+                Data = _mapper.Map<EmpresaDTO>(empresa)
+            };
+        }
 
-        public async Task<Response<EmpOutputDTO>> EmpresaPorId(Guid id)
+        public async Task<Response<EmpresaDTO>> AtualizarEmpresa(EmpEdicaoDTO empresaDTO)
         {
-            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
-            try
+            var validationResult = new EmpresaEdicaoValidator().Validate(empresaDTO);
+            if (!validationResult.IsValid)
             {
-                Empresa empresa = await _empresaRepository.EmpresaPorId(id);
-
-                if (empresa == null)
+                return new Response<EmpresaDTO>()
                 {
-                    resposta.Mensagem = "Empresa não encontrada.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-
-                resposta.Dados = EmpresaMap.MapEmpresa(empresa);
-                resposta.Mensagem = "Empresa encontrada com sucesso";
-                return resposta;
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
             }
-            catch (Exception ex)
-            {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
-        }
 
-        public async Task<Response<EmpOutputDTO>> CriarEmpresa(EmpCriacaoDTO empresa)
-        {
-            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
-            try
+            var empresaExistente = await _empresaRepository.ObterEmpresaPorId(empresaDTO.Id);
+            if (empresaExistente == null)
             {
-                ValidarUsuarioCriacao(empresa);
-                Empresa map = EmpresaMap.MapEmpresa(empresa);
-                Empresa retorno = await _empresaRepository.CriarEmpresa(map);
-
-                resposta.Dados = EmpresaMap.MapEmpresa(retorno);
-                resposta.Mensagem = "Empresa criada com sucesso";
-                return resposta;
-            }
-            catch (Exception ex)
-            {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
-        }
-
-        public async Task<Response<EmpOutputDTO>> AtualizarEmpresa(EmpEdicaoDTO empresa)
-        {
-            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
-            try
-            {
-                ValidarUsuarioEdicao(empresa);
-                Empresa buscarEmpresa = await _empresaRepository.EmpresaPorId(empresa.Id);
-                if (buscarEmpresa == null)
+                return new Response<EmpresaDTO>()
                 {
-                    resposta.Mensagem = "Empresa não encontrada.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-                AtualizarDadosEmpresa(buscarEmpresa, empresa);
-                Empresa retorno = await _empresaRepository.AtualizarEmpresa(buscarEmpresa);
+                    Sucesso = false,
+                    Erros = new List<string> { EmpresaMessages.EmpresaNaoEncontrada }
+                };
+            }
 
-                resposta.Dados = EmpresaMap.MapEmpresa(retorno);
-                resposta.Mensagem = "Empresa atualizada com sucesso";
-                return resposta;
-            }
-            catch (Exception ex)
+            var empresa = _mapper.Map(empresaDTO, empresaExistente);
+            await _empresaRepository.AtualizarEmpresa(empresa);
+
+            return new Response<EmpresaDTO>()
             {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
+                Sucesso = true,
+                Id = empresa.Id,
+                Data = _mapper.Map<EmpresaDTO>(empresa)
+            };
         }
 
-        public async Task<Response<EmpOutputDTO>> DeletarEmpresa(Guid id)
+        public async Task<Response<EmpresaDTO>> DeletarEmpresa(Guid id)
         {
-            Response<EmpOutputDTO> resposta = new Response<EmpOutputDTO>();
-            try
+            var empresaExistente = await _empresaRepository.ObterEmpresaPorId(id);
+
+            if (empresaExistente == null)
             {
-                Empresa empresa = await _empresaRepository.EmpresaPorId(id);
-                if (empresa == null)
+                return new Response<EmpresaDTO>
                 {
-                    resposta.Mensagem = "Empresa não encontrada para deleção.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-                Empresa retorno = await _empresaRepository.DeletarEmpresa(id);
-
-                resposta.Dados = EmpresaMap.MapEmpresa(retorno);
-                resposta.Mensagem = "Empresa deletada com sucesso";
-                return resposta;
+                    Sucesso = false,
+                    Erros = new List<string> { EmpresaMessages.EmpresaNaoEncontrada }
+                };
             }
-            catch (Exception ex)
+
+            var sucessoDelecao = await _empresaRepository.DeletarEmpresa(id);
+            if (!sucessoDelecao)
             {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
+                return new Response<EmpresaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { EmpresaMessages.ErroAoDeletarEmpresa }
+                };
             }
-        }
 
-        private void ValidarUsuarioCriacao(EmpCriacaoDTO empresa)
-        {
-            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpNome, "Empresa é obrigatório");
-            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpCnpj, "Cnpj é obrigatório");
-            ValidadorUtils.ValidarMaximo(empresa.EmpNome, 50, "Nome deve conter no máximo 50 caracteres");
-            ValidadorUtils.ValidarMinimo(empresa.EmpNome, 3, "Nome deve conter no minimo 3 caracteres");
-            ValidadorUtils.ValidarMaximo(empresa.EmpCnpj, 18, "Nome deve conter no máximo 18 caracteres");
-            ValidadorUtils.ValidarMinimo(empresa.EmpCnpj, 14, "Nome deve conter no minimo 14 caracteres");
-            ValidadorUtils.ValidarCnpj(empresa.EmpCnpj, "Digite um CNPJ Valido");
-        }
-
-        private void ValidarUsuarioEdicao(EmpEdicaoDTO empresa)
-        {
-            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpNome, "Empresa é obrigatório");
-            ValidadorUtils.ValidarSeVazioOuNulo(empresa.EmpCnpj, "Cnpj é obrigatório");
-            ValidadorUtils.ValidarMaximo(empresa.EmpNome, 50, "Nome deve conter no máximo 50 caracteres");
-            ValidadorUtils.ValidarMinimo(empresa.EmpNome, 3, "Nome deve conter no minimo 3 caracteres");
-            ValidadorUtils.ValidarMaximo(empresa.EmpCnpj, 18, "Nome deve conter no máximo 18 caracteres");
-            ValidadorUtils.ValidarMinimo(empresa.EmpCnpj, 14, "Nome deve conter no minimo 14 caracteres");
-            ValidadorUtils.ValidarCnpj(empresa.EmpCnpj, "Digite um CNPJ Valido");
-        }
-
-        private void AtualizarDadosEmpresa(Empresa empresaExistente, EmpEdicaoDTO empresa)
-        {
-            empresaExistente.EmpNome = empresa.EmpNome;
-            empresaExistente.EmpCnpj = empresa.EmpCnpj;
+            var dados = _mapper.Map<EmpresaDTO>(empresaExistente);
+            return new Response<EmpresaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { EmpresaMessages.EmpresaDeletadaComSucesso }
+            };
         }
     }
 }

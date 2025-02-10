@@ -7,48 +7,50 @@ namespace WebMesaGestor.Infra.Repositories
 {
     public class UsuarioRepository : IUsuarioRepository
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly AppDbContext _context;
 
-        public UsuarioRepository(AppDbContext appDbContext)
+        public UsuarioRepository(AppDbContext context)
         {
-            _appDbContext = appDbContext;
+            _context = context;
         }
 
-        public async Task<IEnumerable<Usuario>> ListarUsuarios()
+        public async Task<IEnumerable<Usuario>> ObterTodosUsuarios()
         {
-            return await _appDbContext.Usuarios.ToListAsync();
+            return await _context.Usuarios.Include(e => e.Empresa).ToListAsync();
         }
 
-        public async Task<Usuario> UsuarioPorId(Guid id)
+        public async Task<Usuario> ObterUsuarioPorId(Guid id)
         {
-            return await _appDbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
-        }
-
-        public async Task<Usuario> UsuarioPorEmail(string email)
-        {
-            return await _appDbContext.Usuarios.FirstOrDefaultAsync(u => u.UsuEmail == email);
+            return await _context.Usuarios
+                .Include(e => e.Empresa)
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<Usuario> CriarUsuario(Usuario usuario)
         {
-            await _appDbContext.Usuarios.AddAsync(usuario);
-            await _appDbContext.SaveChangesAsync();
+            _context.Usuarios.Add(usuario);
+            await _context.SaveChangesAsync();
             return usuario;
         }
 
         public async Task<Usuario> AtualizarUsuario(Usuario usuario)
         {
-            _appDbContext.Usuarios.Update(usuario);
-            await _appDbContext.SaveChangesAsync();
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
             return usuario;
         }
 
-        public async Task<Usuario> DeletarUsuario(Guid id)
+        public async Task<bool> DeletarUsuario(Guid id)
         {
-            Usuario usuario = await UsuarioPorId(id);
-            _appDbContext.Usuarios.Remove(usuario);
-            await _appDbContext.SaveChangesAsync();
-            return usuario;
+            var usuario = await _context.Usuarios.FindAsync(id);
+            if (usuario == null)
+            {
+                return false;
+            }
+
+            _context.Usuarios.Remove(usuario);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

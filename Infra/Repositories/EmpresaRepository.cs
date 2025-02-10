@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
 using WebMesaGestor.Infra.Data;
@@ -8,51 +7,47 @@ namespace WebMesaGestor.Infra.Repositories
 {
     public class EmpresaRepository : IEmpresaRepository 
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly AppDbContext _context;
 
         public EmpresaRepository(AppDbContext appDbContext)
         {
-            _appDbContext = appDbContext;
+            _context = appDbContext;
         }
 
-        public async Task<IEnumerable<Empresa>> ListarEmpresas()
+        public async Task<IEnumerable<Empresa>> ObterTodasEmpresas()
         {
-            return await _appDbContext.Empresas.ToListAsync();
+            return await _context.Empresas.ToListAsync();
         }
 
-        public async Task<Empresa> EmpresaPorId(Guid id)
+        public async Task<Empresa> ObterEmpresaPorId(Guid id)
         {
-            return await _appDbContext.Empresas.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
+            return await _context.Empresas.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
         }
 
         public async Task<Empresa> CriarEmpresa(Empresa empresa)
         {
-            try
-            {
-                await _appDbContext.Empresas.AddAsync(empresa);
-                await _appDbContext.SaveChangesAsync();
-                return empresa;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
+            _context.Empresas.Add(empresa);
+            await _context.SaveChangesAsync();
+            return empresa;
         }
 
         public async Task<Empresa> AtualizarEmpresa(Empresa empresa)
         {
-            _appDbContext.Empresas.Update(empresa);
-            await _appDbContext.SaveChangesAsync();
+            _context.Empresas.Update(empresa);
+            await _context.SaveChangesAsync();
             return empresa;
         }
 
-        public async Task<Empresa> DeletarEmpresa(Guid id)
+        public async Task<bool> DeletarEmpresa(Guid id)
         {
-            Empresa empresa = await EmpresaPorId(id);
-            _appDbContext.Empresas.Remove(empresa);
-            await _appDbContext.SaveChangesAsync();
-            return empresa;
+            var empresa = await _context.Empresas.FindAsync(id);
+            if (empresa == null)
+            {
+                return false;
+            }
+            _context.Empresas.Remove(empresa);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

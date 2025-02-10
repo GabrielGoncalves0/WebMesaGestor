@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using WebMesaGestor.Domain.Entities;
 
-namespace WebMesaGestor.Application.DTO.Input.USuario
+namespace WebMesaGestor.Application.DTO.Input.Usuario
 {
     public class UsuCriacaoDTO
     {

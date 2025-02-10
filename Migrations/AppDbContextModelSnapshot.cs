@@ -81,7 +81,7 @@ namespace WebMesaGestor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<DateTime>("CriacaoData")
+                    b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EmpCnpj")
@@ -297,7 +297,7 @@ namespace WebMesaGestor.Migrations
                     b.Property<Guid>("ProdutoId")
                         .HasColumnType("char(36)");
 
-                    b.Property<int>("statusProPed")
+                    b.Property<int>("StatusProPed")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -377,7 +377,7 @@ namespace WebMesaGestor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<DateTime>("CriacaoData")
+                    b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime(6)");
 
                     b.Property<Guid?>("EmpresaId")

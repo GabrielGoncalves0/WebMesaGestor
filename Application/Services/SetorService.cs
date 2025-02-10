@@ -1,167 +1,130 @@
-﻿using WebMesaGestor.Application.DTO.Input.Setor;
+﻿using AutoMapper;
+using WebMesaGestor.Application.Common;
 using WebMesaGestor.Application.DTO.Output;
-using WebMesaGestor.Application.Map;
+using WebMesaGestor.Application.DTO.Input.Setor;
+using WebMesaGestor.Application.Validations.Setor;
 using WebMesaGestor.Domain.Entities;
 using WebMesaGestor.Domain.Interfaces;
-using WebMesaGestor.Utils;
+using WebMesaGestor.Infra.Repositories;
+
 
 namespace WebMesaGestor.Application.Services
 {
     public class SetorService
     {
         private readonly ISetorRepository _setorRepository;
+        private readonly IMapper _mapper;
 
-        public SetorService(ISetorRepository setorRepository)
+        public SetorService(ISetorRepository setorRepository, IMapper mapper)
         {
             _setorRepository = setorRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Response<IEnumerable<SetOutputDTO>>> ListarSetors()
+        public async Task<IEnumerable<SetorDTO>> ObterTodosSetores()
         {
-            Response<IEnumerable<SetOutputDTO>> resposta = new Response<IEnumerable<SetOutputDTO>>();
-            try
+            var setores = await _setorRepository.ObterTodosSetores();
+            return _mapper.Map<IEnumerable<SetorDTO>>(setores);
+        }
+
+        public async Task<SetorDTO> ObterSetorPorId(Guid id)
+        {
+            var setor = await _setorRepository.ObterSetorPorId(id);
+
+            if (setor == null)
             {
-                IEnumerable<Setor> setors = await _setorRepository.ListarSetors();
-                if (setors == null || !setors.Any())
+                return null;
+            }
+
+            return _mapper.Map<SetorDTO>(setor);
+        }
+
+        public async Task<Response<SetorDTO>> CriarSetor(SetCriacaoDTO setorDTO)
+        {
+            var validationResult = new SetorCriacaoValidator().Validate(setorDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<SetorDTO>
                 {
-                    resposta.Mensagem = "Nenhuma setor encontrado.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-                resposta.Dados = SetorMap.MapSetor(setors);
-                resposta.Mensagem = "Setores listados com sucesso";
-                return resposta;
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
             }
-            catch (Exception ex)
+
+            var setor = _mapper.Map<Setor>(setorDTO);
+            await _setorRepository.CriarSetor(setor);
+
+            return new Response<SetorDTO>
             {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
+                Sucesso = true,
+                Id = setor.Id,
+                Data = _mapper.Map<SetorDTO>(setor)
+            };
         }
 
-        public async Task<Response<SetOutputDTO>> SetorPorId(Guid id)
+        public async Task<Response<SetorDTO>> AtualizarSetor(SetEdicaoDTO setorDTO)
         {
-            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
-            try
+            var validationResult = new SetorEdicaoValidator().Validate(setorDTO);
+            if (!validationResult.IsValid)
             {
-                Setor setor = await _setorRepository.SetorPorId(id);
-                if (setor == null)
+                return new Response<SetorDTO>()
                 {
-                    resposta.Mensagem = "Setor não encontrada.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-                resposta.Dados = SetorMap.MapSetor(setor);
-                resposta.Mensagem = "Setor encontrado com sucesso";
-                return resposta;
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
             }
-            catch (Exception ex)
-            {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
-        }
 
-        public async Task<Response<SetOutputDTO>> CriarSetor(SetCriacaoDTO setor)
-        {
-            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
-            try
+            var setorExistente = await _setorRepository.ObterSetorPorId(setorDTO.Id);
+            if (setorExistente == null)
             {
-                ValidarSetorCriacao(setor);
-                Setor map = SetorMap.MapSetor(setor);
-                Setor retorno = await _setorRepository.CriarSetor(map);
-
-                resposta.Dados = SetorMap.MapSetor(retorno);
-                resposta.Mensagem = "Setor criado com sucesso";
-                return resposta; 
-            }
-            catch (Exception ex)
-            {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
-        }
-
-        public async Task<Response<SetOutputDTO>> AtualizarSetor(SetEdicaoDTO setor)
-        {
-            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
-            try
-            {
-                ValidarSetorEdicao(setor);
-                Setor buscarSetor = await _setorRepository.SetorPorId(setor.Id);
-                if (buscarSetor == null)
+                return new Response<SetorDTO>()
                 {
-                    resposta.Mensagem = "Setor não encontrado.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-                AtualizarDadosSetor(buscarSetor, setor);
-                Setor retorno = await _setorRepository.AtualizarSetor(buscarSetor);
+                    Sucesso = false,
+                    Erros = new List<string> { SetorMessages.SetorNaoEncontrado }
+                };
+            }
 
-                resposta.Dados = SetorMap.MapSetor(retorno);
-                resposta.Mensagem = "Setor atualizado com sucesso";
-                return resposta;
-            }
-            catch (Exception ex)
+            var setor = _mapper.Map(setorDTO, setorExistente);
+            await _setorRepository.AtualizarSetor(setor);
+
+            return new Response<SetorDTO>()
             {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
+                Sucesso = true,
+                Id = setor.Id,
+                Data = _mapper.Map<SetorDTO>(setor)
+            };
         }
 
-        public async Task<Response<SetOutputDTO>> DeletarSetor(Guid id)
+        public async Task<Response<SetorDTO>> DeletarSetor(Guid id)
         {
-            Response<SetOutputDTO> resposta = new Response<SetOutputDTO>();
-            try
+            var setorExistente = await _setorRepository.ObterSetorPorId(id);
+
+            if (setorExistente == null)
             {
-                Setor setor = await _setorRepository.SetorPorId(id);
-                if (setor == null)
+                return new Response<SetorDTO>
                 {
-                    resposta.Mensagem = "Setor não encontrada.";
-                    resposta.Status = false;
-                    return resposta;
-                }
-                Setor retorno = await _setorRepository.DeletarSetor(id);
-                resposta.Dados = SetorMap.MapSetor(retorno);
-                resposta.Mensagem = "Setor deletado com sucesso";
-                return resposta;
+                    Sucesso = false,
+                    Erros = new List<string> { SetorMessages.SetorNaoEncontrado }
+                };
             }
-            catch (Exception ex)
-            {
-                resposta.Mensagem = ex.Message;
-                resposta.Status = false;
-                return resposta;
-            }
-        }
 
-        private void ValidarSetorCriacao(SetCriacaoDTO setor)
-        {
-            ValidadorUtils.ValidarMaximo(setor.SetDesc, 100, "Setor deve conter no máximo 100 caracteres");
-            ValidadorUtils.ValidarSeVazioOuNulo(setor.SetDesc, "Setor é obrigatório");
-            if (!Enum.IsDefined(typeof(SetorStatus), setor.SetStatus))
+            var sucessoDelecao = await _setorRepository.DeletarSetor(id);
+            if (!sucessoDelecao)
             {
-                throw new Exception("Status do setor é obrigatório");
+                return new Response<SetorDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { SetorMessages.ErroAoDeletarSetor }
+                };
             }
-        }
 
-        private void ValidarSetorEdicao(SetEdicaoDTO setor)
-        {
-            ValidadorUtils.ValidarMaximo(setor.SetDesc, 100, "Setor deve conter no máximo 100 caracteres");
-            ValidadorUtils.ValidarSeVazioOuNulo(setor.SetDesc, "Setor é obrigatório");
-            if (!Enum.IsDefined(typeof(SetorStatus), setor.SetStatus))
+            var dados = _mapper.Map<SetorDTO>(setorExistente);
+            return new Response<SetorDTO>
             {
-                throw new Exception("Status do setor é obrigatório");
-            }
-        }
-
-        private void AtualizarDadosSetor(Setor setorExistente, SetEdicaoDTO setor)
-        {
-            setorExistente.SetDesc = setor.SetDesc;
-            setorExistente.SetStatus = setor.SetStatus;
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { SetorMessages.SetorDeletadoComSucesso }
+            };
         }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebMesaGestor.Application.Common;
 using WebMesaGestor.Application.DTO.Input.Empresa;
+using WebMesaGestor.Application.DTO.Input.Usuario;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.DTO.Response;
 using WebMesaGestor.Application.Services;
 
 namespace WebMesaGestor.Web.Controllers
@@ -18,43 +22,86 @@ namespace WebMesaGestor.Web.Controllers
 
         [HttpGet]
         [Route("buscarTodos")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> ObterTodasEmpresas()
         {
-            var empresa = await _empresaService.ListarEmpresas();
+            var empresas = await _empresaService.ObterTodasEmpresas();
+
+            if (empresas == null)
+            {
+                empresas = new List<EmpresaDTO>();
+            }
+
+            return Ok(empresas);
+        }
+
+        [HttpGet]
+        [Route("buscar/{id}")]
+        public async Task<IActionResult> ObterEmpresaPorId(Guid id)
+        {
+            var empresa = await _empresaService.ObterEmpresaPorId(id);
+
+            if (empresa == null)
+            {
+                return NotFound(new ErrorResponse { Mensagem = EmpresaMessages.EmpresaNaoEncontrada });
+            }
+
             return Ok(empresa);
         }
 
         [HttpPost]
         [Route("cadastrar")]
-        public async Task<IActionResult> Post([FromBody] EmpCriacaoDTO empCriacaoDTO)
+        public async Task<IActionResult> CriarEmpresa([FromBody] EmpCriacaoDTO empresaDTO)
         {
-            var empresa = await _empresaService.CriarEmpresa(empCriacaoDTO);
-            return Ok(empresa);
-        }
+            var resultado = await _empresaService.CriarEmpresa(empresaDTO);
 
+            if (resultado.Sucesso)
+            {
+                return CreatedAtAction(nameof(ObterEmpresaPorId), new { id = resultado.Id }, resultado);
+            }
+
+            return BadRequest(new ValidationErrorResponse { Errors = resultado.Erros });
+        }
 
         [HttpPut]
         [Route("atualizar")]
-        public async Task<IActionResult> Put([FromBody] EmpEdicaoDTO empEdicaoDTO)
+        public async Task<IActionResult> AtualizarEmpresa([FromBody] EmpEdicaoDTO empresaDTO)
         {
-            var empresa = await _empresaService.AtualizarEmpresa(empEdicaoDTO);
-            return Ok(empresa);
-        }
+            var empresaExistente = await _empresaService.ObterEmpresaPorId(empresaDTO.Id);
 
-        [HttpGet]
-        [Route("buscar/{id}")]
-        public async Task<IActionResult> Get([FromRoute] Guid id)
-        {
-            var empresa = await _empresaService.EmpresaPorId(id);
-            return Ok(empresa);
+            if (empresaExistente == null)
+            {
+                return NotFound(new { mensagem = EmpresaMessages.EmpresaNaoEncontrada });
+            }
+
+            var resultado = await _empresaService.AtualizarEmpresa(empresaDTO);
+
+            if (resultado.Sucesso)
+            {
+                return Ok(new { mensagem = EmpresaMessages.EmpresaAtualizadaComSucesso });
+            }
+
+            return BadRequest(new { mensagem = EmpresaMessages.ErroAoAtualizarEmpresa, erros = resultado.Erros });
         }
 
         [HttpDelete]
         [Route("deletar/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        public async Task<IActionResult> DeletarEmpresa(Guid id)
         {
-            var empresa = await _empresaService.DeletarEmpresa(id);
-            return Ok(empresa);
+            var empresaExistente = await _empresaService.ObterEmpresaPorId(id);
+
+            if (empresaExistente == null)
+            {
+                return NotFound(new { mensagem = EmpresaMessages.EmpresaNaoEncontrada });
+            }
+
+            var resultado = await _empresaService.DeletarEmpresa(id);
+
+            if (resultado.Sucesso)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new { mensagem = EmpresaMessages.ErroAoDeletarEmpresa });
         }
     }
 }

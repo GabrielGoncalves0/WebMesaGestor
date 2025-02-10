@@ -4,10 +4,10 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface IMesaRepository
     {
-        Task<IEnumerable<Mesa>> ListarMesas();
-        Task<Mesa> MesaPorId(Guid id);
+        Task<IEnumerable<Mesa>> ObterMesas();
+        Task<Mesa> ObterMesaPorId(Guid id);
         Task<Mesa> CriarMesa(Mesa mesa);
         Task<Mesa> AtualizarMesa(Mesa mesa);
-        Task<Mesa> DeletarMesa(Guid id);
+        Task<bool> DeletarMesa(Guid id);
     }
 }

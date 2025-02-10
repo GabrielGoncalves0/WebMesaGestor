@@ -7,51 +7,47 @@ namespace WebMesaGestor.Infra.Repositories
 {
     public class SetorRepository : ISetorRepository
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly AppDbContext _context;
 
         public SetorRepository(AppDbContext appDbContext)
         {
-            _appDbContext = appDbContext;
+            _context = appDbContext;
         }
 
-        public async Task<IEnumerable<Setor>> ListarSetors()
+        public async Task<IEnumerable<Setor>> ObterTodosSetores()
         {
-            return await _appDbContext.Setores.ToListAsync();
+            return await _context.Setores.ToListAsync();
         }
 
-        public async Task<Setor> SetorPorId(Guid id)
+        public async Task<Setor> ObterSetorPorId(Guid id)
         {
-            return await _appDbContext.Setores.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
+            return await _context.Setores.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
         }
 
         public async Task<Setor> CriarSetor(Setor setor)
         {
-            try
-            {
-                await _appDbContext.Setores.AddAsync(setor);
-                await _appDbContext.SaveChangesAsync();
-                return setor;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
+            _context.Setores.Add(setor);
+            await _context.SaveChangesAsync();
+            return setor;
         }
 
         public async Task<Setor> AtualizarSetor(Setor setor)
         {
-            _appDbContext.Setores.Update(setor);
-            await _appDbContext.SaveChangesAsync();
+            _context.Setores.Update(setor);
+            await _context.SaveChangesAsync();
             return setor;
         }
 
-        public async Task<Setor> DeletarSetor(Guid id)
+        public async Task<bool> DeletarSetor(Guid id)
         {
-            Setor setor = await SetorPorId(id);
-            _appDbContext.Setores.Remove(setor);
-            await _appDbContext.SaveChangesAsync();
-            return setor;
+            var setor = await _context.Setores.FindAsync(id);
+            if (setor == null)
+            {
+                return false;
+            }
+            _context.Setores.Remove(setor);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

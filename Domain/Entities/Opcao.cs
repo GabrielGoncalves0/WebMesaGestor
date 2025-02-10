@@ -15,7 +15,7 @@ namespace WebMesaGestor.Domain.Entities
         [Column(TypeName = "decimal(10,2)")]
         public decimal OpcaoValor { get; set; }
         public int OpcaoQuantMax { get; set; }
-        public DateTime CriacaoData { get; set; }
+        public DateTime DataCriacao { get; set; }
         public Guid? GrupoOpcoesId { get; set; }
         public virtual GrupoOpcoes? GrupoOpcoes { get; set; }
     }
