@@ -21,7 +21,7 @@ namespace WebMesaGestor.Infra.Repositories
 
         public async Task<Setor> ObterSetorPorId(Guid id)
         {
-            return await _context.Setores.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
+            return await _context.Setores.FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<Setor> CriarSetor(Setor setor)

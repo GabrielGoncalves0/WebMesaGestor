@@ -1,57 +1,59 @@
-﻿//using Microsoft.EntityFrameworkCore;
-//using WebMesaGestor.Domain.Entities;
-//using WebMesaGestor.Domain.Interfaces;
-//using WebMesaGestor.Infra.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Infra.Data;
 
-//namespace WebMesaGestor.Infra.Repositories
-//{
-//    public class ProdutoRepository : IProdutoRepository
-//    {
-//        private readonly AppDbContext _appDbContext;
+namespace WebMesaGestor.Infra.Repositories
+{
+    public class ProdutoRepository : IProdutoRepository
+    {
+        private readonly AppDbContext _context;
 
-//        public ProdutoRepository(AppDbContext appDbContext)
-//        {
-//            _appDbContext = appDbContext;
-//        }
+        public ProdutoRepository(AppDbContext appDbContext)
+        {
+            _context = appDbContext;
+        }
 
-//        public async Task<IEnumerable<Produto>> ListarProdutos()
-//        {
-//            return await _appDbContext.Produtos.ToListAsync();
-//        }
+        public async Task<IEnumerable<Produto>> ObterProdutos()
+        {
+            return await _context.Produtos
+                .Include(p => p.Categoria)
+                .Include(p => p.Setor)
+                .ToListAsync();
+        }
 
-//        public async Task<Produto> ProdutoPorId(Guid id)
-//        {
-//            return await _appDbContext.Produtos.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
-//        }
+        public async Task<Produto> ObterProdutoPorId(Guid id)
+        {
+            return await _context.Produtos
+                .Include(p => p.Categoria)
+                .Include(p => p.Setor)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
 
-//        public async Task<Produto> CriarProduto(Produto produto)
-//        {
-//            try
-//            {
-//                await _appDbContext.Produtos.AddAsync(produto);
-//                await _appDbContext.SaveChangesAsync();
-//                return produto;
-//            }
-//            catch (Exception ex)
-//            {
-//                Console.WriteLine(ex.InnerException?.Message);
-//                throw;
-//            }
-//        }
+        public async Task<Produto> CriarProduto(Produto produto)
+        {
+            _context.Produtos.Add(produto);
+            await _context.SaveChangesAsync();
+            return produto;
+        }
 
-//        public async Task<Produto> AtualizarProduto(Produto produto)
-//        {
-//            _appDbContext.Produtos.Update(produto);
-//            await _appDbContext.SaveChangesAsync();
-//            return produto;
-//        }
+        public async Task<Produto> AtualizarProduto(Produto produto)
+        {
+            _context.Produtos.Update(produto);
+            await _context.SaveChangesAsync();
+            return produto;
+        }
 
-//        public async Task<Produto> DeletarProduto(Guid id)
-//        {
-//            Produto produto = await ProdutoPorId(id);
-//            _appDbContext.Produtos.Remove(produto);
-//            await _appDbContext.SaveChangesAsync();
-//            return produto;
-//        }
-//    }
-//}
+        public async Task<bool> DeletarProduto(Guid id)
+        {
+            var produto = await _context.Produtos.FindAsync(id);
+            if (produto == null)
+            {
+                return false;
+            }
+            _context.Produtos.Remove(produto);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+    }
+}

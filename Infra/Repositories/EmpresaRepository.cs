@@ -21,7 +21,7 @@ namespace WebMesaGestor.Infra.Repositories
 
         public async Task<Empresa> ObterEmpresaPorId(Guid id)
         {
-            return await _context.Empresas.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
+            return await _context.Empresas.FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<Empresa> CriarEmpresa(Empresa empresa)
