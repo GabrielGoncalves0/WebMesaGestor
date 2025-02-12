@@ -7,49 +7,57 @@ namespace WebMesaGestor.Infra.Repositories
 {
     public class CaixaRepository : ICaixaRepository
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly AppDbContext _context;
 
         public CaixaRepository(AppDbContext appDbContext)
         {
-            _appDbContext = appDbContext;
+            _context = appDbContext;
         }
 
         public async Task<IEnumerable<Caixa>> ObterCaixas()
         {
-            return await _appDbContext.Caixas.ToListAsync();
+            return await _context.Caixas
+                .Include(c => c.Usuario)
+                .ToListAsync();
         }
 
         public async Task<Caixa> ObterCaixaPorId(Guid id)
         {
-            return await _appDbContext.Caixas.FirstOrDefaultAsync(u => u.Id == new Guid(id.ToString()));
+            return await _context.Caixas
+                .Include(c => c.Usuario)
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<Caixa> UltimoCaixa()
         {
-            return await _appDbContext.Caixas.Where(c => c.CaiStatus == CaixaStatus.Fechado)
+            return await _context.Caixas.Where(c => c.CaiStatus == CaixaStatus.Fechado)
             .OrderByDescending(c => c.FechamentoData).FirstOrDefaultAsync();
         }
 
         public async Task<Caixa> AbrirCaixa(Caixa caixa)
         {
-            await _appDbContext.Caixas.AddAsync(caixa);
-            await _appDbContext.SaveChangesAsync();
+           _context.Caixas.Add(caixa);
+            await _context.SaveChangesAsync();
             return caixa;
         }
 
         public async Task<Caixa> AtualizarCaixa(Caixa caixa)
         {
-            _appDbContext.Caixas.Update(caixa);
-            await _appDbContext.SaveChangesAsync();
+            _context.Caixas.Update(caixa);
+            await _context.SaveChangesAsync();
             return caixa;
         }
 
-        public async Task<Caixa> DeletarCaixa(Guid id)
+        public async Task<bool> DeletarCaixa(Guid id)
         {
-            Caixa caixa = await CaixaPorId(id);
-            _appDbContext.Caixas.Remove(caixa);
-            await _appDbContext.SaveChangesAsync();
-            return caixa;
+            var caixa = await _context.Caixas.FindAsync(id);
+            if (caixa == null)
+            {
+                return false;
+            }
+            _context.Caixas.Remove(caixa);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
