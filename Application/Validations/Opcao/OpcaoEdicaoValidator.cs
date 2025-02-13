@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.Opcoes;
 
 namespace WebMesaGestor.Application.Validations.Opcoes
 {
-    public class OpcEdicaoValidator : AbstractValidator<OpcEdicaoDTO>
+    public class OpcaoEdicaoValidator : AbstractValidator<OpcEdicaoDTO>
     {
-        public OpcEdicaoValidator()
+        public OpcaoEdicaoValidator()
         {
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("O ID da opção é obrigatório.")

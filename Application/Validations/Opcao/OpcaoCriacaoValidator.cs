@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.Opcoes;
 
 namespace WebMesaGestor.Application.Validations.Opcoes
 {
-    public class OpcCriacaoValidator : AbstractValidator<OpcCriacaoDTO>
+    public class OpcaoCriacaoValidator : AbstractValidator<OpcCriacaoDTO>
     {
-        public OpcCriacaoValidator()
+        public OpcaoCriacaoValidator()
         {
             RuleFor(x => x.OpcaoDesc)
                 .NotEmpty().WithMessage("A descrição da opção é obrigatória.")

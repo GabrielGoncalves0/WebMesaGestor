@@ -94,7 +94,7 @@ namespace WebMesaGestor.Application.Services
                 return new Response<UsuarioDTO> 
                 { 
                     Sucesso = false, 
-                    Erros = new List<string> { UsuarioMessages.UsuariosNaoEncontrado } 
+                    Erros = new List<string> { UsuarioMessages.UsuarioNaoEncontrado } 
                 };
             }
 
