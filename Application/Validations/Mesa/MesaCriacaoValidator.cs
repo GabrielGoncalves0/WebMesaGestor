@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.Mesa;
 
 namespace WebMesaGestor.Application.Validations.Mesa
 {
-    public class MesCriacaoValidator : AbstractValidator<MesCriacaoDTO>
+    public class MesaCriacaoValidator : AbstractValidator<MesCriacaoDTO>
     {
-        public MesCriacaoValidator()
+        public MesaCriacaoValidator()
         {
             RuleFor(x => x.MesaNumero)
                 .NotEmpty().WithMessage("O número da mesa é obrigatório.")

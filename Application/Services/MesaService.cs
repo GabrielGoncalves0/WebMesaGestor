@@ -1,168 +1,127 @@
-﻿//using WebMesaGestor.Application.Common;
-//using WebMesaGestor.Application.DTO.Input.Mesa;
-//using WebMesaGestor.Application.DTO.Output;
-//using WebMesaGestor.Application.Map;
-//using WebMesaGestor.Domain.Entities;
-//using WebMesaGestor.Domain.Interfaces;
-//using WebMesaGestor.Utils;
+﻿using AutoMapper;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Input.Mesa;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.Validations.Mesa;
+using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
 
-//namespace WebMesaGestor.Application.Services
-//{
-//    public class MesaService
-//    {
-//        private readonly IMesaRepository _mesaRepository;
+namespace WebMesaGestor.Application.Services
+{
+    public class MesaService
+    {
+        private readonly IMesaRepository _mesaRepository;
+        private readonly IMapper _mapper;
+        public MesaService(IMesaRepository mesaRepository, IMapper mapper)
+        {
+            _mesaRepository = mesaRepository;
+            _mapper = mapper;
+        }
 
-//        public MesaService(IMesaRepository mesaRepository)
-//        {
-//            _mesaRepository = mesaRepository;
-//        }
+        public async Task<IEnumerable<MesaDTO>> ObterTodasMesas()
+        {
+            var mesas = await _mesaRepository.ObterTodasMesas();
+            return _mapper.Map<IEnumerable<MesaDTO>>(mesas);
+        }
 
-//        public async Task<Response<IEnumerable<MesaDTO>>> ListarMesas()
-//        {
-//            Response<IEnumerable<MesaDTO>> resposta = new Response<IEnumerable<MesaDTO>>();
-//            try
-//            {
-//                IEnumerable<Mesa> mesas = await _mesaRepository.ListarMesas();
-//                if (mesas == null || !mesas.Any())
-//                {
-//                    resposta.Mensagem = "Nenhuma mesa encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                resposta.Dados = MesaMap.MapMesa(mesas);
-//                resposta.Mensagem = "Mesas listadas com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<MesaDTO> ObterMesaPorId(Guid id)
+        {
+            var mesa = await _mesaRepository.ObterMesaPorId(id);
 
-//        public async Task<Response<MesaDTO>> MesaPorId(Guid id)
-//        {
-//            Response<MesaDTO> resposta = new Response<MesaDTO>();
-//            try
-//            {
-//                Mesa mesa = await _mesaRepository.MesaPorId(id);
-//                if (mesa == null)
-//                {
-//                    resposta.Mensagem = "Mesa não encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                resposta.Dados = MesaMap.MapMesa(mesa);
-//                resposta.Mensagem = "Mesa encontrada com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            if (mesa == null)
+            {
+                return null;
+            }
 
-//        public async Task<Response<MesaDTO>> CriarMesa(MesCriacaoDTO mesa)
-//        {
-//            Response<MesaDTO> resposta = new Response<MesaDTO>();
-//            try
-//            {
-//                ValidarMesaCriacao(mesa);
-//                Mesa map = MesaMap.MapMesa(mesa);
-//                Mesa retorno = await _mesaRepository.CriarMesa(map);
+            return _mapper.Map<MesaDTO>(mesa);
+        }
 
-//                resposta.Dados = MesaMap.MapMesa(retorno);
-//                resposta.Mensagem = "Mesa Criada com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<Response<MesaDTO>> CriarMesa(MesCriacaoDTO mesaDTO)
+        {
+            var validationResult = new MesaCriacaoValidator().Validate(mesaDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<MesaDTO>
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//        public async Task<Response<MesaDTO>> AtualizarMesa(MesEdicaoDTO mesa)
-//        {
-//            Response<MesaDTO> resposta = new Response<MesaDTO>();
-//            try
-//            {
-//                ValidarCategoriaEdicao(mesa);
-//                Mesa buscarMesa = await _mesaRepository.MesaPorId(mesa.Id);
-//                if (buscarMesa == null)
-//                {
-//                    resposta.Mensagem = "Mesa não encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                AtualizarDadosCategoria(buscarMesa, mesa);
-//                Mesa retorno = await _mesaRepository.AtualizarMesa(buscarMesa);
+            var mesa = _mapper.Map<Mesa>(mesaDTO);
+            await _mesaRepository.CriarMesa(mesa);
 
-//                resposta.Dados = MesaMap.MapMesa(retorno);
-//                resposta.Mensagem = "Mesas atualizada com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
+            return new Response<MesaDTO>
+            {
+                Sucesso = true,
+                Id = mesa.Id,
+                Data = _mapper.Map<MesaDTO>(mesa)
+            };
+        }
 
+        public async Task<Response<MesaDTO>> AtualizarMesa(MesEdicaoDTO mesaDTO)
+        {
+            var validationResult = new MesaEdicaoValidator().Validate(mesaDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<MesaDTO>()
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//        }
+            var mesaExistente = await _mesaRepository.ObterMesaPorId(mesaDTO.Id);
+            if (mesaExistente == null)
+            {
+                return new Response<MesaDTO>()
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { MesaMessages.MesaNaoEncontrada }
+                };
+            }
 
-//        public async Task<Response<MesaDTO>> DeletarMesa(Guid id)
-//        {
-//            Response<MesaDTO> resposta = new Response<MesaDTO>();
-//            try
-//            {
-//                Mesa mesa = await _mesaRepository.MesaPorId(id);
-//                if (mesa == null)
-//                {
-//                    resposta.Mensagem = "Mesa não encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                Mesa retorno = await _mesaRepository.DeletarMesa(id);
-//                resposta.Dados = MesaMap.MapMesa(retorno);
-//                resposta.Mensagem = "Mesas listadas com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var mesa = _mapper.Map(mesaDTO, mesaExistente);
+            await _mesaRepository.AtualizarMesa(mesa);
 
-//        private void ValidarMesaCriacao(MesCriacaoDTO mesa)
-//        {
-//            ValidadorUtils.ValidarInteiroSeVazioOuNulo(mesa.MesaNumero, "Numero da mesa é obrigatório");
-//            if (!Enum.IsDefined(typeof(MesaStatus), mesa.MesaStatus))
-//            {
-//                throw new Exception("Status da mesa é obrigatório");
-//            }
-//        }
+            return new Response<MesaDTO>()
+            {
+                Sucesso = true,
+                Id = mesa.Id,
+                Data = _mapper.Map<MesaDTO>(mesa)
+            };
+        }
 
-//        private void ValidarCategoriaEdicao(MesEdicaoDTO mesa)
-//        {
-//            ValidadorUtils.ValidarInteiroSeVazioOuNulo(mesa.MesaNumero, "Numero da mesa é obrigatório");
-//            if (!Enum.IsDefined(typeof(MesaStatus), mesa.MesaStatus))
-//            {
-//                throw new Exception("Status da mesa é obrigatório");
-//            }
-//        }
+        public async Task<Response<MesaDTO>> DeletarMesa(Guid id)
+        {
+            var mesaExistente = await _mesaRepository.ObterMesaPorId(id);
 
-//        private void AtualizarDadosCategoria(Mesa mesaExistente, MesEdicaoDTO mesa)
-//        {
-//            mesaExistente.MesaNumero = mesa.MesaNumero;
-//            mesaExistente.MesaStatus = mesa.MesaStatus;
-//        }
-//    }
-//}
+            if (mesaExistente == null)
+            {
+                return new Response<MesaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { MesaMessages.MesaNaoEncontrada }
+                };
+            }
+
+            var sucessoDelecao = await _mesaRepository.DeletarMesa(id);
+            if (!sucessoDelecao)
+            {
+                return new Response<MesaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { MesaMessages.ErroAoDeletarMesa }
+                };
+            }
+
+            var dados = _mapper.Map<MesaDTO>(mesaExistente);
+            return new Response<MesaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { MesaMessages.MesaDeletadaComSucesso }
+            };
+        }
+    }
+}

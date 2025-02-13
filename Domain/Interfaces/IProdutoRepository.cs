@@ -4,7 +4,7 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface IProdutoRepository
     {
-        Task<IEnumerable<Produto>> ObterProdutos();
+        Task<IEnumerable<Produto>> ObterTodosProdutos();
         Task<Produto> ObterProdutoPorId(Guid id);
         Task<Produto> CriarProduto(Produto produto);
         Task<Produto> AtualizarProduto(Produto produto);

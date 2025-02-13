@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.Categoria;
 
 namespace WebMesaGestor.Application.Validations.Categoria
 {
-    public class CatEdicaoValidator : AbstractValidator<CatEdicaoDTO>
+    public class CategoriaEdicaoValidator : AbstractValidator<CatEdicaoDTO>
     {
-        public CatEdicaoValidator()
+        public CategoriaEdicaoValidator()
         {
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("O ID da categoria é obrigatório.")

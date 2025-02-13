@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task<IEnumerable<Categoria>> ObterCategorias()
+        public async Task<IEnumerable<Categoria>> ObterTodasCategorias()
         {
             return await _appDbContext.Categorias.ToListAsync();
         }

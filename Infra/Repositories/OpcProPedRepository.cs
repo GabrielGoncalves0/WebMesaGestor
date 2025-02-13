@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _context = appDbContext;
         }
 
-        public async Task<IEnumerable<OpcaoProPed>> ObterOpcoesPorProPedId(Guid id)
+        public async Task<IEnumerable<OpcaoProPed>> ObterTodasOpcoesPorProPedId(Guid id)
         {
             return await _context.OpcaoProPed.Where(opc => opc.ProdutoPedidoId == id)
                 .Include(opc => opc.Opcao)

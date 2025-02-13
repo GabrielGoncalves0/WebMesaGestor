@@ -4,7 +4,7 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface IOpcaoRepository
     {
-        Task<IEnumerable<Opcao>> ObterOpcoes();
+        Task<IEnumerable<Opcao>> ObterTodasOpcoes();
         Task<Opcao> ObterOpcaoPorId(Guid id);
         Task<Opcao> CriarOpcao(Opcao opcao);
         Task<Opcao> AtualizarOpcao(Opcao opcao);

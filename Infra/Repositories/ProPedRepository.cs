@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _context = appDbContext;
         }
 
-        public async Task<IEnumerable<ProdutoPedido>> ObterProdutosPorPedId(Guid id)
+        public async Task<IEnumerable<ProdutoPedido>> ObterTodosProdutosPorPedId(Guid id)
         {
             return await _context.ProdutoPedido
                 .Include(pp => pp.Pedido)

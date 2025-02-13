@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task<IEnumerable<Mesa>> ObterMesas()
+        public async Task<IEnumerable<Mesa>> ObterTodasMesas()
         {
             return await _appDbContext.Mesas.ToListAsync();
         }

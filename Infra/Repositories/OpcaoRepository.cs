@@ -15,7 +15,7 @@ namespace WebMesaGestor.Infra.Repositories
             _context = appDbContext;
         }
 
-        public async Task<IEnumerable<Opcao>> ObterOpcoes()
+        public async Task<IEnumerable<Opcao>> ObterTodasOpcoes()
         {
             return await _context.Opcoes
                 .Include(p => p.GrupoOpcoes)

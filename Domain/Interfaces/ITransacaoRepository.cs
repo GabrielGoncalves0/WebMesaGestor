@@ -4,7 +4,7 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface ITransacaoRepository
     {
-        Task<IEnumerable<Transacao>> ObterTransacoes();
+        Task<IEnumerable<Transacao>> ObterTodasTransacoes();
         Task<Transacao> ObterTransacaoPorId(Guid id);
         Task<Transacao> CriarTransacao(Transacao transacao);
         Task<bool> DeletarTransacao(Guid id);

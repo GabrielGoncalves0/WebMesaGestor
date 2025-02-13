@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _context = appDbContext;
         }
 
-        public async Task<IEnumerable<Transacao>> ObterTransacoes()
+        public async Task<IEnumerable<Transacao>> ObterTodasTransacoes()
         {
             return await _context.Transacoes
                 .Include(t => t.Usuario)

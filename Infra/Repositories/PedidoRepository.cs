@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _context = appDbContext;
         }
 
-        public async Task<IEnumerable<Pedido>> ObterPedidos()
+        public async Task<IEnumerable<Pedido>> ObterTodosPedidos()
         {
             return await _context.Pedidos
                 .Include(p => p.Usuario)

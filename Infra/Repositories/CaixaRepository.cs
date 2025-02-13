@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _context = appDbContext;
         }
 
-        public async Task<IEnumerable<Caixa>> ObterCaixas()
+        public async Task<IEnumerable<Caixa>> ObterTodosCaixas()
         {
             return await _context.Caixas
                 .Include(c => c.Usuario)

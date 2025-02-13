@@ -4,7 +4,7 @@ namespace WebMesaGestor.Domain.Interfaces
 {
     public interface IGrupoOpcaoRepository
     {
-        Task<IEnumerable<GrupoOpcoes>> ObterGrupoOpcoes();
+        Task<IEnumerable<GrupoOpcoes>> ObterTodosGrupoOpcoes();
         Task<GrupoOpcoes> ObterGrupoOpcaoPorId(Guid id);
         Task<GrupoOpcoes> CriarGrupoOpcao(GrupoOpcoes GrupoOpcao);
         Task<GrupoOpcoes> AtualizarGrupoOpcao(GrupoOpcoes GrupoOpcao);

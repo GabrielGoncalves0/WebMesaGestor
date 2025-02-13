@@ -1,161 +1,129 @@
-﻿//using WebMesaGestor.Application.Common;
-//using WebMesaGestor.Application.DTO.Input.Categoria;
-//using WebMesaGestor.Application.DTO.Input.Empresa;
-//using WebMesaGestor.Application.DTO.Output;
-//using WebMesaGestor.Application.Map;
-//using WebMesaGestor.Domain.Entities;
-//using WebMesaGestor.Domain.Interfaces;
-//using WebMesaGestor.Utils;
+﻿using AutoMapper;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.DTO.Input.Categoria;
+using WebMesaGestor.Application.Validations.Categoria;
+using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Infra.Repositories;
 
-//namespace WebMesaGestor.Application.Services
-//{
-//    public class CategoriaService
-//    {
-//        private readonly ICategoriaRepository _categoriaRepository;
+namespace WebMesaGestor.Application.Services
+{
+    public class CategoriaService
+    {
+        private readonly ICategoriaRepository _categoriaRepository;
+        private readonly IMapper _mapper;
 
-//        public CategoriaService(ICategoriaRepository categoriaRepository)
-//        {
-//            _categoriaRepository = categoriaRepository;
-//        }
+        public CategoriaService(ICategoriaRepository categoriaRepository, IMapper mapper)
+        {
+            _categoriaRepository = categoriaRepository;
+            _mapper = mapper;
+        }
 
-//        public async Task<Response<IEnumerable<CategoriaDTO>>> ListarCategorias()
-//        {
-//            Response<IEnumerable<CategoriaDTO>> resposta = new Response<IEnumerable<CategoriaDTO>>();
-//            try
-//            {
-//                IEnumerable<Categoria> categorias = await _categoriaRepository.ListarCategorias();
-//                if (categorias == null || !categorias.Any())
-//                {
-//                    resposta.Mensagem = "Nenhuma categoria encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                resposta.Dados = CategoriaMap.MapCategoria(categorias);
-//                resposta.Mensagem = "Categorias listadas com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<IEnumerable<CategoriaDTO>> ObterTodasCategorias()
+        {
+            var categorias = await _categoriaRepository.ObterTodasCategorias();
+            return _mapper.Map<IEnumerable<CategoriaDTO>>(categorias);
+        }
 
-//        public async Task<Response<CategoriaDTO>> CategoriaPorId(Guid id)
-//        {
-//            Response<CategoriaDTO> resposta = new Response<CategoriaDTO>();
-//            try
-//            {
-//                Categoria categoria = await _categoriaRepository.CategoriaPorId(id);
-//                if (categoria == null)
-//                {
-//                    resposta.Mensagem = "Categoria não encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                resposta.Dados = CategoriaMap.MapCategoria(categoria);
-//                resposta.Mensagem = "Categorias listadas com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<CategoriaDTO> ObterCategoriaPorId(Guid id)
+        {
+            var categoria = await _categoriaRepository.ObterCategoriaPorId(id);
 
-//        public async Task<Response<CategoriaDTO>> CriarCategoria(CatCriacaoDTO categoria)
-//        {
-//            Response<CategoriaDTO> resposta = new Response<CategoriaDTO>();
-//            try
-//            {
-//                ValidarCategoriaCriacao(categoria);
-//                Categoria map = CategoriaMap.MapCategoria(categoria);
-//                Categoria retorno = await _categoriaRepository.CriarCategoria(map);
+            if (categoria == null)
+            {
+                return null;
+            }
 
-//                resposta.Dados = CategoriaMap.MapCategoria(retorno);
-//                resposta.Mensagem = "Categorias listadas com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            return _mapper.Map<CategoriaDTO>(categoria);
+        }
 
-//        public async Task<Response<CategoriaDTO>> AtualizarCategoria(CatEdicaoDTO categoria)
-//        {
-//            Response<CategoriaDTO> resposta = new Response<CategoriaDTO>();
-//            try
-//            {
-//                ValidarCategoriaEdicao(categoria);
-//                Categoria buscarCategoria = await _categoriaRepository.CategoriaPorId(categoria.Id);
-//                if (buscarCategoria == null)
-//                {
-//                    resposta.Mensagem = "Categoria não encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                AtualizarDadosCategoria(buscarCategoria, categoria);
-//                Categoria retorno = await _categoriaRepository.AtualizarCategoria(buscarCategoria);
+        public async Task<Response<CategoriaDTO>> CriarCategoria(CatCriacaoDTO categoriaDTO)
+        {
+            var validationResult = new CategoriaCriacaoValidator().Validate(categoriaDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<CategoriaDTO>
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//                resposta.Dados = CategoriaMap.MapCategoria(retorno);
-//                resposta.Mensagem = "Categorias listadas com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var categoria = _mapper.Map<Categoria>(categoriaDTO);
+            await _categoriaRepository.CriarCategoria(categoria);
 
-//        public async Task<Response<CategoriaDTO>> DeletarCategoria(Guid id)
-//        {
-//            Response<CategoriaDTO> resposta = new Response<CategoriaDTO>();
-//            try
-//            {
-//                Categoria categoria = await _categoriaRepository.CategoriaPorId(id);
-//                if (categoria == null)
-//                {
-//                    resposta.Mensagem = "Categoria não encontrada.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                Categoria retorno = await _categoriaRepository.DeletarCategoria(id);
+            return new Response<CategoriaDTO>
+            {
+                Sucesso = true,
+                Id = categoria.Id,
+                Data = _mapper.Map<CategoriaDTO>(categoria)
+            };
+        }
 
-//                resposta.Dados = CategoriaMap.MapCategoria(retorno);
-//                resposta.Mensagem = "Categorias listadas com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<Response<CategoriaDTO>> AtualizarCategoria(CatEdicaoDTO categoriaDTO)
+        {
+            var validationResult = new CategoriaEdicaoValidator().Validate(categoriaDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<CategoriaDTO>()
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//        private void ValidarCategoriaCriacao(CatCriacaoDTO categoria)
-//        {
-//            ValidadorUtils.ValidarSeVazioOuNulo(categoria.CatDesc, "Categoria é obrigatório");
-//            ValidadorUtils.ValidarMaximo(categoria.CatDesc, 100, "Nome deve conter no máximo 100 caracteres");
-//        }
+            var categoriaExistente = await _categoriaRepository.ObterCategoriaPorId(categoriaDTO.Id);
+            if (categoriaExistente == null)
+            {
+                return new Response<CategoriaDTO>()
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CategoriaMessages.CategoriaNaoEncontrada }
+                };
+            }
 
-//        private void ValidarCategoriaEdicao(CatEdicaoDTO categoria)
-//        {
-//            ValidadorUtils.ValidarSeVazioOuNulo(categoria.CatDesc, "Categoria é obrigatório");
-//            ValidadorUtils.ValidarMaximo(categoria.CatDesc, 100, "Nome deve conter no máximo 100 caracteres");
-//        }
+            var categoria = _mapper.Map(categoriaDTO, categoriaExistente);
+            await _categoriaRepository.AtualizarCategoria(categoria);
 
-//        private void AtualizarDadosCategoria(Categoria categoriaExistente, CatEdicaoDTO categoria)
-//        {
-//            categoriaExistente.CatDesc = categoria.CatDesc;
-//        }
-//    }
-//}
+            return new Response<CategoriaDTO>()
+            {
+                Sucesso = true,
+                Id = categoria.Id,
+                Data = _mapper.Map<CategoriaDTO>(categoria)
+            };
+        }
+
+        public async Task<Response<CategoriaDTO>> DeletarCategoria(Guid id)
+        {
+            var categoriaExistente = await _categoriaRepository.ObterCategoriaPorId(id);
+
+            if (categoriaExistente == null)
+            {
+                return new Response<CategoriaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CategoriaMessages.CategoriaNaoEncontrada }
+                };
+            }
+
+            var sucessoDelecao = await _categoriaRepository.DeletarCategoria(id);
+            if (!sucessoDelecao)
+            {
+                return new Response<CategoriaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CategoriaMessages.ErroAoDeletarCategoria }
+                };
+            }
+
+            var dados = _mapper.Map<CategoriaDTO>(categoriaExistente);
+            return new Response<CategoriaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { CategoriaMessages.CategoriaDeletadaComSucesso }
+            };
+        }
+    }
+}

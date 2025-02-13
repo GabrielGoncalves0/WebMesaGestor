@@ -14,7 +14,7 @@ namespace WebMesaGestor.Infra.Repositories
             _context = appDbContext;
         }
 
-        public async Task<IEnumerable<GrupoOpcoes>> ObterGrupoOpcoes()
+        public async Task<IEnumerable<GrupoOpcoes>> ObterTodosGrupoOpcoes()
         {
             return await _context.GrupoOpcoes
                 .Include(go => go.Produto)

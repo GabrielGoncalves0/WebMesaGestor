@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.Mesa;
 
 namespace WebMesaGestor.Application.Validations.Mesa
 {
-    public class MesEdicaoValidator : AbstractValidator<MesEdicaoDTO>
+    public class MesaEdicaoValidator : AbstractValidator<MesEdicaoDTO>
     {
-        public MesEdicaoValidator()
+        public MesaEdicaoValidator()
         {
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("O ID da mesa é obrigatório.")
