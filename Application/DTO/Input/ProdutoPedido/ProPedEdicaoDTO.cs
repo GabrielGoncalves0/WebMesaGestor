@@ -6,5 +6,6 @@ namespace WebMesaGestor.Application.DTO.Input.ProdutoPedido
     {
         public Guid Id { get; set; }
         public StatusProPed StatusProPed { get; set; }
+
     }
 }

@@ -23,7 +23,7 @@ namespace WebMesaGestor.Web.Controllers
 
         [HttpGet]
         [Route("buscarTodos")]
-        public async Task<IActionResult> ListarUsuarios()
+        public async Task<IActionResult> ObterTodosUsuarios()
         {
             var usuarios = await _usuarioService.ObterTodosUsuarios();
 

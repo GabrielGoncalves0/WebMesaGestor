@@ -1,267 +1,149 @@
-﻿//using WebMesaGestor.Application.Common;
-//using WebMesaGestor.Application.DTO.Input.Grupo;
-//using WebMesaGestor.Application.DTO.Input.OpcaoProPed;
-//using WebMesaGestor.Application.DTO.Input.ProdutoPedido;
-//using WebMesaGestor.Application.DTO.Input.USuario;
-//using WebMesaGestor.Application.DTO.Output;
-//using WebMesaGestor.Application.Map;
-//using WebMesaGestor.Domain.Entities;
-//using WebMesaGestor.Domain.Interfaces;
-//using WebMesaGestor.Infra.Repositories;
-//using WebMesaGestor.Utils;
+﻿using AutoMapper;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Input.ProdutoPedido;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.Validations.ProdutoPedido;
+using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Infra.Repositories;
 
-//namespace WebMesaGestor.Application.Services
-//{
-//    public class ProPedService
-//    {
-//        private readonly IProPedRepository _produtoPedidoRepository;
-//        private readonly IProdutoRepository _produtoRepository;
-//        private readonly IPedidoRepository _pedidoRepository;
+namespace WebMesaGestor.Application.Services
+{
+    public class ProPedService
+    {
+        private readonly IProPedRepository _produtoPedidoRepository;
+        private readonly IProdutoRepository _produtoRepository;
+        private readonly IPedidoRepository _pedidoRepository;
+        private readonly IMapper _mapper;
 
-//        public ProPedService(IProPedRepository produtoPedidoRepository, IProdutoRepository produtoRepository,
-//            IPedidoRepository pedidoRepository)
-//        {
-//            _produtoPedidoRepository = produtoPedidoRepository;
-//            _produtoRepository = produtoRepository;
-//            _pedidoRepository = pedidoRepository;
-//        }
+        public ProPedService(IProPedRepository produtoPedidoRepository, IProdutoRepository produtoRepository,
+            IPedidoRepository pedidoRepository, IMapper mapper)
+        {
+            _produtoPedidoRepository = produtoPedidoRepository;
+            _produtoRepository = produtoRepository;
+            _pedidoRepository = pedidoRepository;
+            _mapper = mapper;
+        }
 
-//        public async Task<Response<IEnumerable<ProdutoPedidoDTO>>> ListarProdutosPorPedId(Guid id)
-//        {
-//            Response<IEnumerable<ProdutoPedidoDTO>> resposta = new Response<IEnumerable<ProdutoPedidoDTO>>();
-//            try
-//            {
-//                IEnumerable<ProdutoPedido> produtosPed = await _produtoPedidoRepository.ListarProdutosPorPedId(id);
-//                if (produtosPed == null || !produtosPed.Any())
-//                {
-//                    resposta.Mensagem = "Produtos por pedido não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
+        public async Task<IEnumerable<ProdutoPedidoDTO>> ObterProdutosPorPedId(Guid id)
+        {
+            var produtoPedido = await _produtoPedidoRepository.ObterTodosProdutosPorPedId(id);
+            return _mapper.Map<IEnumerable<ProdutoPedidoDTO>>(produtoPedido);
+        }
 
-//                await PreencherProdutoPed(produtosPed);
-//                resposta.Dados = ProdutoPedidoMap.MapProPed(produtosPed);
-//                resposta.Mensagem = "Produtos por pedido listados com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<ProdutoPedidoDTO> ObterProPedId(Guid id)
+        {
+            var produtoPedido = await _produtoPedidoRepository.ObterProPedId(id);
+            return _mapper.Map<ProdutoPedidoDTO>(produtoPedido);
+        }
 
-//        public async Task<Response<ProdutoPedidoDTO>> ProPedId(Guid id)
-//        {
-//            Response<ProdutoPedidoDTO> resposta = new Response<ProdutoPedidoDTO>();
-//            try
-//            {
-//                ProdutoPedido produtoPed = await _produtoPedidoRepository.ProPedId(id);
-//                if (produtoPed == null)
-//                {
-//                    resposta.Mensagem = "Produto do pedido não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
+        public async Task<Response<ProdutoPedidoDTO>> CriarProPed(ProPedCriacaoDTO proPedCriacaoDTO)
+        {
+            var validationResult = new ProdutoPedCriacaoValidator().Validate(proPedCriacaoDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<ProdutoPedidoDTO>()
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//                await PreencherProdutoPed(produtoPed);
-//                resposta.Dados = ProdutoPedidoMap.MapProPed(produtoPed);
-//                resposta.Mensagem = "Produto do pedido encontrado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var produto = await _produtoRepository.ObterProdutoPorId(proPedCriacaoDTO.ProdutoId);
+            if (produto == null)
+            {
+                return new Response<ProdutoPedidoDTO>()
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { ProdutoMessages.ProdutoNaoEncontrado }
+                };
+            }
 
-//        public async Task<Response<IEnumerable<ProdutoPedidoDTO>>> CriarProPed(ProPedCriacaoDTO proPedCriacaoDTO)
-//        {
-//            Response<IEnumerable<ProdutoPedidoDTO>> resposta = new Response<IEnumerable<ProdutoPedidoDTO>>();
-//            try
-//            {
-//                var listaProdutoPedido = new List<ProdutoPedido>();
+            var pedido = await _pedidoRepository.ObterPedidoPorId(proPedCriacaoDTO.PedidoId);
+            if (pedido == null)
+            {
+                return new Response<ProdutoPedidoDTO>()
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { PedidoMessages.PedidoNaoEncontrado }
+                };
+            }
 
-//                await ValidarPedido(proPedCriacaoDTO.PedidoId);
-//                await ValidarProduto(proPedCriacaoDTO.ProdutoId);
+            var produtoPedido = _mapper.Map<ProdutoPedido>(proPedCriacaoDTO);
+            produtoPedido.Pedido = pedido;
+            produtoPedido.Produto = produto;
 
-//                for (int i = 0; i < proPedCriacaoDTO.ProPedQuant; i++)
-//                {
-//                    ProdutoPedido map = ProdutoPedidoMap.MapProPed(proPedCriacaoDTO);
-//                    map.PedQuant = 1;
-//                    ProdutoPedido retorno = await _produtoPedidoRepository.CriarProPed(map);
-//                    await PreencherProdutoPed(retorno);
-//                    await AtualizarValorCriacao(retorno);
-//                    listaProdutoPedido.Add(retorno);
-//                }
+            await _produtoPedidoRepository.CriarProPed(produtoPedido);
+            return new Response<ProdutoPedidoDTO>()
+            {
+                Sucesso = true,
+                Id = produtoPedido.Id,
+                Data = _mapper.Map<ProdutoPedidoDTO>(produtoPedido)
+            };
+        }
 
-//                resposta.Dados = ProdutoPedidoMap.MapProPed(listaProdutoPedido);
-//                resposta.Mensagem = "Produtos do pedido criados com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<Response<ProdutoPedidoDTO>> AtualizarProPed(ProPedEdicaoDTO proPedEdicaoDTO)
+        {
+            var validationResult = new ProdutoPedEdicaoValidator().Validate(proPedEdicaoDTO);
+            if (!validationResult.IsValid)
+            {
+                return new Response<ProdutoPedidoDTO>()
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//        public async Task<Response<ProdutoPedidoDTO>> AtualizarProPed(ProPedEdicaoDTO proPedEdicaoDTO)
-//        {
-//            Response<ProdutoPedidoDTO> resposta = new Response<ProdutoPedidoDTO>();
-//            try
-//            {
-//                ProdutoPedido buscarProPed = await _produtoPedidoRepository.ProPedId(proPedEdicaoDTO.Id);
-//                if (buscarProPed == null)
-//                {
-//                    resposta.Mensagem = "Produto do pedido não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                buscarProPed.StatusProPed = proPedEdicaoDTO.StatusProPed;
-//                ProdutoPedido retorno = await _produtoPedidoRepository.AtualizarProPed(buscarProPed);
+            var produtoPedidoExiste = await _produtoPedidoRepository.ObterProPedId(proPedEdicaoDTO.Id);
+            if (produtoPedidoExiste == null)
+            {
+                return new Response<ProdutoPedidoDTO>()
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { ProdutoPedidoMessages.ProdutoPedidoNaoEncontrado }
+                };
+            }
 
-//                resposta.Dados = ProdutoPedidoMap.MapProPed(retorno);
-//                resposta.Mensagem = "Produto do pedido atualizado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var produtoPedido = _mapper.Map(proPedEdicaoDTO, produtoPedidoExiste);
+            await _produtoPedidoRepository.AtualizarProPed(produtoPedido);
 
-//        public async Task<Response<ProdutoPedidoDTO>> DeletarProPed(Guid id)  
-//        {
-//            Response<ProdutoPedidoDTO> resposta = new Response<ProdutoPedidoDTO>();
-//            try
-//            {
-//                ProdutoPedido produtoPed = await _produtoPedidoRepository.ProPedId(id);
-//                if (produtoPed == null)
-//                {
-//                    resposta.Mensagem = "Produto do pedido não encontrado para deleção.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                await AtualizarValorDelete(produtoPed);
+            return new Response<ProdutoPedidoDTO>()
+            {
+                Sucesso = true,
+                Id = produtoPedido.Id,
+                Data = _mapper.Map<ProdutoPedidoDTO>(produtoPedido)
+            };
+        }
 
-//                ProdutoPedido retorno = await _produtoPedidoRepository.DeletarProPed(id);
+        public async Task<Response<ProdutoPedidoDTO>> DeletarProPed(Guid id)
+        {
+            var produtoPedidoExiste = await _produtoPedidoRepository.ObterProPedId(id);
+            if(produtoPedidoExiste == null)
+            {
+                return new Response<ProdutoPedidoDTO>()
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { ProdutoPedidoMessages.ProdutoPedidoNaoEncontrado }
+                };
+            }
 
-//                await PreencherProdutoPed(retorno);
-//                resposta.Dados = ProdutoPedidoMap.MapProPed(retorno);
-//                resposta.Mensagem = "Produto do pedido deletado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var sucessoDelecao = await _produtoPedidoRepository.DeletarProPed(id);
+            if(!sucessoDelecao)
+            {
+                return new Response<ProdutoPedidoDTO>()
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { ProdutoPedidoMessages.ErroAoDeletarProdutosPedido }
+                };
+            }
 
-//        // Métodos auxiliares
-//        private async Task PreencherProdutoPed(IEnumerable<ProdutoPedido> produtosPed)
-//        {
-//            foreach (var produtoPed in produtosPed)
-//            {
-//                if (produtoPed.ProdutoId != null)
-//                {
-//                    produtoPed.Produto = await _produtoRepository.ProdutoPorId((Guid)produtoPed.ProdutoId);
-//                }
-//                if (produtoPed.PedidoId != null)
-//                {
-//                    produtoPed.Pedido = await _pedidoRepository.PedidoPorId((Guid)produtoPed.PedidoId);
-//                }
-//            }
-//        }
-
-//        private async Task PreencherProdutoPed(ProdutoPedido produtoPed)
-//        {
-//            if (produtoPed.ProdutoId != null)
-//            {
-//                produtoPed.Produto = await _produtoRepository.ProdutoPorId((Guid)produtoPed.ProdutoId);
-//            }
-//            if (produtoPed.PedidoId != null)
-//            {
-//                produtoPed.Pedido = await _pedidoRepository.PedidoPorId((Guid)produtoPed.PedidoId);
-//            }
-//        }
-
-//        private async Task ValidarProduto(Guid? produtoId)
-//        {
-//            if (produtoId == null || produtoId == Guid.Empty)
-//            {
-//                throw new Exception("Produto é obrigatório");
-//            }
-
-//            var produto = await _produtoRepository.ProdutoPorId((Guid)produtoId);
-
-//            if (produto == null)
-//            {
-//                throw new Exception("Produto não encontrada");
-//            }
-//        }
-
-//        private async Task ValidarPedido(Guid? pedidoId)
-//        {
-//            if (pedidoId == null || pedidoId == Guid.Empty)
-//            {
-//                throw new Exception("Pedido é obrigatório");
-//            }
-
-//            var pedido = await _pedidoRepository.PedidoPorId((Guid)pedidoId);
-
-//            if (pedido == null)
-//            {
-//                throw new Exception("Pedido não encontrado");
-//            }
-//        }
-
-//        private async Task AtualizarValorCriacao(ProdutoPedido produtoPedido)
-//        {
-//            Pedido pedido = await _pedidoRepository.PedidoPorId(produtoPedido.PedidoId);
-//            Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
-
-//            decimal valorTotalProdutoComDesconto = (produto.ProPreco * produtoPedido.PedQuant) - ((produto.ProPreco * produtoPedido.PedQuant) * (produtoPedido.PedDesconto / 100));
-//            pedido.PedValor += valorTotalProdutoComDesconto;
-
-//            await _pedidoRepository.AtualizarPedido(pedido);
-//        }
-
-//        private async Task AtualizarValorDelete(ProdutoPedido produtoPedido)
-//        {
-//            Pedido pedido = await _pedidoRepository.PedidoPorId(produtoPedido.PedidoId);
-//            Produto produto = await _produtoRepository.ProdutoPorId(produtoPedido.ProdutoId);
-
-//            pedido.PedValor -= produto.ProPreco;
-//            await _pedidoRepository.AtualizarPedido(pedido);
-//        }
-
-//        private void ValidarProdutoPedCriacao(ProPedCriacaoDTO produtoPedido)
-//        {
-//            ValidadorUtils.ValidarInteiroSeVazioOuNulo(produtoPedido.ProPedQuant, "Quantidade é obrigatório");
-//            ValidadorUtils.ValidarMaximo(produtoPedido.ProPedQuant, 10, "Quantidade deve conter no máximo 10 caracteres");
-//            ValidadorUtils.ValidarMinimo(produtoPedido.ProPedQuant, 1, "Quantidade deve conter no minimo 3 caracteres");
-//            ValidadorUtils.ValidarNegativo(produtoPedido.ProPedQuant, "Quantidade deve ser maior que 0");
-            
-//            ValidadorUtils.ValidarInteiroSeVazioOuNulo(produtoPedido.ProPedDesconto, "Desconto é obrigatório");
-//            ValidadorUtils.ValidarMaximo(produtoPedido.ProPedDesconto, 3, "Desconto deve conter no máximo 3 caracteres");
-//            ValidadorUtils.ValidarNegativo(produtoPedido.ProPedDesconto, "Desconto deve ser maior que 0");
-//        }
-
-//        private void ValidarProdutoPedEdicao(ProPedEdicaoDTO produtoPedido)
-//        {
-//            if (!Enum.IsDefined(typeof(StatusProPed), produtoPedido.StatusProPed))
-//            {
-//                throw new Exception("Status do produto do pedido é obrigatório");
-//            }
-//        }
-//    }
-//}
+            var dados =  _mapper.Map<ProdutoPedidoDTO>(produtoPedidoExiste);
+            return new Response<ProdutoPedidoDTO>()
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> {  ProdutoMessages.ProdutoDeletadoComSucesso} 
+            };
+        }
+    }
+}

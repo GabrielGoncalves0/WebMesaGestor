@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.Pedido;
 
 namespace WebMesaGestor.Application.Validations.Pedido
 {
-    public class PedCriacaoValidator : AbstractValidator<PedCriacaoDTO>
+    public class PedidoCriacaoValidator : AbstractValidator<PedCriacaoDTO>
     {
-        public PedCriacaoValidator()
+        public PedidoCriacaoValidator()
         {
             RuleFor(x => x.PedValor)
                     .NotEmpty().WithMessage("Valor é obrigatório.")

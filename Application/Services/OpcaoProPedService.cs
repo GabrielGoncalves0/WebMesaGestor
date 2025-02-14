@@ -1,225 +1,177 @@
-﻿//using WebMesaGestor.Application.Common;
-//using WebMesaGestor.Application.DTO.Input.OpcaoProPed;
-//using WebMesaGestor.Application.DTO.Input.ProdutoPedido;
-//using WebMesaGestor.Application.DTO.Input.USuario;
-//using WebMesaGestor.Application.DTO.Output;
-//using WebMesaGestor.Application.Map;
-//using WebMesaGestor.Domain.Entities;
-//using WebMesaGestor.Domain.Interfaces;
-//using WebMesaGestor.Infra.Repositories;
-//using WebMesaGestor.Utils;
+﻿using AutoMapper;
+using FluentValidation;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Input.OpcaoProPed;
+using WebMesaGestor.Application.DTO.Input.ProdutoPedido;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.Validations.OpcaoProPed;
+using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Infra.Repositories;
 
-//namespace WebMesaGestor.Application.Services
-//{
-//    public class OpcaoProPedService
-//    {
-//        private readonly IOpcProPedRepository _opcProPedRepository;
-//        private readonly IProPedRepository _proPedRepository;
-//        private readonly IOpcaoRepository _opcaoRepository;
+namespace WebMesaGestor.Application.Services
+{
+    public class OpcaoProPedService
+    {
+        private readonly IOpcProPedRepository _opcProPedRepository;
+        private readonly IProPedRepository _proPedRepository;
+        private readonly IOpcaoRepository _opcaoRepository;
+        private readonly IMapper _mapper;
 
-//        public OpcaoProPedService(IOpcProPedRepository opcProPedRepository, IProPedRepository proPedRepository,
-//            IOpcaoRepository opcaoRepository)
-//        {
-//            _opcProPedRepository = opcProPedRepository;
-//            _proPedRepository = proPedRepository;
-//            _opcaoRepository = opcaoRepository;
-//        }
+        public OpcaoProPedService(IOpcProPedRepository opcProPedRepository, IProPedRepository proPedRepository,
+            IOpcaoRepository opcaoRepository, IMapper mapper)
+        {
+            _opcProPedRepository = opcProPedRepository;
+            _proPedRepository = proPedRepository;
+            _opcaoRepository = opcaoRepository;
+            _mapper = mapper;
+        }
 
-//        public async Task<Response<IEnumerable<OpcaoProdutoDTO>>> ListarOpcoesPorProPedId(Guid id)
-//        {
-//            Response<IEnumerable<OpcaoProdutoDTO>> resposta = new Response<IEnumerable<OpcaoProdutoDTO>>();
-//            try
-//            {
-//                IEnumerable<OpcaoProPed> opcaoProPed = await _opcProPedRepository.ListarOpcoesPorProPedId(id);
-//                if (opcaoProPed == null || !opcaoProPed.Any())
-//                {
-//                    resposta.Mensagem = "Opções por produto não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
 
-//                await PreencherOpcoesProPed(opcaoProPed);
-//                resposta.Dados = OpcaoProPedMap.MapOpcProPed(opcaoProPed);
-//                resposta.Mensagem = "Opções por produto listados com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
 
-//        public async Task<Response<OpcaoProdutoDTO>> OpcaoProPedId(Guid id)
-//        {
-//            Response<OpcaoProdutoDTO> resposta = new Response<OpcaoProdutoDTO>();
-//            try
-//            {
-//                OpcaoProPed opcaoProPed = await _opcProPedRepository.OpcaoProPedId(id);
-//                if (opcaoProPed == null)
-//                {
-//                    resposta.Mensagem = "Opção por produto do pedido não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
+        public async Task<OpcaoProPedDTO> OpcaoProPedId(Guid id)
+        {
+            var opcaoProPed = await _opcProPedRepository.ObterOpcaoProPedId(id);
+            return _mapper.Map<OpcaoProPedDTO>(opcaoProPed);
+        }
 
-//                await PreencherOpcaoProPed(opcaoProPed);
-//                resposta.Dados = OpcaoProPedMap.MapOpcProPed(opcaoProPed);
-//                resposta.Mensagem = "Opção por produto do pedido encontrado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<IEnumerable<OpcaoProPedDTO>> ObterTodasOpcoesPorProPedId(Guid id)
+        {
+            var opcaoProPed = await _opcProPedRepository.ObterTodasOpcoesPorProPedId(id);
+            return _mapper.Map<IEnumerable<OpcaoProPedDTO>>(opcaoProPed);
+        }
 
-//        public async Task<Response<OpcaoProdutoDTO>> CriarOpcaoProPed(OpcProPedCriacaoDTO opcProPed)
-//        {
-//            Response<OpcaoProdutoDTO> resposta = new Response<OpcaoProdutoDTO>();
-//            try
-//            {
-//                await ValidarOpcao(opcProPed.OpcaoId);
-//                await ValidarProPed(opcProPed.ProdutoPedidoId);
+        public async Task<Response<OpcaoProPedDTO>> CriarOpcaoProPed(OpcProPedCriacaoDTO opcProPedDTO)
+        {
+            var validationResult = new OpcProPedCriacaoValidator().Validate(opcProPedDTO);
 
-//                OpcaoProPed map = OpcaoProPedMap.MapOpcProPed(opcProPed);
-//                OpcaoProPed retorno = await _opcProPedRepository.CriarOpcaoProdPed(map);
-//                await PreencherOpcaoProPed(retorno);
+            if (!validationResult.IsValid)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//                resposta.Dados = OpcaoProPedMap.MapOpcProPed(retorno);
-//                resposta.Mensagem = "Opção por produto do pedido criado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var opcao = await _opcaoRepository.ObterOpcaoPorId(opcProPedDTO.OpcaoId);
+            if (opcao == null)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { OpcaoMessages.OpcaoNaoEncontrada }
+                };
+            }
 
-//        public async Task<Response<OpcaoProdutoDTO>> AtualizarOpcaoProPed(OpcProPedEdicaoDTO opcProPed)
-//        {
-//            Response<OpcaoProdutoDTO> resposta = new Response<OpcaoProdutoDTO>();
-//            try
-//            {
-//                await ValidarOpcao(opcProPed.OpcaoId);
-//                await ValidarProPed(opcProPed.ProdutoPedidoId);
-//                OpcaoProPed buscarOpcaoProPed = await _opcProPedRepository.OpcaoProPedId(opcProPed.Id);
-//                if (buscarOpcaoProPed == null)
-//                {
-//                    resposta.Mensagem = "Opção por produto do pedido não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                AtualizarDadosUsuario(buscarOpcaoProPed, opcProPed);
-//                OpcaoProPed retorno = await _opcProPedRepository.AtualizarOpcaoProdPed(buscarOpcaoProPed);
-//                await PreencherOpcaoProPed(retorno);
+            var proPed = await _proPedRepository.ObterProPedId(opcProPedDTO.ProdutoPedidoId);
+            if (proPed == null)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { ProdutoPedidoMessages.ProdutoPedidoNaoEncontrado }
+                };
+            }
 
-//                resposta.Dados = OpcaoProPedMap.MapOpcProPed(retorno);
-//                resposta.Mensagem = "Opção por produto do pedido atualizado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var opcaoProPed = _mapper.Map<OpcaoProPed>(opcProPedDTO);
+            opcaoProPed.Opcao = opcao;
+            opcaoProPed.ProdutoPedido = proPed;
 
-//        public async Task<Response<OpcaoProdutoDTO>> DeletarOpcProPed(Guid id)
-//        {
-//            Response<OpcaoProdutoDTO> resposta = new Response<OpcaoProdutoDTO>();
-//            try
-//            {
-//                OpcaoProPed opcaoProPed = await _opcProPedRepository.OpcaoProPedId(id);
-//                if (opcaoProPed  == null)
-//                {
-//                    resposta.Mensagem = "Opção por produto do pedido não encontrada para deleção.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                OpcaoProPed retorno = await _opcProPedRepository.DeletarOpcaoProdPed(id);
+            await _opcProPedRepository.CriarOpcaoProdPed(opcaoProPed);
+            return new Response<OpcaoProPedDTO>
+            {
+                Sucesso = true,
+                Id = opcaoProPed.Id,
+                Data = _mapper.Map<OpcaoProPedDTO>(opcaoProPed)
+            };
+        }
 
-//                await PreencherOpcaoProPed(retorno);
-//                resposta.Dados = OpcaoProPedMap.MapOpcProPed(retorno);
-//                resposta.Mensagem = "Opção por produto do pedido deletado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<Response<OpcaoProPedDTO>> AtualizarOpcaoProPed(OpcProPedEdicaoDTO opcProPedDTO)
+        {
+            var validationResult = new OpcProPedEdicaoValidator().Validate(opcProPedDTO);
 
-//        // Métodos auxiliares
-//        private async Task PreencherOpcoesProPed(IEnumerable<OpcaoProPed> opcoesProPed)
-//        {
-//            foreach (var opcaoProPed in opcoesProPed)
-//            {
-//                if (opcaoProPed.OpcaoId != null)
-//                {
-//                    opcaoProPed.Opcao = await _opcaoRepository.OpcaoPorId((Guid)opcaoProPed.OpcaoId);
-//                }
-//                if (opcaoProPed.ProdutoPedidoId != null)
-//                {
-//                    opcaoProPed.ProdutoPedido = await _proPedRepository.ProPedId((Guid)opcaoProPed.ProdutoPedidoId);
-//                }
-//            }
-//        }
+            if (!validationResult.IsValid)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//        private async Task PreencherOpcaoProPed(OpcaoProPed opcaoProPed)
-//        {
-//            if (opcaoProPed.OpcaoId != null)
-//            {
-//                opcaoProPed.Opcao = await _opcaoRepository.OpcaoPorId((Guid)opcaoProPed.OpcaoId);
-//            }
-//            if (opcaoProPed.ProdutoPedidoId != null)
-//            {
-//                opcaoProPed.ProdutoPedido = await _proPedRepository.ProPedId((Guid)opcaoProPed.ProdutoPedidoId);
-//            }
-//        }
+            var opcaoProPedExiste = await _opcProPedRepository.ObterOpcaoProPedId(opcProPedDTO.Id);
+            if (opcaoProPedExiste == null)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { OpcaoProPedMessages.OpcaoProPedNaoEncontrado }
+                };
+            }
 
-//        private async Task ValidarOpcao(Guid? opcaoId)
-//        {
-//            if (opcaoId == null || opcaoId == Guid.Empty)
-//            {
-//                throw new Exception("Opção é obrigatório");
-//            }
+            var opcaoExiste = await _opcaoRepository.ObterOpcaoPorId(opcProPedDTO.OpcaoId);
+            if (opcaoExiste == null)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { OpcaoMessages.OpcaoNaoEncontrada }
+                };
+            }
 
-//            var opcao = await _opcaoRepository.OpcaoPorId((Guid)opcaoId);
+            var proPedExiste = await _proPedRepository.ObterProPedId(opcProPedDTO.ProdutoPedidoId);
+            if (proPedExiste == null)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { ProdutoPedidoMessages.ProdutoPedidoNaoEncontrado }
+                };
+            }
 
-//            if (opcao == null)
-//            {
-//                throw new Exception("Opção não encontrada");
-//            }
-//        }
+            var opcaoProPed = _mapper.Map(opcProPedDTO, opcaoProPedExiste);
 
-//        private async Task ValidarProPed(Guid? propedId)
-//        {
-//            if (propedId == null || propedId == Guid.Empty)
-//            {
-//                throw new Exception("Produto do pedido é obrigatório");
-//            }
+            await _opcProPedRepository.AtualizarOpcaoProdPed(opcaoProPed);
 
-//            var proped = await _proPedRepository.ProPedId((Guid)propedId);
+            return new Response<OpcaoProPedDTO>
+            {
+                Sucesso = true,
+                Id = opcaoProPed.Id,
+                Data = _mapper.Map<OpcaoProPedDTO>(opcaoProPed)
+            };
+        }
 
-//            if (proped == null)
-//            {
-//                throw new Exception("Produto do pedido não encontrado");
-//            }
-//        }
+        public async Task<Response<OpcaoProPedDTO>> DeletarOpcProPed(Guid id)
+        {
+            var opcaoProPed = await _opcProPedRepository.ObterOpcaoProPedId(id);
 
-//        private void AtualizarDadosUsuario(OpcaoProPed opcaoProPedExistente, OpcProPedEdicaoDTO opcaoProPed)
-//        {
-//            opcaoProPedExistente.OpcaoId = opcaoProPed.OpcaoId;
-//            opcaoProPedExistente.ProdutoPedidoId = opcaoProPed.ProdutoPedidoId;
-//        }
-//    }
-//}
+            if (opcaoProPed == null)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { OpcaoProPedMessages.OpcaoProPedNaoEncontrado }
+                };
+            }
+
+            var sucessoDelecao = await _opcProPedRepository.DeletarOpcaoProdPed(id);
+            if (!sucessoDelecao)
+            {
+                return new Response<OpcaoProPedDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { OpcaoProPedMessages.ErroAoDeletarOpcaoProPed }
+                };
+            }
+
+            var dados = _mapper.Map<OpcaoProPedDTO>(opcaoProPed);
+            return new Response<OpcaoProPedDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { OpcaoProPedMessages.OpcaoProPedDeletadoComSucesso }
+            };
+        }
+    }
+}

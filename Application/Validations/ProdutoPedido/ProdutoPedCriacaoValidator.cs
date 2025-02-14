@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.ProdutoPedido;
 
 namespace WebMesaGestor.Application.Validations.ProdutoPedido
 {
-    public class ProPedCriacaoValidator : AbstractValidator<ProPedCriacaoDTO>
+    public class ProdutoPedCriacaoValidator : AbstractValidator<ProPedCriacaoDTO>
     {
-        public ProPedCriacaoValidator()
+        public ProdutoPedCriacaoValidator()
         {
             RuleFor(x => x.ProPedQuant)
                 .GreaterThan(0).WithMessage("A quantidade do produto no pedido deve ser maior que zero.");

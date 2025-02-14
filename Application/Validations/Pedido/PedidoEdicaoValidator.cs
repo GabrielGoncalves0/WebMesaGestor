@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.Pedido;
 
 namespace WebMesaGestor.Application.Validations.Pedido
 {
-    public class PedEdicaoValidator : AbstractValidator<PedEdicaoDTO>
+    public class PedidoEdicaoValidator : AbstractValidator<PedEdicaoDTO>
     {
-        public PedEdicaoValidator()
+        public PedidoEdicaoValidator()
         {
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("O ID do pedido é obrigatório.")

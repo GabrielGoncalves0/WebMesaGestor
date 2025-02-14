@@ -37,6 +37,10 @@ namespace WebMesaGestor.Application.Services
         public async Task<IEnumerable<UsuarioDTO>> ObterTodosUsuarios()
         {
             var usuarios = await _usuarioRepository.ObterTodosUsuarios();
+            if (usuarios == null)
+            {
+                return null;
+            }
             return _mapper.Map<IEnumerable<UsuarioDTO>>(usuarios);
         }
 
@@ -145,7 +149,8 @@ namespace WebMesaGestor.Application.Services
             var dados = _mapper.Map<UsuarioDTO>(usuarioExistente);
             return new Response<UsuarioDTO> 
             { 
-                Sucesso = true, Data = dados, 
+                Sucesso = true, 
+                Data = dados, 
                 Erros = new List<string> { UsuarioMessages.UsuarioDeletadoComSucesso } 
             };
         }

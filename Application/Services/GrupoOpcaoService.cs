@@ -1,226 +1,144 @@
-﻿//using WebMesaGestor.Application.Common;
-//using WebMesaGestor.Application.DTO.Input.Grupo;
-//using WebMesaGestor.Application.DTO.Input.Opcoes;
-//using WebMesaGestor.Application.DTO.Output;
-//using WebMesaGestor.Application.Map;
-//using WebMesaGestor.Domain.Entities;
-//using WebMesaGestor.Domain.Interfaces;
-//using WebMesaGestor.Utils;
+﻿using AutoMapper;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Input.Grupo;
+using WebMesaGestor.Application.DTO.Input.Opcoes;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.Validations.Grupo;
+using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
 
-//namespace WebMesaGestor.Application.Services
-//{
-//    public class GrupoOpcaoService
-//    {
-//        private readonly IGrupoOpcaoRepository _grupoOpcaoRepository;
-//        private readonly IProdutoRepository _produtoRepository;
+namespace WebMesaGestor.Application.Services
+{
+    public class GrupoOpcaoService
+    {
+        private readonly IGrupoOpcaoRepository _grupoOpcaoRepository;
+        private readonly IProdutoRepository _produtoRepository;
+        private readonly IMapper _mapper;
 
-//        public GrupoOpcaoService(IGrupoOpcaoRepository grupoRepository, IProdutoRepository produtoRepository)
-//        {
-//            _grupoOpcaoRepository = grupoRepository;
-//            _produtoRepository = produtoRepository;
-//        }
+        public GrupoOpcaoService(IGrupoOpcaoRepository grupoRepository, IProdutoRepository produtoRepository, IMapper mapper)
+        {
+            _grupoOpcaoRepository = grupoRepository;
+            _produtoRepository = produtoRepository;
+            _mapper = mapper;
+        }
 
-//        public async Task<Response<IEnumerable<GrupoOpcaoDTO>>> ListarGrupoOpcoes()
-//        {
-//            Response<IEnumerable<GrupoOpcaoDTO>> resposta = new Response<IEnumerable<GrupoOpcaoDTO>>();
-//            try
-//            {
-//                IEnumerable<GrupoOpcoes> grupoOpcao = await _grupoOpcaoRepository.ListarGrupoOpcoes();
-//                if(grupoOpcao == null || !grupoOpcao.Any())
-//                {
-//                    resposta.Mensagem = "Grupo de opcões não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                await PreencherGrupoOpcoes(grupoOpcao);
-//                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(grupoOpcao);
-//                resposta.Mensagem = "Grupo de opções listados com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<IEnumerable<GrupoOpcoesDTO>> ObterTodosGrupoOpcoes()
+        {
+            var grupoOpcoes = await _grupoOpcaoRepository.ObterTodosGrupoOpcoes();
+            return _mapper.Map<IEnumerable<GrupoOpcoesDTO>>(grupoOpcoes);
+        }
 
-//        public async Task<Response<GrupoOpcaoDTO>> GrupoOpcaoPorId(Guid id)
-//        {
-//            Response<GrupoOpcaoDTO> resposta = new Response<GrupoOpcaoDTO>();
-//            try
-//            {
-//                GrupoOpcoes grupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(id);
-//                if (grupoOpcao == null)
-//                {
-//                    resposta.Mensagem = "Grupos não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                await PreencherGrupoOpcao(grupoOpcao);
-//                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(grupoOpcao);
-//                resposta.Mensagem = "Grupo encontrado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<GrupoOpcoesDTO> GrupoOpcaoPorId(Guid id)
+        {
+            var grupoOpcoes = await _grupoOpcaoRepository.ObterGrupoOpcaoPorId(id);
+            return _mapper.Map<GrupoOpcoesDTO>(grupoOpcoes);
+        }
 
-//        public async Task<Response<GrupoOpcaoDTO>> CriarGrupoOpcao(GrupOpcCriacaoDTO grupoOpcao)
-//        {
-//            Response<GrupoOpcaoDTO> resposta = new Response<GrupoOpcaoDTO>();
-//            try
-//            {
-//                ValidarGrupoOpcaoCriacao(grupoOpcao);
-//                await ValidarProduto(grupoOpcao.ProdutoId);
+        public async Task<Response<GrupoOpcoesDTO>> CriarGrupoOpcao(GrupOpcCriacaoDTO grupoOpcao)
+        {
+            var validationResult = new GrupOpcCriacaoValidator().Validate(grupoOpcao);
+            if (!validationResult.IsValid)
+            {
+                return new Response<GrupoOpcoesDTO>
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//                GrupoOpcoes map = GrupoOpcaoMap.MapGrupoOpcao(grupoOpcao);
-//                GrupoOpcoes retorno = await _grupoOpcaoRepository.CriarGrupoOpcao(map);
-//                await PreencherGrupoOpcao(retorno);
+            var produto = await _produtoRepository.ObterProdutoPorId(grupoOpcao.ProdutoId);
+            if (produto == null)
+            {
+                return new Response<GrupoOpcoesDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { GrupoOpcoesMessages.GrupoOpcoesNaoEncontrado }
+                };
+            }
 
-//                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(retorno);
-//                resposta.Mensagem = "Grupo de opções criado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var grupoOpcoes = _mapper.Map<GrupoOpcoes>(grupoOpcao);
+            grupoOpcoes.Produto = produto;
 
-//        public async Task<Response<GrupoOpcaoDTO>> AtualizarGrupoOpcao(GrupOpcEdicaoDTO grupoOpcao)
-//        {
-//            Response<GrupoOpcaoDTO> resposta = new Response<GrupoOpcaoDTO>();
-//            try
-//            {
-//                ValidarGrupoOpcaoEdicao(grupoOpcao);
-//                await ValidarProduto(grupoOpcao.ProdutoId);
-//                GrupoOpcoes buscarGrupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(grupoOpcao.Id);
-//                if (buscarGrupoOpcao == null)
-//                {
-//                    resposta.Mensagem = "Grupo de opções não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                AtualizarDadosGrupoOpcao(buscarGrupoOpcao, grupoOpcao);
-//                GrupoOpcoes retorno = await _grupoOpcaoRepository.AtualizarGrupoOpcao(buscarGrupoOpcao);
-//                await PreencherGrupoOpcao(retorno);
+            await _grupoOpcaoRepository.CriarGrupoOpcao(grupoOpcoes);
+            return new Response<GrupoOpcoesDTO>
+            {
+                Sucesso = true,
+                Id = grupoOpcoes.Id,
+                Data = _mapper.Map<GrupoOpcoesDTO>(grupoOpcoes),
+            };
+        }
 
-//                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(retorno);
-//                resposta.Mensagem = "Grupo atualizado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<Response<GrupoOpcoesDTO>> AtualizarGrupoOpcao(GrupOpcEdicaoDTO grupoOpcaoDTO)
+        {
+            var validationResult = new GrupOpcEdicaoValidator().Validate(grupoOpcaoDTO);
+            if(!validationResult.IsValid)
+            {
+                return new Response<GrupoOpcoesDTO>
+                {
+                    Sucesso = false,
+                    Erros = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-//        public async Task<Response<GrupoOpcaoDTO>> DeletarGrupoOpcao(Guid id)
-//        {
-//            Response<GrupoOpcaoDTO> resposta = new Response<GrupoOpcaoDTO>();
-//            try
-//            {
-//                GrupoOpcoes grupoOpcao = await _grupoOpcaoRepository.GrupoOpcaoPorId(id);
-//                if (grupoOpcao == null)
-//                {
-//                    resposta.Mensagem = "Grupo de opcoes não encontrado para deleção.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                GrupoOpcoes retorno = await _grupoOpcaoRepository.DeletarGrupoOpcao(id);
-//                resposta.Dados = GrupoOpcaoMap.MapGrupoOpcao(retorno);
-//                resposta.Mensagem = "Grupo deletado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var grupoOpcoesExiste = await _grupoOpcaoRepository.ObterGrupoOpcaoPorId(grupoOpcaoDTO.Id);
+            if(grupoOpcoesExiste == null)
+            {
+                return new Response<GrupoOpcoesDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { GrupoOpcoesMessages.GrupoOpcoesNaoEncontrado }
+                };
+            }
 
-//        private async Task PreencherGrupoOpcoes(IEnumerable<GrupoOpcoes> grupoOpcoes)
-//        {
-//            foreach (var grupoOpcao in grupoOpcoes)
-//            {
-//                if (grupoOpcao.ProdutoId != null)
-//                {
-//                    grupoOpcao.Produto = await _produtoRepository.ProdutoPorId((Guid)grupoOpcao.ProdutoId);
-//                }
-//            }
-//        }
+            var produtoExiste = await _produtoRepository.ObterProdutoPorId(grupoOpcaoDTO.ProdutoId);
+            if (produtoExiste == null)
+            {
+                return new Response<GrupoOpcoesDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { ProdutoMessages.ProdutoNaoEncontrado }
+                };
+            }
 
-//        private async Task PreencherGrupoOpcao(GrupoOpcoes grupoOpcao)
-//        {
-//            if (grupoOpcao.ProdutoId != null)
-//            {
-//                grupoOpcao.Produto = await _produtoRepository.ProdutoPorId((Guid)grupoOpcao.ProdutoId); 
-//            }
-//        }
+            var grupoOpcoes = _mapper.Map(grupoOpcaoDTO, grupoOpcoesExiste);
+            await _grupoOpcaoRepository.AtualizarGrupoOpcao(grupoOpcoes);
+            return new Response<GrupoOpcoesDTO>
+            {
+                Sucesso = true,
+                Id = grupoOpcoes.Id,
+                Data = _mapper.Map<GrupoOpcoesDTO>(grupoOpcoes)
+            };
+        }
 
-//        private async Task ValidarProduto(Guid? produtoId)
-//        {
-//            if (produtoId == null || produtoId == Guid.Empty)
-//            {
-//                throw new Exception("Produto é obrigatório");
-//            }
+        public async Task<Response<GrupoOpcoesDTO>> DeletarGrupoOpcao(Guid id)
+        {
+            var grupoOpcoes = await _grupoOpcaoRepository.ObterGrupoOpcaoPorId(id);
+            if(grupoOpcoes == null)
+            {
+                return new Response<GrupoOpcoesDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { GrupoOpcoesMessages.GrupoOpcoesNaoEncontrado }
+                };
+            }
 
-//            var produto = await _produtoRepository.ProdutoPorId((Guid)produtoId);
+            var sucessoDelecao = await _grupoOpcaoRepository.DeletarGrupoOpcao(id);
+            if(!sucessoDelecao)
+            {
+                return new Response<GrupoOpcoesDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { GrupoOpcoesMessages.ErroAoDeletarGrupoOpcoes }
+                };
+            }
 
-//            if (produto == null)
-//            {
-//                throw new Exception("Produto não encontrado");
-//            }
-//        }
-
-//        private void ValidarGrupoOpcaoCriacao(GrupOpcCriacaoDTO grupoOpcao)
-//        {
-//            ValidadorUtils.ValidarSeVazioOuNulo(grupoOpcao.GrupOpcDesc, "Descricao é obrigatório");
-//            ValidadorUtils.ValidarMaximo(grupoOpcao.GrupOpcDesc, 100, "Descricao deve conter no máximo 100 caracteres");
-//            ValidadorUtils.ValidarMinimo(grupoOpcao.GrupOpcDesc, 3, "Descricao deve conter no minimo 3 caracteres");
-
-//            ValidadorUtils.ValidarInteiroSeVazioOuNulo(grupoOpcao.GrupOpcMax, "Quantidade máxima é obrigatório");
-//            ValidadorUtils.ValidarMaximo(grupoOpcao.GrupOpcMax, 9999999, "Quantidade máxima deve ser menor que 9999999");
-//            ValidadorUtils.ValidarMinimo(grupoOpcao.GrupOpcMax, 0, "Quantidade máxima deve ser maior que 0");
-
-//            if (!Enum.IsDefined(typeof(GrupOpcTipo), grupoOpcao.GrupOpcTipo))
-//            {
-//                throw new Exception("Multiplicidade do grupo de opções é obrigatório");
-//            }
-//        }
-
-//        private void ValidarGrupoOpcaoEdicao(GrupOpcEdicaoDTO grupoOpcao)
-//        {
-//            ValidadorUtils.ValidarSeVazioOuNulo(grupoOpcao.GrupOpcDesc, "Descricao é obrigatório");
-//            ValidadorUtils.ValidarMaximo(grupoOpcao.GrupOpcDesc, 100, "Descricao deve conter no máximo 100 caracteres");
-//            ValidadorUtils.ValidarMinimo(grupoOpcao.GrupOpcDesc, 3, "Descricao deve conter no minimo 3 caracteres");
-
-//            ValidadorUtils.ValidarInteiroSeVazioOuNulo(grupoOpcao.GrupOpcMax, "Quantidade máxima é obrigatório");
-//            ValidadorUtils.ValidarMaximo(grupoOpcao.GrupOpcMax, 9999999, "Quantidade máxima deve ser menor que 9999999");
-//            ValidadorUtils.ValidarMinimo(grupoOpcao.GrupOpcMax, 0, "Quantidade máxima deve ser maior que 0");
-
-//            if (!Enum.IsDefined(typeof(GrupOpcTipo), grupoOpcao.GrupOpcTipo))
-//            {
-//                throw new Exception("Multiplicidade do grupo de opções é obrigatório");
-//            }
-//        }
-
-//        private void AtualizarDadosGrupoOpcao(GrupoOpcoes buscarGrupoOpcao, GrupOpcEdicaoDTO grupoOpcao)
-//        {
-//            buscarGrupoOpcao.GrupOpcDesc = grupoOpcao.GrupOpcDesc;
-//            buscarGrupoOpcao.GrupOpcTipo = grupoOpcao.GrupOpcTipo;
-//            buscarGrupoOpcao.GrupOpcMax = grupoOpcao.GrupOpcMax;
-//            buscarGrupoOpcao.ProdutoId = grupoOpcao.ProdutoId;
-//        }
-//    }
-//}
+            var dados = _mapper.Map<GrupoOpcoesDTO>(grupoOpcoes);
+            return new Response<GrupoOpcoesDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { GrupoOpcoesMessages.GrupoOpcoesDeletadoComSucesso }
+            };
+        }
+    }
+}

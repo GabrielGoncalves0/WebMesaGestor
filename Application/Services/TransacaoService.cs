@@ -159,7 +159,7 @@
 
 //        private async Task ProcessarSuprimentoOuSangria(Guid caixaId, decimal valor, bool isSuprimento)
 //        {
-//            Caixa caixa = await _caixaRepository.CaixaPorId(caixaId);
+//            Caixa caixa = await _caixaRepository.ObterCaixaPorId(caixaId);
 //            if (caixa == null)
 //            {
 //                throw new Exception("Caixa não encontrado.");
@@ -183,7 +183,7 @@
 
 //        private async Task ProcessarEntradaNoCaixa(Guid caixaId, decimal valorPedido)
 //        {
-//            Caixa caixa = await _caixaRepository.CaixaPorId(caixaId);
+//            Caixa caixa = await _caixaRepository.ObterCaixaPorId(caixaId);
 //            if (caixa == null)
 //            {
 //                throw new Exception("Caixa não encontrado.");
@@ -192,124 +192,6 @@
 //            caixa.CaiValTotal += valorPedido;
 
 //            await _caixaRepository.AtualizarCaixa(caixa);
-//        }
-
-//        private async Task PreencherTransacoes(IEnumerable<Transacao> transacoes)
-//        {
-//            foreach (var transacao in transacoes)
-//            {
-//                if (transacao.UsuarioId != null)
-//                {
-//                    transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
-//                }
-//                if (transacao.CaixaId != null)
-//                {
-//                    transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId); ;
-//                }
-//                if (transacao.PedidoId != null)
-//                {
-//                    transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
-//                }
-//            }
-//        }
-
-//        private async Task PreencherTransacao(Transacao transacao)
-//        {
-//            if (transacao.UsuarioId != null)
-//            {
-//                transacao.Usuario = await _usuarioRepository.UsuarioPorId((Guid)transacao.UsuarioId);
-//            }
-//            if (transacao.CaixaId != null)
-//            {
-//                transacao.Caixa = await _caixaRepository.CaixaPorId((Guid)transacao.CaixaId); ;
-//            }
-//            if (transacao.PedidoId != null)
-//            {
-//                transacao.Pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
-//            }
-//        }
-
-//        private async Task ValidarUsuario(Guid? usuarioId)
-//        {
-//            if (usuarioId == null || usuarioId == Guid.Empty)
-//            {
-//                throw new Exception("Empresa é obrigatória");
-//            }
-
-//            var usuario = await _usuarioRepository.UsuarioPorId((Guid)usuarioId);
-
-//            if (usuario == null)
-//            {
-//                throw new Exception("Empresa não encontrada");
-//            }
-//        }
-
-//        private async Task ValidarCaixa(Guid? caixaId)
-//        {
-//            if (caixaId == null || caixaId == Guid.Empty)
-//            {
-//                throw new Exception("Empresa é obrigatória");
-//            }
-
-//            var caixa = await _caixaRepository.CaixaPorId((Guid)caixaId);
-
-//            if (caixa == null)
-//            {
-//                throw new Exception("Empresa não encontrada");
-//            }
-//        }
-
-//        private async Task ValidarPedido(Guid? pedidoId)
-//        {
-//            if (pedidoId == null || pedidoId == Guid.Empty)
-//            {
-//                throw new Exception("Pedido é obrigatória");
-//            }
-
-//            var pedido = await _pedidoRepository.PedidoPorId((Guid)pedidoId);
-
-//            if (pedido == null)
-//            {
-//                throw new Exception("Pedido não encontrado");
-//            }
-//        }
-
-//        public void validarTransacaoCriacao(TraCriacaoDTO transacao)
-//        {
-//            ValidadorUtils.ValidarSeVazioOuNulo(transacao.TraDescricao, "Descricao é obrigatório");
-//            ValidadorUtils.ValidarMaximo(transacao.TraDescricao, 100, "Descricao deve conter no máximo 100 caracteres");
-//            ValidadorUtils.ValidarMinimo(transacao.TraDescricao, 3, "Descricao deve conter no minimo 3 caracteres");
-//            ValidadorUtils.ValidarDecimalSeVazio(transacao.TraValor, "Valor é obrigatório");
-//            ValidadorUtils.ValidarMaximo(transacao.TraValor, 9999999, "Valor deve ser menor que 9999999");
-//            ValidadorUtils.ValidarMinimo(transacao.TraValor, 0, "Valor deve ser maior que 0");
-//            if (!Enum.IsDefined(typeof(TranStatus), transacao.TransacaoStatus))
-//            {
-//                throw new Exception("Status de transação é obrigatório");
-//            }
-//        }
-
-//        public void validarTransacaoEdicao(TraEdicaoDTO transacao)
-//        {
-//            ValidadorUtils.ValidarSeVazioOuNulo(transacao.TraDescricao, "Descricao é obrigatório");
-//            ValidadorUtils.ValidarMaximo(transacao.TraDescricao, 100, "Descricao deve conter no máximo 100 caracteres");
-//            ValidadorUtils.ValidarMinimo(transacao.TraDescricao, 3, "Descricao deve conter no minimo 3 caracteres");
-//            ValidadorUtils.ValidarDecimalSeVazio(transacao.TraValor, "Descricao é obrigatório");
-//            ValidadorUtils.ValidarMaximo(transacao.TraValor, 9999999, "Valor deve ser menor que 9999999");
-//            ValidadorUtils.ValidarMinimo(transacao.TraValor, 0, "Valor deve ser maior que 0");
-//            if (!Enum.IsDefined(typeof(TranStatus), transacao.TransacaoStatus))
-//            {
-//                throw new Exception("Status de transação é obrigatório");
-//            }
-//        }
-
-//        private void AtualizarDadosTransacao(Transacao transacaoExistente, TraEdicaoDTO transacao)
-//        {
-//            transacaoExistente.TraDescricao = transacao.TraDescricao;
-//            transacaoExistente.TraValor = transacao.TraValor;
-//            transacaoExistente.TransacaoStatus = transacao.TransacaoStatus;
-//            transacaoExistente.UsuarioId = transacao.UsuarioId;
-//            transacaoExistente.CaixaId = transacao.CaixaId;
-//            transacaoExistente.PedidoId = transacao.PedidoId;
 //        }
 
 //        private async Task ProcessarTransacao(Transacao map, TraCriacaoDTO transacao)
@@ -324,7 +206,7 @@
 //            }
 //            if (transacao.PedidoId != null)
 //            {
-//                var pedido = await _pedidoRepository.PedidoPorId((Guid)transacao.PedidoId);
+//                var pedido = await _pedidoRepository.ObterPedidoPorId((Guid)transacao.PedidoId);
 //                if (pedido == null)
 //                {
 //                    throw new Exception("Pedido não encontrado.");

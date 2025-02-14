@@ -3,9 +3,9 @@ using WebMesaGestor.Application.DTO.Input.ProdutoPedido;
 
 namespace WebMesaGestor.Application.Validations.ProdutoPedido
 {
-    public class ProPedEdicaoValidator : AbstractValidator<ProPedEdicaoDTO>
+    public class ProdutoPedEdicaoValidator : AbstractValidator<ProPedEdicaoDTO>
     {
-        public ProPedEdicaoValidator()
+        public ProdutoPedEdicaoValidator()
         {
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("O ID do produto pedido é obrigatório.")
