@@ -22,6 +22,16 @@ namespace WebMesaGestor.Application.Services
             _mapper = mapper;
         }
 
+        public async Task<IEnumerable<UsuarioDTO>> ObterTodosUsuarios()
+        {
+            var usuarios = await _usuarioRepository.ObterTodosUsuarios();
+            if (usuarios == null)
+            {
+                return null;
+            }
+            return _mapper.Map<IEnumerable<UsuarioDTO>>(usuarios);
+        }
+
         public async Task<UsuarioDTO> ObterUsuarioPorId(Guid id)
         {
             var usuario = await _usuarioRepository.ObterUsuarioPorId(id);
@@ -32,16 +42,6 @@ namespace WebMesaGestor.Application.Services
             }
 
             return _mapper.Map<UsuarioDTO>(usuario);
-        }
-
-        public async Task<IEnumerable<UsuarioDTO>> ObterTodosUsuarios()
-        {
-            var usuarios = await _usuarioRepository.ObterTodosUsuarios();
-            if (usuarios == null)
-            {
-                return null;
-            }
-            return _mapper.Map<IEnumerable<UsuarioDTO>>(usuarios);
         }
 
         public async Task<Response<UsuarioDTO>> CriarUsuario(UsuCriacaoDTO usuarioDTO)

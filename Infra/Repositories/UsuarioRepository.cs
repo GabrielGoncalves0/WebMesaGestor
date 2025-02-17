@@ -26,6 +26,13 @@ namespace WebMesaGestor.Infra.Repositories
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        public async Task<Usuario> ObterUsuarioPorEmail(string email)
+        {
+            return await _context.Usuarios
+                .Include(e => e.Empresa)
+                .FirstOrDefaultAsync(u => u.UsuEmail == email);
+        }
+
         public async Task<Usuario> CriarUsuario(Usuario usuario)
         {
             _context.Usuarios.Add(usuario);

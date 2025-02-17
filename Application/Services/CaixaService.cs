@@ -14,7 +14,7 @@
 //{
 //    public class CaixaService
 //    {
-//        private readonly ICaixaRepository _caixaRepository; 
+//        private readonly ICaixaRepository _caixaRepository;
 //        private readonly IUsuarioRepository _usuarioRepository;
 
 
@@ -246,7 +246,7 @@
 
 //        private void AtualizarDadosAtualizacao(Caixa caixaExistente, CaiAtualizarDTO caixa)
 //        {
-//            if(caixa.CaiValTotal != null)
+//            if (caixa.CaiValTotal != null)
 //            {
 //                caixaExistente.CaiValTotal = caixa.CaiValTotal;
 //            }

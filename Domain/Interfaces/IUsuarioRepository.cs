@@ -6,6 +6,7 @@ namespace WebMesaGestor.Domain.Interfaces
     {
         Task<IEnumerable<Usuario>> ObterTodosUsuarios();
         Task<Usuario> ObterUsuarioPorId(Guid id);
+        Task<Usuario> ObterUsuarioPorEmail(string email);
         Task<Usuario> CriarUsuario(Usuario usuario);
         Task<Usuario> AtualizarUsuario(Usuario usuario);
         Task<bool> DeletarUsuario(Guid id);
