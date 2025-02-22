@@ -6,6 +6,7 @@ namespace WebMesaGestor.Domain.Interfaces
     {
         Task<IEnumerable<Caixa>> ObterTodosCaixas();
         Task<Caixa> ObterCaixaPorId(Guid id);
+        Task<Caixa> ObterCaixaAberto();
         Task<Caixa> AbrirCaixa(Caixa caixa);
         Task<Caixa> AtualizarCaixa(Caixa caixa);
         Task<bool> DeletarCaixa(Guid id);

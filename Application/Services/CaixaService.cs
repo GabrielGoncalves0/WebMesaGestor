@@ -1,259 +1,181 @@
-﻿//using System.Drawing;
-//using WebMesaGestor.Application.Common;
-//using WebMesaGestor.Application.DTO.Input.Caixa;
-//using WebMesaGestor.Application.DTO.Input.USuario;
-//using WebMesaGestor.Application.DTO.Output;
-//using WebMesaGestor.Application.Map;
-//using WebMesaGestor.Domain.Entities;
-//using WebMesaGestor.Domain.Interfaces;
-//using WebMesaGestor.Infra.Data;
-//using WebMesaGestor.Infra.Repositories;
-//using WebMesaGestor.Utils;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using System.Drawing;
+using WebMesaGestor.Application.Common;
+using WebMesaGestor.Application.DTO.Input.Caixa;
+using WebMesaGestor.Application.DTO.Output;
+using WebMesaGestor.Application.Validations.Usuario;
+using WebMesaGestor.Domain.Entities;
+using WebMesaGestor.Domain.Interfaces;
+using WebMesaGestor.Infra.Data;
+using WebMesaGestor.Infra.Repositories;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-//namespace WebMesaGestor.Application.Services
-//{
-//    public class CaixaService
-//    {
-//        private readonly ICaixaRepository _caixaRepository;
-//        private readonly IUsuarioRepository _usuarioRepository;
+namespace WebMesaGestor.Application.Services
+{
+    public class CaixaService
+    {
+        private readonly ICaixaRepository _caixaRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IMapper _mapper;
 
 
-//        public CaixaService(IUsuarioRepository usuarioRepository, ICaixaRepository caixaRepository)
-//        {
-//            _caixaRepository = caixaRepository;
-//            _usuarioRepository = usuarioRepository;
-//        }
+        public CaixaService(IUsuarioRepository usuarioRepository, ICaixaRepository caixaRepository, IMapper mapper)
+        {
+            _caixaRepository = caixaRepository;
+            _usuarioRepository = usuarioRepository;
+            _mapper = mapper;
+        }
 
-//        public async Task<Response<IEnumerable<CaiOutputDTO>>> ListarCaixas()
-//        {
-//            Response<IEnumerable<CaiOutputDTO>> resposta = new Response<IEnumerable<CaiOutputDTO>>();
-//            try
-//            {
-//                IEnumerable<Caixa> caixas = await _caixaRepository.ListarCaixas();
-//                foreach (var caixa in caixas)
-//                {
-//                    if (caixa.UsuarioId != null)
-//                    {
-//                        caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
-//                    }
-//                }
+        public async Task<IEnumerable<CaixaDTO>> ObterTodosCaixas()
+        {
+            var caixas = await _caixaRepository.ObterTodosCaixas();
+            if (caixas == null)
+            {
+                return null;
+            }
+            return _mapper.Map<IEnumerable<CaixaDTO>>(caixas);
+        }
 
-//                await PreencherCaixa(caixas);
-//                resposta.Dados = CaixaMap.MapCaixa(caixas);
-//                resposta.Mensagem = "Caixas listados com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+        public async Task<CaixaDTO> ObterCaixaPorId(Guid id)
+        {
+            var caixa = await _caixaRepository.ObterCaixaPorId(id);
+            if (caixa == null)
+            {
+                return null;
+            }
+            return _mapper.Map<CaixaDTO>(caixa);
+        }
 
-//        public async Task<Response<CaiOutputDTO>> CaixaPorId(Guid id)
-//        {
-//            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
-//            try
-//            {
-//                Caixa caixa = await _caixaRepository.CaixaPorId(id);
-//                if (caixa.UsuarioId != null)
-//                {
-//                    caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
-//                }
+        public async Task<Response<CaixaDTO>> AbrirCaixa(CaiAbrirDTO caixaDTO)
+        {
+            var caixaAberto = await _caixaRepository.ObterCaixaAberto();
+            if (caixaAberto != null)
+            {
+                return new Response<CaixaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CaixaMessages.CaixaJaEstaAberto }
+                };
+            }
 
-//                await PreencherCaixa(caixa);
-//                resposta.Dados = CaixaMap.MapCaixa(caixa);
-//                resposta.Mensagem = "Caixas listados com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var caixa = _mapper.Map<Caixa>(caixaDTO);
+            caixa.CaiStatus = CaixaStatus.Aberto;
 
-//        public async Task<Response<CaiOutputDTO>> AbrirCaixa(CaiAbrirDTO caixa)
-//        {
-//            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
-//            try
-//            {
-//                ValidarCaixaAbertura(caixa);
-//                await ValidarUsuario(caixa.UsuarioId);
-//                Caixa map = CaixaMap.MapCaixa(caixa);
-//                Caixa retorno = await _caixaRepository.AbrirCaixa(map);
-//                await PreencherCaixa(retorno);
+            var caixaCriado = await _caixaRepository.AbrirCaixa(caixa);
 
-//                resposta.Dados = CaixaMap.MapCaixa(retorno);
-//                resposta.Mensagem = "Caixas listados com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var dados = _mapper.Map<CaixaDTO>(caixaCriado);
+            return new Response<CaixaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { CaixaMessages.CaixaCriadoComSucesso }
+            };
+        }
 
-//        public async Task<Response<CaiOutputDTO>> FecharCaixa(CaiFecharDTO caixa)
-//        {
-//            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
-//            try
-//            {
-//                Caixa buscarCaixa = await _caixaRepository.CaixaPorId(caixa.Id);
-//                AtualizarDadosFechamendo(buscarCaixa, caixa);
-//                Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarCaixa);
+        public async Task<Response<CaixaDTO>> FecharCaixa(CaiFecharDTO caixaDTO)
+        {
+            var caixa = await _caixaRepository.ObterCaixaPorId(caixaDTO.Id);
+            if (caixa == null || caixa.CaiStatus == CaixaStatus.Fechado)
+            {
+                return new Response<CaixaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CaixaMessages.CaixaNaoEncontrado }
+                };
+            }
 
-//                resposta.Dados = CaixaMap.MapCaixa(retorno);
-//                resposta.Mensagem = "Caixas fechado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            caixa.CaiStatus = CaixaStatus.Fechado;
+            await _caixaRepository.AtualizarCaixa(caixa);
 
-//        public async Task<Response<CaiOutputDTO>> AtualizarCaixa(CaiAtualizarDTO caixa)
-//        {
-//            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
-//            try
-//            {
-//                Caixa buscarCaixa = await _caixaRepository.CaixaPorId(caixa.Id);
-//                if (buscarCaixa == null)
-//                {
-//                    resposta.Mensagem = "Caixa não encontrado.";
-//                    resposta.Status = false;
-//                    return resposta;
-//                }
-//                AtualizarDadosAtualizacao(buscarCaixa, caixa);
+            var dados = _mapper.Map<CaixaDTO>(caixa);
+            return new Response<CaixaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { CaixaMessages.CaixaAtualizadoComSucesso }
+            };
+        }
 
-//                Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarCaixa);
+        public async Task<Response<CaixaDTO>> AtualizarCaixa(CaiAtualizarDTO caixaDTO)
+        {
+            var caixa = await _caixaRepository.ObterCaixaPorId(caixaDTO.Id);
+            if (caixa == null)
+            {
+                return new Response<CaixaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CaixaMessages.CaixaNaoEncontrado }
+                };
+            }
 
-//                resposta.Dados = CaixaMap.MapCaixa(retorno);
-//                resposta.Mensagem = "Caixa atualizado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            _mapper.Map(caixaDTO, caixa);
+            await _caixaRepository.AtualizarCaixa(caixa);
 
-//        public async Task<Response<CaiOutputDTO>> DeletarCaixa(Guid id)
-//        {
-//            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
+            var dados = _mapper.Map<CaixaDTO>(caixa);
+            return new Response<CaixaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { CaixaMessages.CaixaAtualizadoComSucesso }
+            };
+        }
 
-//            try
-//            {
-//                Caixa retorno = await _caixaRepository.DeletarCaixa(id);
+        public async Task<Response<CaixaDTO>> DeletarCaixa(Guid id)
+        {
+            var caixa = await _caixaRepository.ObterCaixaPorId(id);
+            if (caixa == null)
+            {
+                return new Response<CaixaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CaixaMessages.CaixaNaoEncontrado }
+                };
+            }
 
-//                resposta.Dados = CaixaMap.MapCaixa(retorno);
-//                resposta.Mensagem = "Caixa deletado com sucesso";
-//                return resposta;
-//            }
-//            catch (Exception ex)
-//            {
-//                resposta.Mensagem = ex.Message;
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//        }
+            var sucessoDelecao = await _caixaRepository.DeletarCaixa(id);
+            if (!sucessoDelecao)
+            {
+                return new Response<CaixaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CaixaMessages.ErroAoDeletarCaixa }
+                };
+            }
 
-//        public async Task<Response<CaiOutputDTO>> ReabrirUltimoCaixa()
-//        {
-//            Response<CaiOutputDTO> resposta = new Response<CaiOutputDTO>();
-//            Caixa buscarUltimoCaixa = await _caixaRepository.UltimoCaixa();
-//            if (buscarUltimoCaixa == null)
-//            {
-//                resposta.Mensagem = "Caixa não encontrado.";
-//                resposta.Status = false;
-//                return resposta;
-//            }
-//            buscarUltimoCaixa.CaiStatus = CaixaStatus.Aberto;
-//            Caixa retorno = await _caixaRepository.AtualizarCaixa(buscarUltimoCaixa);
-//            resposta.Dados = CaixaMap.MapCaixa(retorno);
-//            resposta.Mensagem = "Caixa reaberto com sucesso";
-//            return resposta;
-//        }
+            var dados = _mapper.Map<CaixaDTO>(caixa);
+            return new Response<CaixaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { CaixaMessages.CaixaDeletadoComSucesso }
+            };
+        }
 
-//        //Metodos auxiliares
 
-//        private async Task PreencherCaixa(IEnumerable<Caixa> caixas)
-//        {
-//            foreach (var caixa in caixas)
-//            {
-//                if (caixa.UsuarioId != null)
-//                {
-//                    caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
-//                }
-//            }
-//        }
+        public async Task<Response<CaixaDTO>> ReabrirUltimoCaixa()
+        {
+            var buscarUltimoCaixa = await _caixaRepository.UltimoCaixa();
 
-//        private async Task PreencherCaixa(Caixa caixa)
-//        {
-//            if (caixa.UsuarioId != null)
-//            {
-//                caixa.Usuario = await _usuarioRepository.UsuarioPorId((Guid)caixa.UsuarioId);
-//            }
-//        }
+            if (buscarUltimoCaixa.CaiStatus == CaixaStatus.Aberto)
+            {
+                return new Response<CaixaDTO>
+                {
+                    Sucesso = false,
+                    Erros = new List<string> { CaixaMessages.CaixaJaEstaAberto }
+                };
+            }
 
-//        private async Task ValidarUsuario(Guid? usuarioId)
-//        {
-//            if (usuarioId == null || usuarioId == Guid.Empty)
-//            {
-//                throw new Exception("Usuario é obrigatório");
-//            }
+            buscarUltimoCaixa.CaiStatus = CaixaStatus.Aberto;
+            await _caixaRepository.AtualizarCaixa(buscarUltimoCaixa);
 
-//            var usuario = await _usuarioRepository.UsuarioPorId((Guid)usuarioId);
-
-//            if (usuario == null)
-//            {
-//                throw new Exception("Usuario não encontrado");
-//            }
-//        }
-
-//        private void ValidarCaixaAbertura(CaiAbrirDTO caixa)
-//        {
-//            ValidadorUtils.ValidarDecimalSeVazio(caixa.CaiValInicial, "Valor é obrigatório");
-//            ValidadorUtils.ValidarMaximo(caixa.CaiValInicial, 9999999, "Valor deve ser menor que 9999999");
-//            ValidadorUtils.ValidarMinimo(caixa.CaiValInicial, 0, "Valor deve ser maior que 0");
-//        }
-
-//        private void ValidarCaixaFechamento(CaiFecharDTO caixa)
-//        {
-//            ValidadorUtils.ValidarDecimalSeVazio(caixa.CaiValFechamento, "Valor é obrigatório");
-//            ValidadorUtils.ValidarMaximo(caixa.CaiValFechamento, 9999999, "Valor deve ser menor que 9999999");
-//            ValidadorUtils.ValidarMinimo(caixa.CaiValFechamento, 0, "Valor deve ser maior que 0");
-//        }
-
-//        private void AtualizarDadosFechamendo(Caixa caixaExistente, CaiFecharDTO caixa)
-//        {
-//            if (caixa.CaiValFechamento != null)
-//            {
-//                caixaExistente.CaiValFechamento = caixa.CaiValFechamento;
-//            }
-//            caixaExistente.CaiStatus = CaixaStatus.Fechado;
-//            caixaExistente.FechamentoData = DateTime.UtcNow;
-//        }
-
-//        private void AtualizarDadosAtualizacao(Caixa caixaExistente, CaiAtualizarDTO caixa)
-//        {
-//            if (caixa.CaiValTotal != null)
-//            {
-//                caixaExistente.CaiValTotal = caixa.CaiValTotal;
-//            }
-//            if (caixa.CaiStatus != null)
-//            {
-//                caixaExistente.CaiStatus = caixa.CaiStatus;
-//            }
-//        }
-//    }
-//}
+            var dados = _mapper.Map<CaixaDTO>(buscarUltimoCaixa);
+            return new Response<CaixaDTO>
+            {
+                Sucesso = true,
+                Data = dados,
+                Erros = new List<string> { CaixaMessages.CaixaReabertoComSucesso }
+            };
+        }
+    }
+}

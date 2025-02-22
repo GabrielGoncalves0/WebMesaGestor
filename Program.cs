@@ -42,7 +42,7 @@ builder.Services.AddScoped<EmpresaService>();
 builder.Services.AddScoped<SetorService>();
 builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<MesaService>();
-//builder.Services.AddScoped<CaixaService>();
+builder.Services.AddScoped<CaixaService>();
 builder.Services.AddScoped<GrupoOpcaoService>();
 builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<OpcaoService>();

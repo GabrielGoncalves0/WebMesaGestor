@@ -28,6 +28,14 @@ namespace WebMesaGestor.Infra.Repositories
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        public async Task<Caixa> ObterCaixaAberto()
+        {
+            return await _context.Caixas
+                .Where(c => c.CaiStatus == CaixaStatus.Aberto)
+                .FirstOrDefaultAsync();
+        }
+
+
         public async Task<Caixa> UltimoCaixa()
         {
             return await _context.Caixas.Where(c => c.CaiStatus == CaixaStatus.Fechado)
