@@ -157,14 +157,14 @@ namespace WebMesaGestor.Application.Services
         {
             var buscarUltimoCaixa = await _caixaRepository.UltimoCaixa();
 
-            if (buscarUltimoCaixa.CaiStatus == CaixaStatus.Aberto)
+            if (buscarUltimoCaixa == null || buscarUltimoCaixa.CaiStatus == CaixaStatus.Aberto)
             {
                 return new Response<CaixaDTO>
                 {
                     Sucesso = false,
                     Erros = new List<string> { CaixaMessages.CaixaJaEstaAberto }
                 };
-            }
+            } 
 
             buscarUltimoCaixa.CaiStatus = CaixaStatus.Aberto;
             await _caixaRepository.AtualizarCaixa(buscarUltimoCaixa);
